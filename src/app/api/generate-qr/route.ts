@@ -29,10 +29,17 @@ export async function POST(request: NextRequest) {
     .from('qr-codes')
     .getPublicUrl(filePath)
 
-  await supabase
+  const { error: updateError } = await supabase
     .from('gift_tokens')
     .update({ qr_image_url: publicUrl })
     .eq('token', token)
+
+  if (updateError) {
+    console.error('[generate-qr] failed to persist qr_image_url', {
+      token,
+      error: updateError.message,
+    })
+  }
 
   return NextResponse.json({ qrImageUrl: publicUrl })
 }

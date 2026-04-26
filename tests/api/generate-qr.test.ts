@@ -82,4 +82,18 @@ describe('POST /api/generate-qr', () => {
     const res = await POST(req)
     expect(res.status).toBe(500)
   })
+
+  it('returns 200 even when gift_tokens update fails', async () => {
+    mockEq.mockResolvedValue({ error: { message: 'DB write failed' } })
+    const { POST } = await import('@/app/api/generate-qr/route')
+    const req = new NextRequest('http://localhost/api/generate-qr', {
+      method: 'POST',
+      body: JSON.stringify({ token: 'token-1', campaignId: 'campaign-1' }),
+      headers: { 'Content-Type': 'application/json' },
+    })
+    const res = await POST(req)
+    const json = await res.json()
+    expect(res.status).toBe(200)
+    expect(json.qrImageUrl).toBeDefined()
+  })
 })
