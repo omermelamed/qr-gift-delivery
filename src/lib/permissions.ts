@@ -13,7 +13,7 @@ export async function fetchPermissions(roleId: string): Promise<string[]> {
     .eq('role_id', roleId)
 
   if (error || !data) return []
-  return (data as RolePermissionRow[])
+  return (data as unknown as RolePermissionRow[])
     .filter((row) => row.permissions != null)
     .map((row) => row.permissions!.name)
 }
