@@ -51,6 +51,21 @@ describe('fetchPermissions', () => {
 
     expect(perms).toEqual([])
   })
+
+  it('skips rows where permissions join is null', async () => {
+    mockEq.mockResolvedValue({
+      data: [
+        { permissions: { name: 'campaigns:read' } },
+        { permissions: null },
+      ],
+      error: null,
+    })
+
+    const { fetchPermissions } = await import('@/lib/permissions')
+    const perms = await fetchPermissions('role-uuid-partial')
+
+    expect(perms).toEqual(['campaigns:read'])
+  })
 })
 
 describe('hasPermission', () => {
