@@ -29,4 +29,11 @@ describe('generateQrBuffer', () => {
     const buf2 = await generateQrBuffer('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee')
     expect(buf1.equals(buf2)).toBe(false)
   })
+
+  it('throws if NEXT_PUBLIC_APP_URL is not set', async () => {
+    const saved = process.env.NEXT_PUBLIC_APP_URL
+    delete process.env.NEXT_PUBLIC_APP_URL
+    await expect(generateQrBuffer('any-token')).rejects.toThrow('NEXT_PUBLIC_APP_URL is not set')
+    process.env.NEXT_PUBLIC_APP_URL = saved
+  })
 })
