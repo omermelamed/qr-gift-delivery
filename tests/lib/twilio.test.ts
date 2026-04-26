@@ -40,6 +40,7 @@ describe('sendGiftMMS', () => {
     expect(result.sid).toBe('SM_real_123')
     expect(mockCreate).toHaveBeenCalledWith(
       expect.objectContaining({
+        from: '+1234567890',
         to: '+972501234567',
         body: expect.stringContaining('Omer'),
         mediaUrl: ['https://example.com/qr.png'],

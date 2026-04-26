@@ -7,7 +7,7 @@ export async function sendGiftMMS(params: {
   qrImageUrl: string
 }): Promise<{ sid: string }> {
   if (process.env.TWILIO_MOCK === 'true') {
-    console.log(`[MOCK SMS] To: ${params.to} | Employee: ${params.employeeName}`)
+    console.log(`[MOCK SMS] Employee: ${params.employeeName}`)
     return { sid: 'mock' }
   }
 
