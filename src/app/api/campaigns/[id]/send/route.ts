@@ -109,7 +109,7 @@ export async function POST(
     }
   }
 
-  if (dispatched > 0) {
+  if (dispatched > 0 && failed === 0) {
     await service
       .from('campaigns')
       .update({ sent_at: new Date().toISOString() })

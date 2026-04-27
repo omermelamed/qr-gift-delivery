@@ -63,7 +63,7 @@ export default function ScanPage() {
   return (
     <main className="flex flex-col min-h-screen bg-black overflow-hidden">
       <div className="relative flex-1">
-        <QrScanner onResult={handleScan} active={scanState === 'scanning'} />
+        <QrScanner onResult={handleScan} active={scanState === 'scanning' && userId !== null} />
 
         {scanState === 'loading' && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/70">
