@@ -12,10 +12,12 @@ export async function proxy(request: NextRequest) {
       cookies: {
         getAll: () => request.cookies.getAll(),
         setAll: (cookiesToSet) => {
+          // Update request cookies so NextResponse.next({ request }) sees them
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           )
           proxyResponse = NextResponse.next({ request })
+          // Write full options (Secure, HttpOnly, etc.) to the response
           cookiesToSet.forEach(({ name, value, options }) =>
             proxyResponse.cookies.set(name, value, options)
           )
@@ -40,5 +42,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/scan', '/admin/:path*', '/api/campaigns/:path*'],
+  matcher: ['/scan/:path*', '/admin/:path*', '/api/campaigns', '/api/campaigns/:path*'],
 }
