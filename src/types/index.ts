@@ -28,6 +28,7 @@ export type Campaign = {
   id: string
   company_id: string
   name: string
+  campaign_date: string | null
   created_by: string | null
   created_at: string
   sent_at: string | null
@@ -38,6 +39,7 @@ export type GiftToken = {
   campaign_id: string
   employee_name: string
   phone_number: string
+  department: string | null
   token: string
   qr_image_url: string | null
   sms_sent_at: string | null
