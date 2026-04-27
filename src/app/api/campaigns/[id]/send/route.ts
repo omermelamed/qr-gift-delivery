@@ -22,7 +22,7 @@ export async function POST(
 
   const appMeta = user.app_metadata as JwtAppMetadata
   const permissions = await fetchPermissions(appMeta.role_id)
-  if (hasPermission(permissions, 'campaigns:launch') === false) {
+  if (!hasPermission(permissions, 'campaigns:launch')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -75,17 +75,20 @@ export async function POST(
             .eq('id', token.id)
         }
 
-        await sendGiftMMS({
-          to: token.phone_number,
-          employeeName: token.employee_name,
-          holidayName: campaign.name,
-          qrImageUrl,
-        })
+        if (process.env.TWILIO_MOCK !== 'true') {
+          await sendGiftMMS({
+            to: token.phone_number,
+            employeeName: token.employee_name,
+            holidayName: campaign.name,
+            qrImageUrl,
+          })
+        }
 
-        await service
+        const { error: sentError } = await service
           .from('gift_tokens')
           .update({ sms_sent_at: new Date().toISOString() })
           .eq('id', token.id)
+        if (sentError) throw new Error(sentError.message)
       })
     )
 

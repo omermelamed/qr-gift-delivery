@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
 const mockGetUser = vi.fn()
@@ -42,10 +42,13 @@ function makeRequest(campaignId: string) {
 }
 
 describe('POST /api/campaigns/[id]/send', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks()
     vi.stubEnv('TWILIO_MOCK', 'true')
     vi.stubEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:3000')
+
+    const { hasPermission } = await import('@/lib/permissions')
+    vi.mocked(hasPermission).mockReturnValue(true)
 
     mockGetUser.mockResolvedValue({
       data: {
@@ -220,5 +223,52 @@ describe('POST /api/campaigns/[id]/send', () => {
 
     expect(vi.mocked(generateQrBuffer)).not.toHaveBeenCalled()
     expect(mockUpload).not.toHaveBeenCalled()
+  })
+
+  it('does not call sendGiftMMS when TWILIO_MOCK=true', async () => {
+    let fromCallCount = 0
+    mockFromService.mockImplementation(() => {
+      fromCallCount++
+      if (fromCallCount === 1) {
+        return {
+          select: () => ({
+            eq: () => ({
+              eq: () => ({
+                single: () =>
+                  Promise.resolve({
+                    data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1' },
+                    error: null,
+                  }),
+              }),
+            }),
+          }),
+        }
+      }
+      if (fromCallCount === 2) {
+        return {
+          select: () => ({
+            eq: () => ({
+              is: () =>
+                Promise.resolve({
+                  data: [
+                    { id: 'token-row-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: 'https://existing.com/qr.png' },
+                  ],
+                  error: null,
+                }),
+            }),
+          }),
+        }
+      }
+      return {
+        update: () => ({ eq: () => Promise.resolve({ error: null }) }),
+      }
+    })
+
+    const { POST } = await import('@/app/api/campaigns/[id]/send/route')
+    await POST(makeRequest('campaign-1'), {
+      params: Promise.resolve({ id: 'campaign-1' }),
+    })
+
+    expect(mockSendGiftMMS).not.toHaveBeenCalled()
   })
 })
