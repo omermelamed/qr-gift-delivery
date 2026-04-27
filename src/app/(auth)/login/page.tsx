@@ -17,23 +17,26 @@ export default function LoginPage() {
     setLoading(true)
     setError(null)
 
-    const supabase = createClient()
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const supabase = createClient()
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (authError || !data.user) {
-      setError(authError?.message ?? 'Sign in failed')
+      if (authError || !data.user) {
+        setError(authError?.message ?? 'Sign in failed')
+        return
+      }
+
+      const meta = data.user.app_metadata as JwtAppMetadata | undefined
+      if (meta?.role_name === 'scanner') {
+        router.push('/scan')
+      } else {
+        router.push('/admin')
+      }
+    } finally {
       setLoading(false)
-      return
-    }
-
-    const meta = data.user.app_metadata as JwtAppMetadata | undefined
-    if (meta?.role_name === 'scanner') {
-      router.push('/scan')
-    } else {
-      router.push('/admin')
     }
   }
 
@@ -49,16 +52,20 @@ export default function LoginPage() {
           <p className="text-sm text-red-600 bg-red-50 rounded px-3 py-2">{error}</p>
         )}
 
+        <label htmlFor="email" className="text-sm font-medium">Email</label>
         <input
+          id="email"
           type="email"
-          placeholder="Email"
+          placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
           className="border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
         />
 
+        <label htmlFor="password" className="text-sm font-medium">Password</label>
         <input
+          id="password"
           type="password"
           placeholder="Password"
           value={password}

@@ -33,7 +33,7 @@ export async function proxy(request: NextRequest) {
     if (pathname.startsWith('/api/campaigns')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-    if (pathname.startsWith('/scan') || pathname.startsWith('/admin')) {
+    if (pathname.startsWith('/scan') || pathname.startsWith('/admin') || pathname.startsWith('/dev')) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
   }
@@ -42,5 +42,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/scan/:path*', '/admin/:path*', '/api/campaigns', '/api/campaigns/:path*'],
+  matcher: ['/scan/:path*', '/admin/:path*', '/api/campaigns', '/api/campaigns/:path*', '/dev/:path*'],
 }

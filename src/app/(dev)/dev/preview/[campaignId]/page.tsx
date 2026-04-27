@@ -11,11 +11,20 @@ export default async function DevPreviewPage({
   const { campaignId } = await params
   const supabase = createServiceClient()
 
-  const { data: tokens } = await supabase
+  const { data: tokens, error: fetchError } = await supabase
     .from('gift_tokens')
-    .select('id, employee_name, phone_number, qr_image_url, token')
+    .select('id, employee_name, phone_number, qr_image_url')
     .eq('campaign_id', campaignId)
     .order('employee_name')
+
+  if (fetchError) {
+    return (
+      <main className="p-8">
+        <h1 className="text-2xl font-bold mb-2">Dev Preview</h1>
+        <p className="text-red-500">Error loading tokens: {fetchError.message}</p>
+      </main>
+    )
+  }
 
   if (!tokens || tokens.length === 0) {
     return (
@@ -39,7 +48,9 @@ export default async function DevPreviewPage({
             className="border rounded-xl p-4 flex flex-col items-center gap-3 bg-white shadow-sm"
           >
             <p className="font-semibold">{t.employee_name}</p>
-            <p className="text-xs text-gray-400">{t.phone_number}</p>
+            <p className="text-xs text-gray-400">
+              {t.phone_number.replace(/\d(?=\d{4})/g, '•')}
+            </p>
             {t.qr_image_url ? (
               <img
                 src={t.qr_image_url}
