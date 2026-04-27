@@ -49,7 +49,7 @@ export default async function DevPreviewPage({
           >
             <p className="font-semibold">{t.employee_name}</p>
             <p className="text-xs text-gray-400">
-              {t.phone_number.replace(/\d(?=\d{4})/g, '•')}
+              {t.phone_number?.replace(/\d(?=\d{4})/g, '•') ?? '—'}
             </p>
             {t.qr_image_url ? (
               <img
