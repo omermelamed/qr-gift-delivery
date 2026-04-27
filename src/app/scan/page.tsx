@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { QrScanner } from '@/components/QrScanner'
 import type { TokenVerifyResult } from '@/types'
 
@@ -12,6 +12,13 @@ const TOKEN_PATTERN = /\/verify\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4
 export default function ScanPage() {
   const [scanState, setScanState] = useState<ScanState>('scanning')
   const [result, setResult] = useState<TokenVerifyResult | null>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 
   const handleScan = useCallback(
     async (text: string) => {
@@ -22,7 +29,7 @@ export default function ScanPage() {
       if (!match) {
         setResult({ valid: false, reason: 'invalid' })
         setScanState('result')
-        setTimeout(() => { setResult(null); setScanState('scanning') }, RESULT_DISPLAY_MS)
+        timeoutRef.current = setTimeout(() => { setResult(null); setScanState('scanning') }, RESULT_DISPLAY_MS)
         return
       }
 
@@ -40,7 +47,7 @@ export default function ScanPage() {
       }
 
       setScanState('result')
-      setTimeout(() => { setResult(null); setScanState('scanning') }, RESULT_DISPLAY_MS)
+      timeoutRef.current = setTimeout(() => { setResult(null); setScanState('scanning') }, RESULT_DISPLAY_MS)
     },
     [scanState]
   )
@@ -75,7 +82,7 @@ export default function ScanPage() {
                 <p className="text-white/80 text-lg">{result.employeeName}</p>
               </>
             ) : (
-              <p className="text-white text-2xl font-bold">Invalid QR code</p>
+              <p className="text-white text-2xl font-bold">Could not verify — try again</p>
             )}
           </div>
         )}
