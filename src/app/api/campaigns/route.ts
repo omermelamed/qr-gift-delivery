@@ -14,6 +14,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
+  if (!appMeta?.company_id) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   const body = await request.json().catch(() => ({}))
   const { name, campaignDate } = body
 
@@ -22,6 +26,10 @@ export async function POST(request: NextRequest) {
   }
   if (!campaignDate || typeof campaignDate !== 'string') {
     return NextResponse.json({ error: 'campaignDate is required' }, { status: 400 })
+  }
+
+  if (isNaN(Date.parse(campaignDate))) {
+    return NextResponse.json({ error: 'campaignDate must be a valid date' }, { status: 400 })
   }
 
   const service = createServiceClient()
