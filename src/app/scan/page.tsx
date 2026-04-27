@@ -57,7 +57,7 @@ export default function ScanPage() {
       setScanState('result')
       timeoutRef.current = setTimeout(() => { setResult(null); setScanState('scanning') }, RESULT_DISPLAY_MS)
     },
-    [scanState]
+    [scanState, userId]
   )
 
   return (
