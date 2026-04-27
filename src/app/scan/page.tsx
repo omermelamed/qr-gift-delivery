@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { QrScanner } from '@/components/QrScanner'
+import { createClient } from '@/lib/supabase/browser'
 import type { TokenVerifyResult } from '@/types'
 
 type ScanState = 'scanning' | 'loading' | 'result'
@@ -12,7 +13,14 @@ const TOKEN_PATTERN = /\/verify\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4
 export default function ScanPage() {
   const [scanState, setScanState] = useState<ScanState>('scanning')
   const [result, setResult] = useState<TokenVerifyResult | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null)
+    })
+  }, [])
 
   useEffect(() => {
     return () => {
@@ -38,7 +46,7 @@ export default function ScanPage() {
         const res = await fetch(`/api/verify/${token}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ distributorId: null }),
+          body: JSON.stringify({ distributorId: userId }),
         })
         const data: TokenVerifyResult = await res.json()
         setResult(data)
