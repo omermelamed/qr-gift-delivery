@@ -43,12 +43,14 @@ function makeRequest(campaignId: string) {
 
 describe('POST /api/campaigns/[id]/send', () => {
   beforeEach(async () => {
-    vi.clearAllMocks()
+    vi.resetAllMocks()
     vi.stubEnv('TWILIO_MOCK', 'true')
     vi.stubEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:3000')
 
     const { hasPermission } = await import('@/lib/permissions')
     vi.mocked(hasPermission).mockReturnValue(true)
+
+    mockSendGiftMMS.mockResolvedValue({ sid: 'mock' })
 
     mockGetUser.mockResolvedValue({
       data: {
@@ -115,6 +117,31 @@ describe('POST /api/campaigns/[id]/send', () => {
     expect(res.status).toBe(404)
   })
 
+  it('returns 409 when campaign already dispatched', async () => {
+    mockFromService.mockReturnValue({
+      select: () => ({
+        eq: () => ({
+          eq: () => ({
+            single: () =>
+              Promise.resolve({
+                data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1', sent_at: '2026-04-01T10:00:00.000Z' },
+                error: null,
+              }),
+          }),
+        }),
+      }),
+    })
+
+    const { POST } = await import('@/app/api/campaigns/[id]/send/route')
+    const res = await POST(makeRequest('campaign-1'), {
+      params: Promise.resolve({ id: 'campaign-1' }),
+    })
+
+    expect(res.status).toBe(409)
+    const body = await res.json()
+    expect(body.error).toBe('Campaign already dispatched')
+  })
+
   it('dispatches tokens in mock mode and returns devPreviewUrl', async () => {
     let fromCallCount = 0
     mockFromService.mockImplementation(() => {
@@ -127,7 +154,7 @@ describe('POST /api/campaigns/[id]/send', () => {
               eq: () => ({
                 single: () =>
                   Promise.resolve({
-                    data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1' },
+                    data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1', sent_at: null },
                     error: null,
                   }),
               }),
@@ -180,7 +207,7 @@ describe('POST /api/campaigns/[id]/send', () => {
               eq: () => ({
                 single: () =>
                   Promise.resolve({
-                    data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1' },
+                    data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1', sent_at: null },
                     error: null,
                   }),
               }),
@@ -236,7 +263,7 @@ describe('POST /api/campaigns/[id]/send', () => {
               eq: () => ({
                 single: () =>
                   Promise.resolve({
-                    data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1' },
+                    data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1', sent_at: null },
                     error: null,
                   }),
               }),

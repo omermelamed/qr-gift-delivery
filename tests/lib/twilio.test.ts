@@ -1,32 +1,21 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 
-const mockCreate = vi.fn().mockResolvedValue({ sid: 'SM_real_123' })
+const mockCreate = vi.fn()
 
 vi.mock('twilio', () => ({
   default: vi.fn(() => ({ messages: { create: mockCreate } })),
 }))
 
 describe('sendGiftMMS', () => {
+  beforeEach(() => {
+    mockCreate.mockResolvedValue({ sid: 'SM_real_123' })
+  })
+
   afterEach(() => {
     vi.unstubAllEnvs()
-    vi.clearAllMocks()
   })
 
-  it('returns mock sid and skips Twilio when TWILIO_MOCK=true', async () => {
-    vi.stubEnv('TWILIO_MOCK', 'true')
-    const { sendGiftMMS } = await import('@/lib/twilio')
-    const result = await sendGiftMMS({
-      to: '+972501234567',
-      employeeName: 'Omer',
-      holidayName: 'Passover',
-      qrImageUrl: 'https://example.com/qr.png',
-    })
-    expect(result.sid).toBe('mock')
-    expect(mockCreate).not.toHaveBeenCalled()
-  })
-
-  it('calls Twilio and returns real sid when TWILIO_MOCK is not set', async () => {
-    vi.stubEnv('TWILIO_MOCK', '')
+  it('always calls the Twilio client and returns its sid', async () => {
     vi.stubEnv('TWILIO_ACCOUNT_SID', 'ACtest')
     vi.stubEnv('TWILIO_AUTH_TOKEN', 'auth_token')
     vi.stubEnv('TWILIO_PHONE_NUMBER', '+1234567890')
@@ -44,6 +33,25 @@ describe('sendGiftMMS', () => {
         to: '+972501234567',
         body: expect.stringContaining('Omer'),
         mediaUrl: ['https://example.com/qr.png'],
+      })
+    )
+  })
+
+  it('calls Twilio client with correct body and mediaUrl', async () => {
+    vi.stubEnv('TWILIO_ACCOUNT_SID', 'ACtest')
+    vi.stubEnv('TWILIO_AUTH_TOKEN', 'auth_token')
+    vi.stubEnv('TWILIO_PHONE_NUMBER', '+1234567890')
+    const { sendGiftMMS } = await import('@/lib/twilio')
+    await sendGiftMMS({
+      to: '+972509999999',
+      employeeName: 'Dana',
+      holidayName: 'Rosh Hashana',
+      qrImageUrl: 'https://example.com/dana-qr.png',
+    })
+    expect(mockCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        body: expect.stringContaining('Dana'),
+        mediaUrl: ['https://example.com/dana-qr.png'],
       })
     )
   })

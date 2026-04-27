@@ -6,11 +6,6 @@ export async function sendGiftMMS(params: {
   holidayName: string
   qrImageUrl: string
 }): Promise<{ sid: string }> {
-  if (process.env.TWILIO_MOCK === 'true') {
-    console.log(`[MOCK SMS] Employee: ${params.employeeName}`)
-    return { sid: 'mock' }
-  }
-
   const client = twilio(
     process.env.TWILIO_ACCOUNT_SID!,
     process.env.TWILIO_AUTH_TOKEN!

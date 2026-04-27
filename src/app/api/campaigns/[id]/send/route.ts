@@ -30,13 +30,17 @@ export async function POST(
 
   const { data: campaign, error: campaignError } = await service
     .from('campaigns')
-    .select('id, name, company_id')
+    .select('id, name, company_id, sent_at')
     .eq('id', campaignId)
     .eq('company_id', appMeta.company_id)
     .single()
 
   if (campaignError || !campaign) {
     return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
+  }
+
+  if (campaign.sent_at) {
+    return NextResponse.json({ error: 'Campaign already dispatched' }, { status: 409 })
   }
 
   const { data: tokens, error: tokensError } = await service
@@ -105,10 +109,12 @@ export async function POST(
     }
   }
 
-  await service
-    .from('campaigns')
-    .update({ sent_at: new Date().toISOString() })
-    .eq('id', campaignId)
+  if (dispatched > 0) {
+    await service
+      .from('campaigns')
+      .update({ sent_at: new Date().toISOString() })
+      .eq('id', campaignId)
+  }
 
   const devPreviewUrl =
     process.env.TWILIO_MOCK === 'true'
