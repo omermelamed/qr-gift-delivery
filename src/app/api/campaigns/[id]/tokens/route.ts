@@ -37,7 +37,7 @@ export async function POST(
   if (campaign.sent_at) return NextResponse.json({ error: 'Campaign already sent' }, { status: 409 })
 
   const body = await request.json().catch(() => ({}))
-  const rows: InputRow[] = body.rows ?? []
+  const rows: InputRow[] = Array.isArray(body.rows) ? body.rows : []
 
   const valid: InsertRow[] = []
   const errors: RowError[] = []
@@ -56,7 +56,8 @@ export async function POST(
   }
 
   if (valid.length > 0) {
-    await service.from('gift_tokens').delete().eq('campaign_id', campaignId).is('sms_sent_at', null)
+    const { error: deleteError } = await service.from('gift_tokens').delete().eq('campaign_id', campaignId).is('sms_sent_at', null)
+    if (deleteError) return NextResponse.json({ error: 'Failed to clear existing tokens' }, { status: 500 })
     const { error: insertError } = await service.from('gift_tokens').insert(valid)
     if (insertError) return NextResponse.json({ error: 'Failed to insert employees' }, { status: 500 })
   }
