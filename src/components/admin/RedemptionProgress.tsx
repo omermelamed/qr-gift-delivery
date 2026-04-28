@@ -21,12 +21,7 @@ export function RedemptionProgress({
       .channel(`redemption-${campaignId}`)
       .on(
         'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'gift_tokens',
-          filter: `campaign_id=eq.${campaignId}`,
-        },
+        { event: 'UPDATE', schema: 'public', table: 'gift_tokens', filter: `campaign_id=eq.${campaignId}` },
         (payload) => {
           if (payload.new?.redeemed === true && payload.old?.redeemed === false) {
             setClaimed((c) => Math.min(c + 1, total))
@@ -34,25 +29,41 @@ export function RedemptionProgress({
         }
       )
       .subscribe()
-
     return () => { supabase.removeChannel(channel) }
   }, [campaignId, total])
 
   const pct = total === 0 ? 0 : Math.round((claimed / total) * 100)
+  const pending = total - claimed
 
   return (
-    <div className="border rounded-xl p-5 bg-white">
-      <div className="flex items-center justify-between mb-2">
-        <span className="font-semibold">Redemptions</span>
-        <span className="text-sm text-gray-600">{claimed} / {total}</span>
+    <div className="bg-white rounded-xl border border-zinc-200 p-5">
+      {/* Stat cards */}
+      <div className="grid grid-cols-3 gap-3 mb-5">
+        <div className="text-center">
+          <p className="text-2xl font-bold text-zinc-900">{total}</p>
+          <p className="text-xs text-zinc-400 mt-0.5">Total</p>
+        </div>
+        <div className="text-center">
+          <p className="text-2xl font-bold text-indigo-600">{claimed}</p>
+          <p className="text-xs text-zinc-400 mt-0.5">Claimed</p>
+        </div>
+        <div className="text-center">
+          <p className="text-2xl font-bold text-amber-500">{pending}</p>
+          <p className="text-xs text-zinc-400 mt-0.5">Pending</p>
+        </div>
       </div>
-      <div className="w-full bg-gray-100 rounded-full h-3">
+
+      {/* Progress bar */}
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium text-zinc-700">Redemption</span>
+        <span className="text-sm font-semibold text-indigo-600">{pct}%</span>
+      </div>
+      <div className="w-full bg-zinc-100 rounded-full h-2.5">
         <div
-          className="bg-green-500 h-3 rounded-full transition-all duration-500"
+          className="bg-gradient-to-r from-indigo-500 to-violet-500 h-2.5 rounded-full transition-all duration-500"
           style={{ width: `${pct}%` }}
         />
       </div>
-      <p className="text-xs text-gray-400 mt-1">{pct}% claimed</p>
     </div>
   )
 }
