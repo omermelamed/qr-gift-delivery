@@ -58,7 +58,7 @@ export default async function CampaignDetailPage({
         </span>
       </div>
 
-      {canLaunch && <LaunchButton campaignId={campaign.id} />}
+      {canLaunch && <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} />}
 
       {!campaign.sent_at && <TokenUploader campaignId={campaign.id} />}
 

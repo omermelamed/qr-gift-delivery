@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { read, utils } from 'xlsx'
 import { normalizePhone } from '@/lib/phone'
@@ -33,11 +33,11 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
     setRows(validateRows(parsed))
   }
 
-  const handleFile = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
     await processFile(file)
-  }, [])
+  }
 
   function handleDrop(e: React.DragEvent) {
     e.preventDefault()
@@ -84,7 +84,11 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
 
       {/* Drop zone */}
       <div
+        role="button"
+        tabIndex={0}
+        aria-label="Upload CSV file"
         onClick={() => inputRef.current?.click()}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click() } }}
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}

@@ -22,6 +22,8 @@ export function LaunchButton({ campaignId, employeeCount }: { campaignId: string
         return
       }
       router.refresh()
+    } catch {
+      setError('Network error — please try again')
     } finally {
       setLoading(false)
       setShowModal(false)

@@ -51,8 +51,14 @@ export function EmployeeTable({
     try {
       const res = await fetch(`/api/campaigns/${campaignId}/resend`, { method: 'POST' })
       const data = await res.json()
+      if (!res.ok) {
+        setResendMsg(data.error ?? 'Resend failed')
+        return
+      }
       setResendMsg(`Resent to ${data.dispatched} employees${data.failed > 0 ? ` · ${data.failed} failed` : ''}`)
       setTimeout(() => setResendMsg(null), 4000)
+    } catch {
+      setResendMsg('Network error — please try again')
     } finally {
       setResending(false)
     }
