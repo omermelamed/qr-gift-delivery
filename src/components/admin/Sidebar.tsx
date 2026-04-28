@@ -11,13 +11,13 @@ export function Sidebar() {
   async function handleSignOut() {
     const supabase = createClient()
     await supabase.auth.signOut()
-    router.push('/login')
+    router.refresh()
   }
 
-  const isCampaigns = pathname.startsWith('/admin')
+  const isCampaigns = pathname === '/admin' || pathname.startsWith('/admin/campaigns')
 
   return (
-    <nav className="group flex flex-col bg-zinc-900 w-14 hover:w-56 transition-all duration-200 overflow-hidden flex-shrink-0 min-h-screen z-10">
+    <nav className="group flex flex-col bg-zinc-900 w-14 hover:w-56 transition-all duration-200 overflow-hidden flex-shrink-0 h-full">
       {/* Logo */}
       <div className="flex items-center gap-3 h-14 px-3 border-b border-zinc-800 flex-shrink-0">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex-shrink-0" />
@@ -30,6 +30,8 @@ export function Sidebar() {
       <div className="flex flex-col gap-1 p-2 flex-1">
         <Link
           href="/admin"
+          aria-label="Campaigns"
+          aria-current={isCampaigns ? 'page' : undefined}
           className={`flex items-center gap-3 px-2 py-2 rounded-lg transition-colors ${
             isCampaigns
               ? 'bg-indigo-600 text-white'
@@ -50,6 +52,7 @@ export function Sidebar() {
       <div className="p-2 border-t border-zinc-800 flex-shrink-0">
         <button
           onClick={handleSignOut}
+          aria-label="Sign out"
           className="flex items-center gap-3 px-2 py-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors w-full"
         >
           <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
