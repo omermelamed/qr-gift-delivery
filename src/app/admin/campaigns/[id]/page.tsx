@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
 import { TokenUploader } from '@/components/admin/TokenUploader'
@@ -16,7 +17,8 @@ export default async function CampaignDetailPage({
 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const appMeta = user!.app_metadata as JwtAppMetadata
+  if (!user) redirect('/login')
+  const appMeta = user.app_metadata as JwtAppMetadata
 
   const service = createServiceClient()
 
@@ -41,37 +43,53 @@ export default async function CampaignDetailPage({
   const canLaunch = !campaign.sent_at && allTokens.length > 0
 
   return (
-    <main className="p-8 max-w-5xl mx-auto flex flex-col gap-6">
-      <div className="mb-2">
-        <Link href="/admin" className="text-sm text-gray-500 hover:underline">← Campaigns</Link>
+    <div className="p-8 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="mb-6">
+        <Link href="/admin" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors">
+          ← Campaigns
+        </Link>
       </div>
 
-      <div className="flex items-start justify-between">
+      <div className="flex items-start justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold">{campaign.name}</h1>
-          <p className="text-sm text-gray-500 mt-1">{campaign.campaign_date ?? '—'}</p>
+          <h1 className="text-2xl font-bold text-zinc-900">{campaign.name}</h1>
+          <p className="text-sm text-zinc-400 mt-0.5">{campaign.campaign_date ?? '—'}</p>
         </div>
-        <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-          campaign.sent_at ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-        }`}>
-          {campaign.sent_at ? 'Sent' : 'Draft'}
-        </span>
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+            campaign.sent_at ? 'bg-green-100 text-green-700' : 'bg-violet-100 text-violet-700'
+          }`}>
+            {campaign.sent_at ? 'Sent' : 'Draft'}
+          </span>
+          {canLaunch && (
+            <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} />
+          )}
+        </div>
       </div>
 
-      {canLaunch && <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} />}
+      {/* Two-column layout */}
+      <div className="flex gap-6 items-start">
+        {/* Left rail */}
+        <div className="w-72 flex-shrink-0 flex flex-col gap-4">
+          <RedemptionProgress
+            campaignId={campaign.id}
+            initialClaimed={claimedCount}
+            total={allTokens.length}
+          />
+          {!campaign.sent_at && (
+            <TokenUploader campaignId={campaign.id} />
+          )}
+        </div>
 
-      {!campaign.sent_at && <TokenUploader campaignId={campaign.id} />}
-
-      <RedemptionProgress
-        campaignId={campaign.id}
-        initialClaimed={claimedCount}
-        total={allTokens.length}
-      />
-
-      <EmployeeTable
-        campaignId={campaign.id}
-        initialRows={allTokens}
-      />
-    </main>
+        {/* Right column */}
+        <div className="flex-1 min-w-0">
+          <EmployeeTable
+            campaignId={campaign.id}
+            initialRows={allTokens}
+          />
+        </div>
+      </div>
+    </div>
   )
 }
