@@ -1,11 +1,13 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
 
 export default async function AdminPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  const appMeta = user!.app_metadata as JwtAppMetadata
+  if (!user) redirect('/login')
+  const appMeta = user.app_metadata as JwtAppMetadata
 
   const service = createServiceClient()
   const { data: campaigns } = await service
