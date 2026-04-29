@@ -32,16 +32,7 @@ export async function POST(request: NextRequest) {
 
   const service = createServiceClient()
 
-  const { data: company, error: coError } = await service
-    .from('companies')
-    .insert({ name, slug })
-    .select('id')
-    .single()
-
-  if (coError || !company) {
-    return NextResponse.json({ error: coError?.message ?? 'Failed to create company' }, { status: 500 })
-  }
-
+  // 1. Look up role first — fail early before creating anything
   const { data: role } = await service
     .from('roles')
     .select('id')
@@ -51,6 +42,7 @@ export async function POST(request: NextRequest) {
 
   if (!role) return NextResponse.json({ error: 'company_admin role not found' }, { status: 500 })
 
+  // 2. Invite user — nothing created in DB yet, so a failure here is clean
   const { data: invited, error: inviteError } = await service.auth.admin.inviteUserByEmail(adminEmail, {
     redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/admin`,
   })
@@ -61,11 +53,24 @@ export async function POST(request: NextRequest) {
 
   const newUserId = invited.user.id
 
+  // 3. Create company
+  const { data: company, error: coError } = await service
+    .from('companies')
+    .insert({ name, slug })
+    .select('id')
+    .single()
+
+  if (coError || !company) {
+    return NextResponse.json({ error: coError?.message ?? 'Failed to create company' }, { status: 500 })
+  }
+
+  // 4. Stamp app_metadata with real company_id
   const { error: metaError } = await service.auth.admin.updateUserById(newUserId, {
     app_metadata: { company_id: company.id, role_id: role.id, role_name: 'company_admin' },
   })
   if (metaError) return NextResponse.json({ error: 'Failed to set user metadata' }, { status: 500 })
 
+  // 5. Insert user_company_roles
   const { error: ucrError } = await service.from('user_company_roles').insert({
     user_id: newUserId,
     company_id: company.id,
