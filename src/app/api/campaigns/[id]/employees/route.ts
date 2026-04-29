@@ -15,6 +15,9 @@ export async function POST(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
+  if (!appMeta?.company_id || !appMeta?.role_id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'campaigns:create')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -32,7 +35,12 @@ export async function POST(
   if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
   if (campaign.sent_at) return NextResponse.json({ error: 'Campaign already sent' }, { status: 409 })
 
-  const body = await request.json().catch(() => ({}))
+  let body: Record<string, unknown>
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
   const name = (body.name ?? '').trim()
   const phone = normalizePhone(body.phone_number ?? '')
   const department = (body.department ?? '').trim() || null

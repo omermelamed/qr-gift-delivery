@@ -46,6 +46,14 @@ describe('POST /api/campaigns/[id]/employees', () => {
     expect(res.status).toBe(401)
   })
 
+  it('returns 403 when missing campaigns:create permission', async () => {
+    const { hasPermission } = await import('@/lib/permissions')
+    vi.mocked(hasPermission).mockReturnValue(false)
+    const { POST } = await import('@/app/api/campaigns/[id]/employees/route')
+    const res = await POST(makeRequest('c-1', { name: 'A', phone_number: '+972501234567' }), { params: Promise.resolve({ id: 'c-1' }) })
+    expect(res.status).toBe(403)
+  })
+
   it('returns 404 when campaign not found', async () => {
     mockFromService.mockReturnValue({
       select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: null, error: null }) }) }) }),
