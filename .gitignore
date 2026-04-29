@@ -47,3 +47,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE
+.idea/
+
+# Claude/Superpowers local files
+.claude/skills/
+.superpowers/
+
+# Supabase temp
+supabase/.temp/
