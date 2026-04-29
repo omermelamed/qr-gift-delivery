@@ -9,23 +9,37 @@ type Props = { userId: string; name: string }
 export function RemoveMemberButton({ userId, name }: Props) {
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   async function handleConfirm() {
     setLoading(true)
+    setError(null)
     try {
       const res = await fetch(`/api/team/members/${userId}`, { method: 'DELETE' })
-      if (res.ok) { router.refresh() }
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        setError(data.error ?? 'Failed to remove member')
+        setShowModal(false)
+        return
+      }
+      router.refresh()
+      setShowModal(false)
+    } catch {
+      setError('Network error — please try again')
+      setShowModal(false)
     } finally {
       setLoading(false)
-      setShowModal(false)
     }
   }
 
   return (
     <>
+      {error && (
+        <span className="text-xs text-red-500 mr-1">{error}</span>
+      )}
       <button
-        onClick={() => setShowModal(true)}
+        onClick={() => { setError(null); setShowModal(true) }}
         aria-label={`Remove ${name}`}
         className="text-zinc-300 hover:text-red-500 transition-colors"
       >

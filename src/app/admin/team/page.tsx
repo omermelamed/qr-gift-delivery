@@ -47,7 +47,7 @@ export default async function TeamPage() {
       id: u.id,
       email: u.email ?? '',
       name: u.user_metadata?.full_name ?? u.email?.split('@')[0] ?? '—',
-      role_name: (u.app_metadata as JwtAppMetadata)?.role_name ?? roleRow?.name ?? '—',
+      role_name: roleRow?.name ?? (u.app_metadata as JwtAppMetadata)?.role_name ?? '—',
       isPending: !u.last_sign_in_at,
       isSelf: u.id === user.id,
     }
