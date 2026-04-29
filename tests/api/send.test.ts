@@ -163,6 +163,20 @@ describe('POST /api/campaigns/[id]/send', () => {
         }
       }
       if (fromCallCount === 2) {
+        // Company sms_template lookup
+        return {
+          select: () => ({
+            eq: () => ({
+              single: () =>
+                Promise.resolve({
+                  data: { sms_template: null },
+                  error: null,
+                }),
+            }),
+          }),
+        }
+      }
+      if (fromCallCount === 3) {
         // Fetch unsent tokens
         return {
           select: () => ({
@@ -216,6 +230,20 @@ describe('POST /api/campaigns/[id]/send', () => {
         }
       }
       if (fromCallCount === 2) {
+        // Company sms_template lookup
+        return {
+          select: () => ({
+            eq: () => ({
+              single: () =>
+                Promise.resolve({
+                  data: { sms_template: null },
+                  error: null,
+                }),
+            }),
+          }),
+        }
+      }
+      if (fromCallCount === 3) {
         return {
           select: () => ({
             eq: () => ({
@@ -272,6 +300,20 @@ describe('POST /api/campaigns/[id]/send', () => {
         }
       }
       if (fromCallCount === 2) {
+        // Company sms_template lookup
+        return {
+          select: () => ({
+            eq: () => ({
+              single: () =>
+                Promise.resolve({
+                  data: { sms_template: null },
+                  error: null,
+                }),
+            }),
+          }),
+        }
+      }
+      if (fromCallCount === 3) {
         return {
           select: () => ({
             eq: () => ({

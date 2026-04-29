@@ -43,6 +43,14 @@ export async function POST(
     return NextResponse.json({ error: 'Campaign already dispatched' }, { status: 409 })
   }
 
+  const { data: company } = await service
+    .from('companies')
+    .select('sms_template')
+    .eq('id', campaign.company_id)
+    .single()
+
+  const smsTemplate = company?.sms_template ?? null
+
   const { data: tokens, error: tokensError } = await service
     .from('gift_tokens')
     .select('id, token, employee_name, phone_number, qr_image_url')
@@ -85,6 +93,11 @@ export async function POST(
             employeeName: token.employee_name,
             holidayName: campaign.name,
             qrImageUrl,
+            body: smsTemplate
+              ? smsTemplate
+                  .replace('{name}', token.employee_name)
+                  .replace('{link}', `${process.env.NEXT_PUBLIC_APP_URL}/verify/${token.token}`)
+              : undefined,
           })
         }
 

@@ -3,6 +3,7 @@ interface SendGiftMMSOptions {
   employeeName: string
   holidayName: string
   qrImageUrl: string
+  body?: string
 }
 
 interface SendGiftMMSResult {
@@ -36,7 +37,7 @@ export async function sendGiftMMS(options: SendGiftMMSOptions): Promise<SendGift
         From: fromNumber,
         To: options.to,
         MediaUrl: options.qrImageUrl,
-        Body: `Hi ${options.employeeName}! Here's your ${options.holidayName} gift QR code above. Scan it to redeem!`,
+        Body: options.body ?? `Hi ${options.employeeName}! Here's your ${options.holidayName} gift QR code above. Scan it to redeem!`,
       }).toString(),
     }
   )
