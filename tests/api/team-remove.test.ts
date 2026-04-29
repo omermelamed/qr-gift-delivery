@@ -52,6 +52,32 @@ describe('DELETE /api/team/members/[userId]', () => {
     expect(body.error).toMatch(/yourself/i)
   })
 
+  it('returns 401 when app_metadata is missing company_id', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: 'u-1', app_metadata: { role_id: 'r-1' } } },
+    })
+    const { DELETE } = await import('@/app/api/team/members/[userId]/route')
+    const res = await DELETE(makeRequest('u-2'), { params: Promise.resolve({ userId: 'u-2' }) })
+    expect(res.status).toBe(401)
+  })
+
+  it('returns 403 when missing users:manage permission', async () => {
+    const { hasPermission } = await import('@/lib/permissions')
+    vi.mocked(hasPermission).mockReturnValue(false)
+    const { DELETE } = await import('@/app/api/team/members/[userId]/route')
+    const res = await DELETE(makeRequest('u-2'), { params: Promise.resolve({ userId: 'u-2' }) })
+    expect(res.status).toBe(403)
+  })
+
+  it('returns 500 when delete from user_company_roles fails', async () => {
+    mockFromService.mockReturnValue({
+      delete: () => ({ eq: () => ({ eq: () => Promise.resolve({ error: { message: 'db error' } }) }) }),
+    })
+    const { DELETE } = await import('@/app/api/team/members/[userId]/route')
+    const res = await DELETE(makeRequest('u-2'), { params: Promise.resolve({ userId: 'u-2' }) })
+    expect(res.status).toBe(500)
+  })
+
   it('removes user from user_company_roles and clears app_metadata', async () => {
     mockFromService.mockReturnValue({
       delete: () => ({ eq: () => ({ eq: () => Promise.resolve({ error: null }) }) }),

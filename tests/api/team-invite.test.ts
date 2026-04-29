@@ -69,6 +69,32 @@ describe('POST /api/team/invite', () => {
     expect(res.status).toBe(400)
   })
 
+  it('returns 401 when app_metadata is missing company_id', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: 'u-1', app_metadata: { role_id: 'r-1' } } },
+    })
+    const { POST } = await import('@/app/api/team/invite/route')
+    const res = await POST(makeRequest({ email: 'x@x.com', role_name: 'scanner' }))
+    expect(res.status).toBe(401)
+  })
+
+  it('asserts user_company_roles insert is called on success', async () => {
+    let ucrInserted: unknown = null
+    mockFromService.mockImplementation((table: string) => {
+      if (table === 'roles') {
+        return { select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'role-scanner' }, error: null }) }) }) }) }
+      }
+      return { insert: (row: unknown) => { ucrInserted = row; return Promise.resolve({ error: null }) } }
+    })
+    mockInviteUser.mockResolvedValue({ data: { user: { id: 'new-user-1' } }, error: null })
+    mockUpdateUser.mockResolvedValue({ data: {}, error: null })
+
+    const { POST } = await import('@/app/api/team/invite/route')
+    await POST(makeRequest({ email: 'scanner@co.com', role_name: 'scanner' }))
+
+    expect(ucrInserted).toMatchObject({ user_id: 'new-user-1', company_id: 'co-1', role_id: 'role-scanner' })
+  })
+
   it('invites user, sets app_metadata, inserts user_company_roles', async () => {
     mockFromService.mockImplementation((table: string) => {
       if (table === 'roles') {

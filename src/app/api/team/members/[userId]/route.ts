@@ -37,7 +37,10 @@ export async function DELETE(
 
   if (deleteError) return NextResponse.json({ error: 'Failed to remove member' }, { status: 500 })
 
-  await service.auth.admin.updateUserById(userId, { app_metadata: {} })
+  const { error: metaError } = await service.auth.admin.updateUserById(userId, { app_metadata: {} })
+  if (metaError) {
+    console.error('[team/remove] failed to clear app_metadata:', metaError.message)
+  }
 
   return NextResponse.json({ success: true })
 }

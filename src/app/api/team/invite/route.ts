@@ -61,15 +61,17 @@ export async function POST(request: NextRequest) {
 
   const newUserId = invited.user.id
 
-  await service.auth.admin.updateUserById(newUserId, {
+  const { error: metaError } = await service.auth.admin.updateUserById(newUserId, {
     app_metadata: { company_id: appMeta.company_id, role_id: role.id, role_name: roleName },
   })
+  if (metaError) return NextResponse.json({ error: 'Failed to set user metadata' }, { status: 500 })
 
-  await service.from('user_company_roles').insert({
+  const { error: ucrError } = await service.from('user_company_roles').insert({
     user_id: newUserId,
     company_id: appMeta.company_id,
     role_id: role.id,
   })
+  if (ucrError) return NextResponse.json({ error: 'Failed to assign company role' }, { status: 500 })
 
   return NextResponse.json({ success: true })
 }
