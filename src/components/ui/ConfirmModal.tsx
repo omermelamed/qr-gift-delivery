@@ -39,7 +39,7 @@ export function ConfirmModal({
             disabled={loading}
             className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-violet-500 rounded-lg hover:brightness-110 transition-all disabled:opacity-50"
           >
-            {loading ? 'Launching…' : confirmLabel}
+            {loading ? `${confirmLabel}…` : confirmLabel}
           </button>
         </div>
       </div>
