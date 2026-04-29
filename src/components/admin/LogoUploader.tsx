@@ -22,7 +22,8 @@ export function LogoUploader({ companyId, currentUrl, onUploaded }: Props) {
     setError(null)
     setUploading(true)
     try {
-      const ext = file.name.split('.').pop() ?? 'png'
+      const nameParts = file.name.split('.')
+      const ext = nameParts.length > 1 ? nameParts.pop()! : 'png'
       const path = `${companyId}/logo.${ext}`
       const supabase = createClient()
       const { error: uploadError } = await supabase.storage
