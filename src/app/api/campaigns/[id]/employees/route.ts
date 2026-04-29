@@ -41,9 +41,9 @@ export async function POST(
   } catch {
     return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
   }
-  const name = (body.name ?? '').trim()
-  const phone = normalizePhone(body.phone_number ?? '')
-  const department = (body.department ?? '').trim() || null
+  const name = (String(body.name ?? '')).trim()
+  const phone = normalizePhone(String(body.phone_number ?? ''))
+  const department = (String(body.department ?? '')).trim() || null
 
   if (!name) return NextResponse.json({ error: 'Name is required' }, { status: 400 })
   if (!phone) return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })

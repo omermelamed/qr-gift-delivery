@@ -87,6 +87,7 @@ export default async function CampaignDetailPage({
           <EmployeeTable
             campaignId={campaign.id}
             initialRows={allTokens}
+            isDraft={!campaign.sent_at}
           />
         </div>
       </div>
