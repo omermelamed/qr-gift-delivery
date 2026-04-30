@@ -7,6 +7,7 @@ import { TokenUploader } from '@/components/admin/TokenUploader'
 import { LaunchButton } from '@/components/admin/LaunchButton'
 import { CloseCampaignButton } from '@/components/admin/CloseCampaignButton'
 import { RedemptionProgress } from '@/components/admin/RedemptionProgress'
+import { DistributorAssignment } from '@/components/admin/DistributorAssignment'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 
@@ -77,6 +78,9 @@ export default async function CampaignDetailPage({
             initialClaimed={claimedCount}
             total={allTokens.length}
           />
+          {!campaign.sent_at && (
+            <DistributorAssignment campaignId={campaign.id} />
+          )}
           {!campaign.sent_at && (
             <TokenUploader campaignId={campaign.id} />
           )}
