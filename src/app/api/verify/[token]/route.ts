@@ -27,6 +27,19 @@ export async function POST(
     return NextResponse.json({ valid: false, reason: 'campaign_closed' })
   }
 
+  // Distributor restriction check
+  const { data: assignedDistributors } = await supabase
+    .from('campaign_distributors')
+    .select('user_id')
+    .eq('campaign_id', tokenRow.campaign_id)
+
+  if (assignedDistributors && assignedDistributors.length > 0) {
+    const assignedIds = new Set(assignedDistributors.map((r) => r.user_id))
+    if (!distributorId || !assignedIds.has(distributorId)) {
+      return NextResponse.json({ valid: false, reason: 'not_authorized' })
+    }
+  }
+
   if (tokenRow.redeemed) {
     return NextResponse.json({
       valid: false,
