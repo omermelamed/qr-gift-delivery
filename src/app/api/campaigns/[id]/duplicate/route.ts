@@ -36,7 +36,7 @@ export async function POST(
 
   const { data: newCampaign } = await service
     .from('campaigns')
-    .insert({ name: name.trim(), campaign_date: campaign_date ?? null, company_id: appMeta.company_id })
+    .insert({ name: name.trim(), campaign_date: campaign_date ?? null, company_id: appMeta.company_id, created_by: user.id })
     .select('id')
     .single()
 

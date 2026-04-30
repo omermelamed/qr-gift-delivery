@@ -44,7 +44,7 @@ export function DuplicateCampaignButton({ campaignId, sourceName, sourceDate }: 
   return (
     <>
       <button
-        onClick={(e) => { e.preventDefault(); setShowModal(true) }}
+        onClick={(e) => { e.preventDefault(); setError(null); setShowModal(true) }}
         aria-label="Duplicate campaign"
         className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors opacity-0 group-hover:opacity-100"
       >

@@ -93,4 +93,16 @@ describe('POST /api/verify/[token]', () => {
     expect(body.valid).toBe(false)
     expect(body.reason).toBe('already_used')
   })
+
+  it('returns campaign_closed even when token is already redeemed', async () => {
+    mockSelectSingle.mockResolvedValue({
+      data: { id: 't-1', employee_name: 'Dana', redeemed: true, campaign_id: 'c-1', campaigns: { closed_at: '2026-04-10' } },
+      error: null,
+    })
+    const { POST } = await import('@/app/api/verify/[token]/route')
+    const res = await POST(makeRequest('used-and-closed'), { params: Promise.resolve({ token: 'used-and-closed' }) })
+    const body = await res.json()
+    expect(body.valid).toBe(false)
+    expect(body.reason).toBe('campaign_closed')
+  })
 })
