@@ -86,6 +86,10 @@ export function EmployeeTable({
 
   const hasDepts = rows.some((r) => r.department != null)
 
+  useEffect(() => {
+    if (!hasDepts) setGroupByDept(false)
+  }, [hasDepts])
+
   const unclaimedCount = rows.filter((r) => !r.redeemed).length
 
   type GroupHeader = { _type: 'header'; department: string; claimed: number; total: number }

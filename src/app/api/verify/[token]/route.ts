@@ -22,7 +22,7 @@ export async function POST(
     return NextResponse.json({ valid: false, reason: 'invalid' })
   }
 
-  const campaign = tokenRow.campaigns as { closed_at: string | null } | null
+  const campaign = tokenRow.campaigns as unknown as { closed_at: string | null } | null
   if (campaign?.closed_at) {
     return NextResponse.json({ valid: false, reason: 'campaign_closed' })
   }
