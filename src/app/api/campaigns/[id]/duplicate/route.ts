@@ -27,7 +27,7 @@ export async function POST(
 
   const { data: source } = await service
     .from('campaigns')
-    .select('id, company_id')
+    .select('id')
     .eq('id', sourceCampaignId)
     .eq('company_id', appMeta.company_id)
     .single()
@@ -49,7 +49,7 @@ export async function POST(
       .eq('campaign_id', sourceCampaignId)
 
     if (tokens && tokens.length > 0) {
-      await service.from('gift_tokens').insert(
+      const { error: tokenInsertError } = await service.from('gift_tokens').insert(
         tokens.map((t) => ({
           campaign_id: newCampaign.id,
           employee_name: t.employee_name,
@@ -57,6 +57,9 @@ export async function POST(
           department: t.department,
         }))
       )
+      if (tokenInsertError) {
+        return NextResponse.json({ error: 'Failed to copy employees' }, { status: 500 })
+      }
     }
   }
 

@@ -89,4 +89,36 @@ describe('POST /api/campaigns/[id]/duplicate', () => {
     expect(body.id).toBe('new-c')
     expect(insertedCampaign).toMatchObject({ name: 'Copy', campaign_date: '2026-05-01', company_id: 'co-1' })
   })
+
+  it('copies employees without redeemed/sms fields when copyEmployees is true', async () => {
+    let tokenInsertRows: unknown = null
+    mockFromService.mockImplementation((table: string) => {
+      if (table === 'campaigns') {
+        return {
+          select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1' }, error: null }) }) }) }),
+          insert: () => ({ select: () => ({ single: () => Promise.resolve({ data: { id: 'new-c' }, error: null }) }) }),
+        }
+      }
+      if (table === 'gift_tokens') {
+        return {
+          select: () => ({ eq: () => Promise.resolve({ data: [{ employee_name: 'Alice', phone_number: '+1234', department: 'Eng', redeemed: true, redeemed_at: '2026-04-01', redeemed_by: 'u-1', sms_sent_at: '2026-04-01', qr_image_url: 'https://qr.example.com' }], error: null }) }),
+          insert: (rows: unknown) => { tokenInsertRows = rows; return Promise.resolve({ error: null }) },
+        }
+      }
+    })
+
+    const { POST } = await import('@/app/api/campaigns/[id]/duplicate/route')
+    const res = await POST(makeRequest('c-1', { name: 'Copy', campaign_date: null, copyEmployees: true }), { params: Promise.resolve({ id: 'c-1' }) })
+    expect(res.status).toBe(200)
+    expect(Array.isArray(tokenInsertRows)).toBe(true)
+    const row = (tokenInsertRows as Record<string, unknown>[])[0]
+    expect(row.employee_name).toBe('Alice')
+    expect(row.phone_number).toBe('+1234')
+    expect(row.department).toBe('Eng')
+    expect(row).not.toHaveProperty('redeemed')
+    expect(row).not.toHaveProperty('redeemed_at')
+    expect(row).not.toHaveProperty('redeemed_by')
+    expect(row).not.toHaveProperty('sms_sent_at')
+    expect(row).not.toHaveProperty('qr_image_url')
+  })
 })
