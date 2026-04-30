@@ -32,6 +32,7 @@ export type Campaign = {
   created_by: string | null
   created_at: string
   sent_at: string | null
+  closed_at: string | null
 }
 
 export type GiftToken = {
@@ -52,6 +53,8 @@ export type TokenVerifyResult =
   | { valid: true; employeeName: string }
   | { valid: false; reason: 'already_used'; employeeName: string }
   | { valid: false; reason: 'invalid' }
+  | { valid: false; reason: 'campaign_closed' }
+  | { valid: false; reason: 'not_authorized' }
 
 export type JwtAppMetadata = {
   company_id: string
