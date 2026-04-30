@@ -39,9 +39,13 @@ export async function POST(request: NextRequest) {
   if (!targetUser.email) {
     return NextResponse.json({ error: 'User has no email address' }, { status: 422 })
   }
-  await service.auth.admin.inviteUserByEmail(targetUser.email, {
+  const { error: inviteError } = await service.auth.admin.inviteUserByEmail(targetUser.email, {
     redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/admin`,
   })
+
+  if (inviteError) {
+    return NextResponse.json({ error: inviteError.message ?? 'Failed to send invite' }, { status: 500 })
+  }
 
   return NextResponse.json({ success: true })
 }

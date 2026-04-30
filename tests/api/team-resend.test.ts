@@ -70,6 +70,16 @@ describe('POST /api/team/resend', () => {
     expect(res.status).toBe(404)
   })
 
+  it('returns 404 when user belongs to a different company', async () => {
+    mockGetUserById.mockResolvedValue({
+      data: { user: { id: 'u-2', email: 'user@other.com', app_metadata: { company_id: 'co-2' } } },
+      error: null,
+    })
+    const { POST } = await import('@/app/api/team/resend/route')
+    const res = await POST(makeRequest({ userId: 'u-2' }))
+    expect(res.status).toBe(404)
+  })
+
   it('re-invites user and returns success', async () => {
     mockGetUserById.mockResolvedValue({ data: { user: { id: 'u-1', email: 'user@co.com', app_metadata: { company_id: 'co-1' } } }, error: null })
     mockInviteUser.mockResolvedValue({ data: {}, error: null })

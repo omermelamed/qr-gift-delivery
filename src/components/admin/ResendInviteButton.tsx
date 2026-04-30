@@ -13,10 +13,16 @@ export function ResendInviteButton({ userId }: { userId: string }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
       })
-      setState(res.ok ? 'sent' : 'error')
-      if (res.ok) setTimeout(() => setState('idle'), 3000)
+      if (res.ok) {
+        setState('sent')
+        setTimeout(() => setState('idle'), 3000)
+      } else {
+        setState('error')
+        setTimeout(() => setState('idle'), 3000)
+      }
     } catch {
       setState('error')
+      setTimeout(() => setState('idle'), 3000)
     }
   }
 
