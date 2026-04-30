@@ -103,6 +103,11 @@ export default function ScanPage() {
                 <p className="text-white text-4xl font-bold text-center px-8">{result.employeeName}</p>
                 <p className="text-white/80 text-lg">Gift collected</p>
               </>
+            ) : result.reason === 'campaign_closed' ? (
+              <>
+                <p className="text-white text-3xl font-bold">Campaign closed</p>
+                <p className="text-white/80 text-lg">No further gifts can be claimed</p>
+              </>
             ) : result.reason === 'already_used' ? (
               <>
                 <p className="text-white text-3xl font-bold">Already claimed</p>

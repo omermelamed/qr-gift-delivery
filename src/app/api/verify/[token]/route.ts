@@ -11,7 +11,31 @@ export async function POST(
 
   const supabase = createServiceClient()
 
-  // Atomic write: first writer wins, second writer gets 0 rows back
+  // Fetch token row with campaign closed_at in one query
+  const { data: tokenRow } = await supabase
+    .from('gift_tokens')
+    .select('id, employee_name, redeemed, campaign_id, campaigns(closed_at)')
+    .eq('token', token)
+    .single()
+
+  if (!tokenRow) {
+    return NextResponse.json({ valid: false, reason: 'invalid' })
+  }
+
+  const campaign = tokenRow.campaigns as { closed_at: string | null } | null
+  if (campaign?.closed_at) {
+    return NextResponse.json({ valid: false, reason: 'campaign_closed' })
+  }
+
+  if (tokenRow.redeemed) {
+    return NextResponse.json({
+      valid: false,
+      reason: 'already_used',
+      employeeName: tokenRow.employee_name,
+    })
+  }
+
+  // Atomic write: first writer wins
   const { data: redeemed } = await supabase
     .from('gift_tokens')
     .update({
@@ -28,20 +52,10 @@ export async function POST(
     return NextResponse.json({ valid: true, employeeName: redeemed.employee_name })
   }
 
-  // UPDATE hit 0 rows — find out whether the token exists at all
-  const { data: existing } = await supabase
-    .from('gift_tokens')
-    .select('employee_name, redeemed')
-    .eq('token', token)
-    .single()
-
-  if (!existing) {
-    return NextResponse.json({ valid: false, reason: 'invalid' })
-  }
-
+  // Race condition: another request redeemed it between our read and write
   return NextResponse.json({
     valid: false,
     reason: 'already_used',
-    employeeName: existing.employee_name,
+    employeeName: tokenRow.employee_name,
   })
 }
