@@ -32,11 +32,15 @@ export async function POST(
   if (!campaign.sent_at) return NextResponse.json({ error: 'Campaign not yet sent' }, { status: 409 })
   if (campaign.closed_at) return NextResponse.json({ error: 'Campaign already closed' }, { status: 409 })
 
-  await service
+  const { error: closeError } = await service
     .from('campaigns')
     .update({ closed_at: new Date().toISOString() })
     .eq('id', campaignId)
     .eq('company_id', appMeta.company_id)
+
+  if (closeError) {
+    return NextResponse.json({ error: 'Failed to close campaign' }, { status: 500 })
+  }
 
   return NextResponse.json({ success: true })
 }

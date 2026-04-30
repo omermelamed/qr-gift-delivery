@@ -67,6 +67,8 @@ describe('POST /api/campaigns/[id]/close', () => {
     const { POST } = await import('@/app/api/campaigns/[id]/close/route')
     const res = await POST(makeRequest('c-1'), { params: Promise.resolve({ id: 'c-1' }) })
     expect(res.status).toBe(409)
+    const body = await res.json()
+    expect(body.error).toContain('not yet sent')
   })
 
   it('returns 409 when campaign already closed', async () => {
@@ -76,6 +78,8 @@ describe('POST /api/campaigns/[id]/close', () => {
     const { POST } = await import('@/app/api/campaigns/[id]/close/route')
     const res = await POST(makeRequest('c-1'), { params: Promise.resolve({ id: 'c-1' }) })
     expect(res.status).toBe(409)
+    const body = await res.json()
+    expect(body.error).toContain('already closed')
   })
 
   it('closes a sent campaign and returns success', async () => {
