@@ -5,8 +5,15 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
 import { TokenUploader } from '@/components/admin/TokenUploader'
 import { LaunchButton } from '@/components/admin/LaunchButton'
+import { CloseCampaignButton } from '@/components/admin/CloseCampaignButton'
 import { RedemptionProgress } from '@/components/admin/RedemptionProgress'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
+
+function StatusBadge({ sentAt, closedAt }: { sentAt: string | null; closedAt: string | null }) {
+  if (closedAt) return <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-500">Closed</span>
+  if (sentAt) return <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700">Sent</span>
+  return <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet-100 text-violet-700">Draft</span>
+}
 
 export default async function CampaignDetailPage({
   params,
@@ -24,7 +31,7 @@ export default async function CampaignDetailPage({
 
   const { data: campaign } = await service
     .from('campaigns')
-    .select('id, name, campaign_date, sent_at')
+    .select('id, name, campaign_date, sent_at, closed_at')
     .eq('id', campaignId)
     .eq('company_id', appMeta.company_id)
     .single()
@@ -41,6 +48,7 @@ export default async function CampaignDetailPage({
   const allTokens = tokens ?? []
   const claimedCount = allTokens.filter((t) => t.redeemed).length
   const canLaunch = !campaign.sent_at && allTokens.length > 0
+  const canClose = !!campaign.sent_at && !campaign.closed_at
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -57,11 +65,8 @@ export default async function CampaignDetailPage({
           <p className="text-sm text-zinc-400 mt-0.5">{campaign.campaign_date ?? '—'}</p>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
-          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-            campaign.sent_at ? 'bg-green-100 text-green-700' : 'bg-violet-100 text-violet-700'
-          }`}>
-            {campaign.sent_at ? 'Sent' : 'Draft'}
-          </span>
+          <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} />
+          {canClose && <CloseCampaignButton campaignId={campaign.id} />}
           {canLaunch && (
             <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} />
           )}
