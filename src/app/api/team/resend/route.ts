@@ -11,7 +11,9 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!appMeta?.company_id || !appMeta?.role_id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
 
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'users:manage')) {
@@ -29,7 +31,15 @@ export async function POST(request: NextRequest) {
   } = await service.auth.admin.getUserById(userId)
   if (error || !targetUser) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
-  await service.auth.admin.inviteUserByEmail(targetUser.email!, {
+  const targetMeta = targetUser.app_metadata as { company_id?: string } | undefined
+  if (targetMeta?.company_id !== appMeta.company_id) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 })
+  }
+
+  if (!targetUser.email) {
+    return NextResponse.json({ error: 'User has no email address' }, { status: 422 })
+  }
+  await service.auth.admin.inviteUserByEmail(targetUser.email, {
     redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/admin`,
   })
 

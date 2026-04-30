@@ -71,7 +71,7 @@ describe('POST /api/team/resend', () => {
   })
 
   it('re-invites user and returns success', async () => {
-    mockGetUserById.mockResolvedValue({ data: { user: { id: 'u-1', email: 'user@co.com' } }, error: null })
+    mockGetUserById.mockResolvedValue({ data: { user: { id: 'u-1', email: 'user@co.com', app_metadata: { company_id: 'co-1' } } }, error: null })
     mockInviteUser.mockResolvedValue({ data: {}, error: null })
     const { POST } = await import('@/app/api/team/resend/route')
     const res = await POST(makeRequest({ userId: 'u-1' }))
