@@ -61,12 +61,9 @@ export default function ResetPasswordPage() {
               <h1 className="text-lg font-semibold text-zinc-900">Verifying link…</h1>
               <p className="text-sm text-zinc-500">
                 If nothing happens, your link may have expired.{' '}
-                <button
-                  onClick={() => router.push('/login')}
-                  className="text-indigo-600 hover:underline"
-                >
+                <a href="/login" className="text-indigo-600 hover:underline">
                   Request a new one.
-                </button>
+                </a>
               </p>
             </>
           ) : (
