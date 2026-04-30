@@ -111,6 +111,7 @@ describe('POST /api/verify/[token]', () => {
     const body = await res.json()
     expect(body.valid).toBe(false)
     expect(body.reason).toBe('already_used')
+    expect(body.employeeName).toBe('Dana')
   })
 
   it('returns valid:true on successful first scan', async () => {
@@ -133,5 +134,17 @@ describe('POST /api/verify/[token]', () => {
     const body = await res.json()
     expect(body.valid).toBe(false)
     expect(body.reason).toBe('campaign_closed')
+  })
+
+  it('returns already_used when race condition prevents atomic update', async () => {
+    mockTokenSelectSingle.mockResolvedValue({ data: openToken, error: null })
+    mockDistributorSelect.mockResolvedValue({ data: [], error: null })
+    mockUpdateSingle.mockResolvedValue({ data: null, error: null })
+    const { POST } = await import('@/app/api/verify/[token]/route')
+    const res = await POST(makeRequest('race-token'), { params: Promise.resolve({ token: 'race-token' }) })
+    const body = await res.json()
+    expect(body.valid).toBe(false)
+    expect(body.reason).toBe('already_used')
+    expect(body.employeeName).toBe('Omer')
   })
 })

@@ -28,10 +28,14 @@ export async function POST(
   }
 
   // Distributor restriction check
-  const { data: assignedDistributors } = await supabase
+  const { data: assignedDistributors, error: distError } = await supabase
     .from('campaign_distributors')
     .select('user_id')
     .eq('campaign_id', tokenRow.campaign_id)
+
+  if (distError) {
+    return NextResponse.json({ valid: false, reason: 'invalid' }, { status: 500 })
+  }
 
   if (assignedDistributors && assignedDistributors.length > 0) {
     const assignedIds = new Set(assignedDistributors.map((r) => r.user_id))

@@ -190,7 +190,7 @@ export default function ScanPage() {
               ) : (
                 <ul className="flex flex-col gap-3">
                   {scanHistory.map((entry, i) => (
-                    <li key={i} className="flex items-center gap-3">
+                    <li key={`${entry.timestamp.getTime()}-${i}`} className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                         entry.outcome === 'success' ? 'bg-green-500/20' : 'bg-red-500/20'
                       }`}>
