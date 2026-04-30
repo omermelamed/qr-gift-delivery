@@ -41,10 +41,24 @@ describe('GET /api/campaigns/[id]/distributors', () => {
   })
 
   it('returns list of assigned distributors', async () => {
-    mockFromService.mockReturnValue({
-      select: () => ({
-        eq: () => Promise.resolve({ data: [{ user_id: 'u-1' }], error: null }),
-      }),
+    mockFromService.mockImplementation((table: string) => {
+      if (table === 'campaigns') {
+        return {
+          select: () => ({
+            eq: () => ({
+              eq: () => ({
+                single: () => Promise.resolve({ data: { id: 'c-1' }, error: null }),
+              }),
+            }),
+          }),
+        }
+      }
+      // campaign_distributors
+      return {
+        select: () => ({
+          eq: () => Promise.resolve({ data: [{ user_id: 'u-1' }], error: null }),
+        }),
+      }
     })
     mockGetUserById.mockResolvedValue({
       data: { user: { id: 'u-1', email: 'alice@co.com', user_metadata: { full_name: 'Alice' } } },
@@ -76,8 +90,22 @@ describe('POST /api/campaigns/[id]/distributors', () => {
 
   it('inserts a distributor assignment', async () => {
     let inserted: unknown = null
-    mockFromService.mockReturnValue({
-      insert: (row: unknown) => { inserted = row; return Promise.resolve({ error: null }) },
+    mockFromService.mockImplementation((table: string) => {
+      if (table === 'user_company_roles') {
+        return {
+          select: () => ({
+            eq: () => ({
+              eq: () => ({
+                single: () => Promise.resolve({ data: { roles: { name: 'scanner' } }, error: null }),
+              }),
+            }),
+          }),
+        }
+      }
+      // campaign_distributors
+      return {
+        insert: (row: unknown) => { inserted = row; return Promise.resolve({ error: null }) },
+      }
     })
     const { POST } = await import('@/app/api/campaigns/[id]/distributors/route')
     const req = new NextRequest('http://localhost/api/campaigns/c-1/distributors', {

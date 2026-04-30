@@ -19,7 +19,7 @@ export async function GET() {
 
   const scannerUserIds = (ucr ?? [])
     .filter((row) => {
-      const role = row.roles as { name: string } | null
+      const role = row.roles as unknown as { name: string } | null
       return role?.name === 'scanner'
     })
     .map((row) => row.user_id)

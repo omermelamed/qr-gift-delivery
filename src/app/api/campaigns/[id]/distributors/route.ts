@@ -12,7 +12,19 @@ export async function GET(
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const appMeta = user.app_metadata as JwtAppMetadata
+  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const service = createServiceClient()
+
+  const { data: campaign } = await service
+    .from('campaigns')
+    .select('id')
+    .eq('id', campaignId)
+    .eq('company_id', appMeta.company_id)
+    .single()
+
+  if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
 
   const { data: rows } = await service
     .from('campaign_distributors')
@@ -51,6 +63,20 @@ export async function POST(
   if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
 
   const service = createServiceClient()
+
+  // Verify target user is a scanner in this company
+  const { data: ucr } = await service
+    .from('user_company_roles')
+    .select('roles(name)')
+    .eq('user_id', userId)
+    .eq('company_id', appMeta.company_id)
+    .single()
+
+  const targetRole = ucr?.roles as unknown as { name: string } | null
+  if (!ucr || targetRole?.name !== 'scanner') {
+    return NextResponse.json({ error: 'User is not a scanner in this company' }, { status: 422 })
+  }
+
   const { error } = await service
     .from('campaign_distributors')
     .insert({ campaign_id: campaignId, user_id: userId })
