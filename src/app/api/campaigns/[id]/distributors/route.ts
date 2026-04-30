@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import type { JwtAppMetadata } from '@/types'
 
 export async function GET(
@@ -13,7 +14,12 @@ export async function GET(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!appMeta?.company_id || !appMeta?.role_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const permissions = await fetchPermissions(appMeta.role_id)
+  if (!hasPermission(permissions, 'campaigns:launch')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const service = createServiceClient()
 
@@ -56,7 +62,12 @@ export async function POST(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!appMeta?.company_id || !appMeta?.role_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const permissions = await fetchPermissions(appMeta.role_id)
+  if (!hasPermission(permissions, 'campaigns:launch')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
 
   const body = await request.json().catch(() => ({}))
   const userId: string | undefined = body.userId

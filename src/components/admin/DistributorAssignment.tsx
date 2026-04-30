@@ -43,8 +43,10 @@ export function DistributorAssignment({ campaignId }: { campaignId: string }) {
   }
 
   async function handleRemove(userId: string) {
-    await fetch(`/api/campaigns/${campaignId}/distributors/${userId}`, { method: 'DELETE' })
-    setDistributors((prev) => prev.filter((d) => d.userId !== userId))
+    const res = await fetch(`/api/campaigns/${campaignId}/distributors/${userId}`, { method: 'DELETE' })
+    if (res.ok) {
+      setDistributors((prev) => prev.filter((d) => d.userId !== userId))
+    }
   }
 
   const assignedIds = new Set(distributors.map((d) => d.userId))

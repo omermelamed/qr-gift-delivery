@@ -4,6 +4,8 @@ import { NextRequest } from 'next/server'
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
 const mockGetUserById = vi.fn()
+const mockFetchPermissions = vi.fn()
+const mockHasPermission = vi.fn()
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => ({ auth: { getUser: mockGetUser } }),
@@ -14,8 +16,8 @@ vi.mock('@/lib/supabase/server', () => ({
 }))
 
 vi.mock('@/lib/permissions', () => ({
-  fetchPermissions: vi.fn().mockResolvedValue(['campaigns:launch']),
-  hasPermission: vi.fn().mockReturnValue(true),
+  fetchPermissions: (...args: unknown[]) => mockFetchPermissions(...args),
+  hasPermission: (...args: unknown[]) => mockHasPermission(...args),
 }))
 
 function adminUser() {
@@ -30,7 +32,12 @@ function adminUser() {
 }
 
 describe('GET /api/campaigns/[id]/distributors', () => {
-  beforeEach(() => { vi.resetAllMocks(); mockGetUser.mockResolvedValue(adminUser()) })
+  beforeEach(() => {
+    vi.resetAllMocks()
+    mockGetUser.mockResolvedValue(adminUser())
+    mockFetchPermissions.mockResolvedValue(['campaigns:launch'])
+    mockHasPermission.mockReturnValue(true)
+  })
 
   it('returns 401 when unauthenticated', async () => {
     mockGetUser.mockResolvedValue({ data: { user: null } })
@@ -75,7 +82,12 @@ describe('GET /api/campaigns/[id]/distributors', () => {
 })
 
 describe('POST /api/campaigns/[id]/distributors', () => {
-  beforeEach(() => { vi.resetAllMocks(); mockGetUser.mockResolvedValue(adminUser()) })
+  beforeEach(() => {
+    vi.resetAllMocks()
+    mockGetUser.mockResolvedValue(adminUser())
+    mockFetchPermissions.mockResolvedValue(['campaigns:launch'])
+    mockHasPermission.mockReturnValue(true)
+  })
 
   it('returns 400 when userId missing', async () => {
     const { POST } = await import('@/app/api/campaigns/[id]/distributors/route')
@@ -122,14 +134,33 @@ describe('POST /api/campaigns/[id]/distributors', () => {
 })
 
 describe('DELETE /api/campaigns/[id]/distributors/[userId]', () => {
-  beforeEach(() => { vi.resetAllMocks(); mockGetUser.mockResolvedValue(adminUser()) })
+  beforeEach(() => {
+    vi.resetAllMocks()
+    mockGetUser.mockResolvedValue(adminUser())
+    mockFetchPermissions.mockResolvedValue(['campaigns:launch'])
+    mockHasPermission.mockReturnValue(true)
+  })
 
   it('removes a distributor assignment', async () => {
     let deleted = false
-    mockFromService.mockReturnValue({
-      delete: () => ({
-        eq: () => ({ eq: () => { deleted = true; return Promise.resolve({ error: null }) } }),
-      }),
+    mockFromService.mockImplementation((table: string) => {
+      if (table === 'campaigns') {
+        return {
+          select: () => ({
+            eq: () => ({
+              eq: () => ({
+                single: () => Promise.resolve({ data: { id: 'c-1' }, error: null }),
+              }),
+            }),
+          }),
+        }
+      }
+      // campaign_distributors
+      return {
+        delete: () => ({
+          eq: () => ({ eq: () => { deleted = true; return Promise.resolve({ error: null }) } }),
+        }),
+      }
     })
     const { DELETE } = await import('@/app/api/campaigns/[id]/distributors/[userId]/route')
     const req = new NextRequest('http://localhost/api/campaigns/c-1/distributors/u-1', { method: 'DELETE' })

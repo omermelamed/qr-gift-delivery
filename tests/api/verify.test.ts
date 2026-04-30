@@ -101,6 +101,16 @@ describe('POST /api/verify/[token]', () => {
     expect(body.valid).toBe(true)
   })
 
+  it('returns 500 when distributor DB query fails', async () => {
+    mockTokenSelectSingle.mockResolvedValue({ data: openToken, error: null })
+    mockDistributorSelect.mockResolvedValue({ data: null, error: { message: 'db error' } })
+    const { POST } = await import('@/app/api/verify/[token]/route')
+    const res = await POST(makeRequest('some-token', 'any-scanner'), { params: Promise.resolve({ token: 'some-token' }) })
+    const body = await res.json()
+    expect(res.status).toBe(500)
+    expect(body.valid).toBe(false)
+  })
+
   it('returns already_used when token is already redeemed', async () => {
     mockTokenSelectSingle.mockResolvedValue({
       data: { ...openToken, redeemed: true, employee_name: 'Dana' },
