@@ -33,6 +33,7 @@ export function EmployeeTable({
   const [resendMsg, setResendMsg] = useState<string | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [groupByDept, setGroupByDept] = useState(false)
+  const [distributorNames, setDistributorNames] = useState<Record<string, string>>({})
 
   useEffect(() => {
     const supabase = createClient()
@@ -85,6 +86,20 @@ export function EmployeeTable({
   }
 
   const hasDepts = rows.some((r) => r.department != null)
+
+  useEffect(() => {
+    if (isDraft) return
+    fetch(`/api/campaigns/${campaignId}/distributors`)
+      .then((r) => r.json())
+      .then((data) => {
+        const map: Record<string, string> = {}
+        for (const d of data.distributors ?? []) {
+          map[d.userId] = d.name
+        }
+        setDistributorNames(map)
+      })
+      .catch(() => {})
+  }, [campaignId, isDraft])
 
   useEffect(() => {
     if (!hasDepts) setGroupByDept(false)
@@ -206,7 +221,9 @@ export function EmployeeTable({
                           {row.redeemed_at ? new Date(row.redeemed_at).toLocaleString() : <span className="text-zinc-300">—</span>}
                         </td>
                         <td className="px-3 py-2.5 text-xs text-zinc-400">
-                          {row.redeemed_by ?? <span className="text-zinc-300">—</span>}
+                          {row.redeemed_by
+                            ? distributorNames[row.redeemed_by] ?? row.redeemed_by
+                            : <span className="text-zinc-300">—</span>}
                         </td>
                       </tr>
                     )
@@ -233,7 +250,9 @@ export function EmployeeTable({
                         {r.redeemed_at ? new Date(r.redeemed_at).toLocaleString() : <span className="text-zinc-300">—</span>}
                       </td>
                       <td className="px-3 py-2.5 text-xs text-zinc-400">
-                        {r.redeemed_by ?? <span className="text-zinc-300">—</span>}
+                        {r.redeemed_by
+                          ? distributorNames[r.redeemed_by] ?? r.redeemed_by
+                          : <span className="text-zinc-300">—</span>}
                       </td>
                     </tr>
                   ))}
