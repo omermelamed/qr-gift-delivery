@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
 import { RemoveMemberButton } from '@/components/admin/RemoveMemberButton'
+import { ResendInviteButton } from '@/components/admin/ResendInviteButton'
 import { InviteButton } from '@/components/admin/InviteButton'
 
 type Member = {
@@ -94,7 +95,12 @@ export default async function TeamPage() {
                     </span>
                   </td>
                   <td className="px-5 py-3 text-right">
-                    {!m.isSelf && <RemoveMemberButton userId={m.id} name={m.name} />}
+                    <div className="flex items-center justify-end gap-2">
+                      {m.isPending && !m.isSelf && (
+                        <ResendInviteButton userId={m.id} />
+                      )}
+                      {!m.isSelf && <RemoveMemberButton userId={m.id} name={m.name} />}
+                    </div>
                   </td>
                 </tr>
               ))}
