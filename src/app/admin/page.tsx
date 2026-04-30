@@ -2,6 +2,13 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
+import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignButton'
+
+function StatusBadge({ sentAt, closedAt }: { sentAt: string | null; closedAt: string | null }) {
+  if (closedAt) return <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-500">Closed</span>
+  if (sentAt) return <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-100 text-green-700">Sent</span>
+  return <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-violet-100 text-violet-700">Draft</span>
+}
 
 export default async function AdminPage() {
   const supabase = await createClient()
@@ -12,7 +19,7 @@ export default async function AdminPage() {
   const service = createServiceClient()
   const { data: campaigns } = await service
     .from('campaigns')
-    .select('id, name, campaign_date, sent_at')
+    .select('id, name, campaign_date, sent_at, closed_at')
     .eq('company_id', appMeta.company_id)
     .order('created_at', { ascending: false })
 
@@ -53,19 +60,22 @@ export default async function AdminPage() {
               href={`/admin/campaigns/${c.id}`}
               className="bg-white border border-zinc-200 rounded-xl p-5 hover:shadow-md transition-shadow flex items-center justify-between group"
             >
-              <div>
-                <p className="font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors">
-                  {c.name}
-                </p>
-                <p className="text-sm text-zinc-400 mt-0.5">{c.campaign_date ?? '—'}</p>
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="min-w-0">
+                  <p className="font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors truncate">
+                    {c.name}
+                  </p>
+                  <p className="text-sm text-zinc-400 mt-0.5">{c.campaign_date ?? '—'}</p>
+                </div>
               </div>
-              <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
-                c.sent_at
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-violet-100 text-violet-700'
-              }`}>
-                {c.sent_at ? 'Sent' : 'Draft'}
-              </span>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <DuplicateCampaignButton
+                  campaignId={c.id}
+                  sourceName={c.name}
+                  sourceDate={c.campaign_date}
+                />
+                <StatusBadge sentAt={c.sent_at} closedAt={c.closed_at} />
+              </div>
             </Link>
           ))}
         </div>
