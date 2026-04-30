@@ -32,6 +32,7 @@ export function EmployeeTable({
   const [resending, setResending] = useState(false)
   const [resendMsg, setResendMsg] = useState<string | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [groupByDept, setGroupByDept] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -83,7 +84,36 @@ export function EmployeeTable({
     a.click()
   }
 
+  const hasDepts = rows.some((r) => r.department != null)
+
   const unclaimedCount = rows.filter((r) => !r.redeemed).length
+
+  type GroupHeader = { _type: 'header'; department: string; claimed: number; total: number }
+  type TableRow = TokenRow | GroupHeader
+
+  function buildGroupedRows(): TableRow[] {
+    const groups = new Map<string, TokenRow[]>()
+    for (const row of rows) {
+      const key = row.department ?? 'No department'
+      if (!groups.has(key)) groups.set(key, [])
+      groups.get(key)!.push(row)
+    }
+    const sorted = [...groups.entries()].sort(([a], [b]) => {
+      if (a === 'No department') return 1
+      if (b === 'No department') return -1
+      return a.localeCompare(b)
+    })
+    const result: TableRow[] = []
+    for (const [dept, deptRows] of sorted) {
+      const sortedRows = [...deptRows].sort((a, b) => {
+        if (a.redeemed !== b.redeemed) return a.redeemed ? 1 : -1
+        return a.employee_name.localeCompare(b.employee_name)
+      })
+      result.push({ _type: 'header', department: dept, claimed: deptRows.filter((r) => r.redeemed).length, total: deptRows.length })
+      result.push(...sortedRows)
+    }
+    return result
+  }
 
   return (
     <>
@@ -113,6 +143,18 @@ export function EmployeeTable({
             >
               Export CSV
             </button>
+            {hasDepts && (
+              <button
+                onClick={() => setGroupByDept((v) => !v)}
+                className={`border rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                  groupByDept
+                    ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
+                    : 'border-zinc-200 text-zinc-700 hover:bg-zinc-50'
+                }`}
+              >
+                By department
+              </button>
+            )}
           </div>
         </div>
 
@@ -130,32 +172,67 @@ export function EmployeeTable({
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
-                <tr
-                  key={r.id}
-                  className={`border-b border-zinc-50 transition-colors duration-500 ${r.redeemed ? 'bg-green-50' : 'hover:bg-zinc-50'}`}
-                >
-                  <td className="px-3 py-2.5 font-medium text-zinc-800">{r.employee_name}</td>
-                  <td className="px-3 py-2.5 font-mono text-xs text-zinc-500">{maskPhone(r.phone_number)}</td>
-                  <td className="px-3 py-2.5 text-zinc-500">{r.department ?? <span className="text-zinc-300">—</span>}</td>
-                  <td className="px-3 py-2.5">
-                    {r.sms_sent_at
-                      ? <span className="text-green-600 text-xs font-medium">✓ Sent</span>
-                      : <span className="text-zinc-300">—</span>}
-                  </td>
-                  <td className="px-3 py-2.5">
-                    {r.redeemed
-                      ? <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">Claimed</span>
-                      : <span className="text-zinc-300">—</span>}
-                  </td>
-                  <td className="px-3 py-2.5 text-xs text-zinc-400">
-                    {r.redeemed_at ? new Date(r.redeemed_at).toLocaleString() : <span className="text-zinc-300">—</span>}
-                  </td>
-                  <td className="px-3 py-2.5 text-xs text-zinc-400">
-                    {r.redeemed_by ?? <span className="text-zinc-300">—</span>}
-                  </td>
-                </tr>
-              ))}
+              {groupByDept
+                ? buildGroupedRows().map((row) =>
+                    '_type' in row ? (
+                      <tr key={`header-${row.department}`} className="bg-zinc-50">
+                        <td colSpan={7} className="px-3 py-1.5 text-xs font-semibold text-zinc-500">
+                          {row.department} · {row.claimed}/{row.total} claimed
+                        </td>
+                      </tr>
+                    ) : (
+                      <tr
+                        key={row.id}
+                        className={`border-b border-zinc-50 transition-colors duration-500 ${row.redeemed ? 'bg-green-50' : 'hover:bg-zinc-50'}`}
+                      >
+                        <td className="px-3 py-2.5 font-medium text-zinc-800">{row.employee_name}</td>
+                        <td className="px-3 py-2.5 font-mono text-xs text-zinc-500">{maskPhone(row.phone_number)}</td>
+                        <td className="px-3 py-2.5 text-zinc-500">{row.department ?? <span className="text-zinc-300">—</span>}</td>
+                        <td className="px-3 py-2.5">
+                          {row.sms_sent_at
+                            ? <span className="text-green-600 text-xs font-medium">✓ Sent</span>
+                            : <span className="text-zinc-300">—</span>}
+                        </td>
+                        <td className="px-3 py-2.5">
+                          {row.redeemed
+                            ? <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">Claimed</span>
+                            : <span className="text-zinc-300">—</span>}
+                        </td>
+                        <td className="px-3 py-2.5 text-xs text-zinc-400">
+                          {row.redeemed_at ? new Date(row.redeemed_at).toLocaleString() : <span className="text-zinc-300">—</span>}
+                        </td>
+                        <td className="px-3 py-2.5 text-xs text-zinc-400">
+                          {row.redeemed_by ?? <span className="text-zinc-300">—</span>}
+                        </td>
+                      </tr>
+                    )
+                  )
+                : rows.map((r) => (
+                    <tr
+                      key={r.id}
+                      className={`border-b border-zinc-50 transition-colors duration-500 ${r.redeemed ? 'bg-green-50' : 'hover:bg-zinc-50'}`}
+                    >
+                      <td className="px-3 py-2.5 font-medium text-zinc-800">{r.employee_name}</td>
+                      <td className="px-3 py-2.5 font-mono text-xs text-zinc-500">{maskPhone(r.phone_number)}</td>
+                      <td className="px-3 py-2.5 text-zinc-500">{r.department ?? <span className="text-zinc-300">—</span>}</td>
+                      <td className="px-3 py-2.5">
+                        {r.sms_sent_at
+                          ? <span className="text-green-600 text-xs font-medium">✓ Sent</span>
+                          : <span className="text-zinc-300">—</span>}
+                      </td>
+                      <td className="px-3 py-2.5">
+                        {r.redeemed
+                          ? <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">Claimed</span>
+                          : <span className="text-zinc-300">—</span>}
+                      </td>
+                      <td className="px-3 py-2.5 text-xs text-zinc-400">
+                        {r.redeemed_at ? new Date(r.redeemed_at).toLocaleString() : <span className="text-zinc-300">—</span>}
+                      </td>
+                      <td className="px-3 py-2.5 text-xs text-zinc-400">
+                        {r.redeemed_by ?? <span className="text-zinc-300">—</span>}
+                      </td>
+                    </tr>
+                  ))}
               {rows.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-3 py-12 text-center text-zinc-400 text-sm">
