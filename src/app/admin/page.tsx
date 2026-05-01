@@ -21,6 +21,22 @@ export default async function AdminPage() {
 
   const list = campaigns ?? []
 
+  // Fetch redemption counts for all campaigns in one query
+  const { data: tokenRows } = list.length
+    ? await service
+        .from('gift_tokens')
+        .select('campaign_id, redeemed')
+        .in('campaign_id', list.map((c) => c.id))
+    : { data: [] }
+
+  const statsMap = new Map<string, { total: number; redeemed: number }>()
+  for (const t of tokenRows ?? []) {
+    if (!statsMap.has(t.campaign_id)) statsMap.set(t.campaign_id, { total: 0, redeemed: 0 })
+    const s = statsMap.get(t.campaign_id)!
+    s.total++
+    if (t.redeemed) s.redeemed++
+  }
+
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-8">
@@ -50,31 +66,51 @@ export default async function AdminPage() {
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          {list.map((c) => (
-            <Link
-              key={c.id}
-              href={`/admin/campaigns/${c.id}`}
-              className="bg-white border border-zinc-200 rounded-xl p-5 hover:shadow-md transition-shadow flex items-center justify-between group"
-            >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="min-w-0">
-                  <p className="font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors truncate">
-                    {c.name}
-                  </p>
-                  <p className="text-sm text-zinc-400 mt-0.5">{c.campaign_date ?? '—'}</p>
+          {list.map((c) => {
+            const stats = statsMap.get(c.id) ?? { total: 0, redeemed: 0 }
+            const pct = stats.total > 0 ? Math.round((stats.redeemed / stats.total) * 100) : 0
+            const showProgress = !!c.sent_at && stats.total > 0
+            return (
+              <Link
+                key={c.id}
+                href={`/admin/campaigns/${c.id}`}
+                className="bg-white border border-zinc-200 rounded-xl p-5 hover:shadow-md transition-shadow group"
+              >
+                <div className="flex items-center justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors truncate">
+                      {c.name}
+                    </p>
+                    <p className="text-sm text-zinc-400 mt-0.5">{c.campaign_date ?? '—'}</p>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {!c.sent_at && <DeleteCampaignButton campaignId={c.id} />}
+                    <DuplicateCampaignButton
+                      campaignId={c.id}
+                      sourceName={c.name}
+                      sourceDate={c.campaign_date}
+                    />
+                    <StatusBadge sentAt={c.sent_at} closedAt={c.closed_at} />
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {!c.sent_at && <DeleteCampaignButton campaignId={c.id} />}
-                <DuplicateCampaignButton
-                  campaignId={c.id}
-                  sourceName={c.name}
-                  sourceDate={c.campaign_date}
-                />
-                <StatusBadge sentAt={c.sent_at} closedAt={c.closed_at} />
-              </div>
-            </Link>
-          ))}
+
+                {showProgress && (
+                  <div className="mt-3">
+                    <div className="flex items-center justify-between text-xs text-zinc-400 mb-1.5">
+                      <span>{stats.redeemed} of {stats.total} claimed</span>
+                      <span>{pct}%</span>
+                    </div>
+                    <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </Link>
+            )
+          })}
         </div>
       )}
     </div>
