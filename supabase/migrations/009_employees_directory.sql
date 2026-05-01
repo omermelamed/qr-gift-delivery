@@ -9,3 +9,11 @@ CREATE TABLE IF NOT EXISTS employees (
 );
 
 CREATE INDEX IF NOT EXISTS employees_company_idx ON employees (company_id);
+
+ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "employees_company_isolation"
+  ON employees
+  FOR ALL
+  USING (company_id = public.jwt_company_id())
+  WITH CHECK (company_id = public.jwt_company_id());

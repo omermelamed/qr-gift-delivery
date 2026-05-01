@@ -23,22 +23,35 @@ jobs:
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      - name: Mark already-applied migrations as applied
-        # Tells the Supabase CLI which migrations already exist in the remote DB
-        # so it doesn't try to re-run them. New migration files added to this list
-        # should be removed once they've been applied once.
-        run: |
-          for version in \
-            001_initial_schema \
-            002_rls_policies \
-            003_seed_roles_permissions \
-            004_storage_bucket \
-            005_admin_columns \
-            006_company_settings; do
-            supabase migration repair --status applied "$version" || true
-          done
+      - name: Bootstrap migration history for pre-existing schema
+        # Inserts records for migrations already applied directly to the DB
+        # so the CLI won't try to re-run them. Remove versions from this list
+        # once the migration history table is fully in sync.
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          SQL=$(cat << 'ENDSQL'
+          CREATE SCHEMA IF NOT EXISTS supabase_migrations;
+          CREATE TABLE IF NOT EXISTS supabase_migrations.schema_migrations (
+            version text NOT NULL PRIMARY KEY
+          );
+          INSERT INTO supabase_migrations.schema_migrations (version) VALUES
+            ('001_initial_schema'),
+            ('002_rls_policies'),
+            ('003_seed_roles_permissions'),
+            ('004_storage_bucket'),
+            ('005_admin_columns'),
+            ('006_company_settings')
+          ON CONFLICT (version) DO NOTHING;
+          ENDSQL
+          )
+          PAYLOAD=$(jq -n --arg q "$SQL" '{"query": $q}')
+          curl -sf -X POST \
+            "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/database/query" \
+            -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
 
       - name: Apply new migrations
         run: supabase db push --yes
