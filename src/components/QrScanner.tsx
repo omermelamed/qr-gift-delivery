@@ -43,7 +43,7 @@ export function QrScanner({ onResult, active }: Props) {
   return (
     <video
       ref={videoRef}
-      className="w-full h-full object-cover"
+      className="absolute inset-0 w-full h-full object-cover"
       playsInline
       muted
     />

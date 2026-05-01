@@ -82,10 +82,12 @@ export default function ScanPage() {
   }
 
   return (
-    <main className="flex flex-col min-h-screen bg-black overflow-hidden">
-      <div className="relative flex-1">
-        {/* Camera */}
-        <QrScanner onResult={handleScan} active={scanState === 'scanning' && userId !== null} />
+    <main className="flex flex-col bg-black overflow-hidden" style={{ height: '100dvh' }}>
+      <div className="relative flex-1 overflow-hidden">
+        {/* Camera — absolute so it fills the container regardless of flex sizing */}
+        <div className="absolute inset-0">
+          <QrScanner onResult={handleScan} active={scanState === 'scanning' && userId !== null} />
+        </div>
 
         {/* Scan frame overlay */}
         {scanState === 'scanning' && (
