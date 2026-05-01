@@ -26,7 +26,7 @@ describe('GET /api/employees', () => {
   it('returns 401 when unauthenticated', async () => {
     mockGetUser.mockResolvedValue({ data: { user: null } })
     const { GET } = await import('@/app/api/employees/route')
-    const res = await GET(new NextRequest('http://localhost/api/employees'))
+    const res = await GET()
     expect(res.status).toBe(401)
   })
 
@@ -35,7 +35,7 @@ describe('GET /api/employees', () => {
       select: () => ({ eq: () => ({ order: () => Promise.resolve({ data: [{ id: 'e-1', employee_name: 'Alice', phone: '+1234', department: 'Eng' }], error: null }) }) }),
     })
     const { GET } = await import('@/app/api/employees/route')
-    const res = await GET(new NextRequest('http://localhost/api/employees'))
+    const res = await GET()
     const body = await res.json()
     expect(res.status).toBe(200)
     expect(body.employees).toHaveLength(1)

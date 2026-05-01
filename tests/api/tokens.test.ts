@@ -126,4 +126,62 @@ describe('POST /api/campaigns/[id]/tokens', () => {
     expect(insertedRows).toHaveLength(1)
     expect((insertedRows[0] as { phone_number: string }).phone_number).toBe('+972501234567')
   })
+
+  it('populates from directory when source is "directory"', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'u-1', app_metadata: { company_id: 'co-1', role_id: 'role-1' } } } })
+    let insertedRows: unknown = null
+    mockFromService.mockImplementation((table: string) => {
+      if (table === 'campaigns') {
+        return { select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null }, error: null }) }) }) }) }
+      }
+      if (table === 'employees') {
+        return { select: () => ({ in: () => ({ eq: () => Promise.resolve({ data: [{ employee_name: 'Alice', phone: '+1234567890', department: 'Eng' }], error: null }) }) }) }
+      }
+      if (table === 'gift_tokens') {
+        return {
+          delete: () => ({ eq: () => ({ is: () => Promise.resolve({ error: null }) }) }),
+          insert: (rows: unknown) => { insertedRows = rows; return Promise.resolve({ error: null }) },
+        }
+      }
+    })
+    const { POST } = await import('@/app/api/campaigns/[id]/tokens/route')
+    const req = new NextRequest('http://localhost/api/campaigns/c-1/tokens', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: 'directory', employeeIds: ['e-1'] }),
+    })
+    const res = await POST(req, { params: Promise.resolve({ id: 'c-1' }) })
+    const body = await res.json()
+    expect(res.status).toBe(200)
+    expect(body.inserted).toBe(1)
+    expect(Array.isArray(insertedRows)).toBe(true)
+    const row = (insertedRows as Record<string, unknown>[])[0]
+    expect(row.employee_name).toBe('Alice')
+    expect(row.phone_number).toBe('+1234567890')
+  })
+
+  it('returns 404 when clone source campaign not in company', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'u-1', app_metadata: { company_id: 'co-1', role_id: 'role-1' } } } })
+    let campaignCallCount = 0
+    mockFromService.mockImplementation((table: string) => {
+      if (table === 'campaigns') {
+        // First call: target campaign (found), second call: source campaign (not found)
+        return {
+          select: () => ({ eq: () => ({ eq: () => ({ single: () => {
+            campaignCallCount++
+            if (campaignCallCount === 1) return Promise.resolve({ data: { id: 'c-1', sent_at: null }, error: null })
+            return Promise.resolve({ data: null, error: null })
+          } }) }) }),
+        }
+      }
+    })
+    const { POST } = await import('@/app/api/campaigns/[id]/tokens/route')
+    const req = new NextRequest('http://localhost/api/campaigns/c-1/tokens', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source: 'clone', sourceCampaignId: 'other-campaign' }),
+    })
+    const res = await POST(req, { params: Promise.resolve({ id: 'c-1' }) })
+    expect(res.status).toBe(404)
+  })
 })
