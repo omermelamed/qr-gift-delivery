@@ -28,8 +28,9 @@ export function Sidebar({ logoUrl }: Props) {
       aria-label={label}
       aria-current={isActive ? 'page' : undefined}
       className={`flex items-center gap-3 px-2 py-2 rounded-lg transition-colors ${
-        isActive ? 'bg-indigo-600 text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+        isActive ? 'text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
       }`}
+      style={isActive ? { backgroundColor: 'var(--brand, #6366f1)' } : undefined}
     >
       {icon}
       <span className="text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-75">
@@ -45,7 +46,7 @@ export function Sidebar({ logoUrl }: Props) {
         {logoUrl ? (
           <img src={logoUrl} alt="Logo" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
         ) : (
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500 flex-shrink-0" />
+          <div className="w-8 h-8 rounded-lg flex-shrink-0" style={{ backgroundColor: 'var(--brand, #6366f1)' }} />
         )}
         <span className="text-white font-bold text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-75">
           GiftFlow

@@ -11,16 +11,16 @@ export default async function SettingsPage() {
   if (meta.role_name !== 'company_admin') redirect('/admin')
 
   const service = createServiceClient()
-  let company: { id: string; name: string; logo_url: string | null; sms_template: string | null } | null = null
+  let company: { id: string; name: string; logo_url: string | null; sms_template: string | null; theme_color: string | null } | null = null
   try {
     const { data } = await service
       .from('companies')
-      .select('id, name, logo_url, sms_template')
+      .select('id, name, logo_url, sms_template, theme_color')
       .eq('id', meta.company_id)
       .single()
     company = data
   } catch {
-    // migration 006 not yet applied — fall back gracefully
+    // fall back gracefully if columns not yet present
   }
 
   if (!company) redirect('/admin')
@@ -36,6 +36,7 @@ export default async function SettingsPage() {
         initialName={company.name}
         initialLogoUrl={company.logo_url}
         initialTemplate={company.sms_template}
+        initialThemeColor={company.theme_color}
       />
     </div>
   )

@@ -28,6 +28,9 @@ export async function PATCH(request: NextRequest) {
   const name: string = (String(body.name ?? '')).trim()
   const logoUrl: string | null = body.logo_url ? String(body.logo_url) : null
   const smsTemplate: string | null = body.sms_template ? String(body.sms_template).trim() : null
+  const themeColor: string | null = body.theme_color && /^#[0-9a-f]{6}$/i.test(String(body.theme_color))
+    ? String(body.theme_color)
+    : null
 
   if (!name) return NextResponse.json({ error: 'Company name is required' }, { status: 400 })
   if (smsTemplate && !smsTemplate.includes('{link}')) {
@@ -37,7 +40,7 @@ export async function PATCH(request: NextRequest) {
   const service = createServiceClient()
   const { error } = await service
     .from('companies')
-    .update({ name, logo_url: logoUrl, sms_template: smsTemplate })
+    .update({ name, logo_url: logoUrl, sms_template: smsTemplate, theme_color: themeColor })
     .eq('id', appMeta.company_id)
 
   if (error) return NextResponse.json({ error: 'Failed to save settings' }, { status: 500 })

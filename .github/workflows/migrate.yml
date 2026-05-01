@@ -34,6 +34,7 @@ jobs:
           SQL=$(cat << 'ENDSQL'
           ALTER TABLE companies ADD COLUMN IF NOT EXISTS logo_url TEXT;
           ALTER TABLE companies ADD COLUMN IF NOT EXISTS sms_template TEXT;
+          ALTER TABLE companies ADD COLUMN IF NOT EXISTS theme_color TEXT;
           INSERT INTO storage.buckets (id, name, public)
             VALUES ('qr-codes', 'qr-codes', true)
             ON CONFLICT (id) DO NOTHING;
