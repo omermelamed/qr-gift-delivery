@@ -10,6 +10,7 @@ import { RedemptionProgress } from '@/components/admin/RedemptionProgress'
 import { DistributorAssignment } from '@/components/admin/DistributorAssignment'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
 import { StatusBadge } from '@/components/admin/StatusBadge'
+import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 
 export default async function CampaignDetailPage({
   params,
@@ -62,6 +63,7 @@ export default async function CampaignDetailPage({
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
           <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} />
+          {!campaign.sent_at && <DeleteCampaignButton campaignId={campaign.id} redirectAfter />}
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
           {canLaunch && (
             <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} />

@@ -30,6 +30,9 @@ export function EmployeeTable({
 }) {
   const [rows, setRows] = useState(initialRows)
   const [resending, setResending] = useState(false)
+
+  // Sync rows when the server re-renders via router.refresh() (e.g. after populate)
+  useEffect(() => { setRows(initialRows) }, [initialRows])
   const [resendMsg, setResendMsg] = useState<string | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [groupByDept, setGroupByDept] = useState(false)

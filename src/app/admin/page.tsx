@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
 import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignButton'
+import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 
 export default async function AdminPage() {
@@ -64,6 +65,7 @@ export default async function AdminPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
+                {!c.sent_at && <DeleteCampaignButton campaignId={c.id} />}
                 <DuplicateCampaignButton
                   campaignId={c.id}
                   sourceName={c.name}
