@@ -23,7 +23,24 @@ jobs:
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      - name: Apply migrations
-        run: supabase db push
+      - name: Mark already-applied migrations as applied
+        # Tells the Supabase CLI which migrations already exist in the remote DB
+        # so it doesn't try to re-run them. New migration files added to this list
+        # should be removed once they've been applied once.
+        run: |
+          for version in \
+            001_initial_schema \
+            002_rls_policies \
+            003_seed_roles_permissions \
+            004_storage_bucket \
+            005_admin_columns \
+            006_company_settings; do
+            supabase migration repair --status applied "$version" || true
+          done
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Apply new migrations
+        run: supabase db push --yes
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
