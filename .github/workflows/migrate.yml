@@ -64,6 +64,18 @@ jobs:
             -H "Content-Type: application/json" \
             -d "$PAYLOAD"
 
+      - name: Debug - show remote migration history
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          echo "=== Remote migration history ==="
+          curl -s -X POST \
+            "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/database/query" \
+            -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d '{"query": "SELECT version FROM supabase_migrations.schema_migrations ORDER BY version"}' | jq '.'
+
       - name: Apply new migrations
         run: supabase db push --yes
         env:
