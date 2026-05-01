@@ -67,15 +67,6 @@ jobs:
             -H "Content-Type: application/json" \
             -d "$PAYLOAD"
 
-      - name: Debug - show CLI migration status
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: |
-          echo "=== local files ==="
-          ls supabase/migrations/
-          echo "=== supabase migration list ==="
-          supabase migration list 2>&1 || true
-
       - name: Apply new migrations
         run: supabase db push --yes
         env:
