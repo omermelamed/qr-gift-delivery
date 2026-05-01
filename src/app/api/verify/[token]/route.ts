@@ -40,19 +40,19 @@ export async function POST(
   if (assignedDistributors && assignedDistributors.length > 0 && distributorId) {
     const assignedIds = new Set(assignedDistributors.map((r) => r.user_id))
     if (!assignedIds.has(distributorId)) {
-      // Allow company admins even if not explicitly assigned to this campaign
+      // Allow admins and campaign managers even if not explicitly assigned
       const companyId = campaign?.company_id
-      const { data: adminRole } = companyId
+      const { data: privilegedRole } = companyId
         ? await supabase
             .from('user_company_roles')
             .select('roles!inner(name)')
             .eq('user_id', distributorId)
             .eq('company_id', companyId)
-            .eq('roles.name', 'company_admin')
+            .in('roles.name', ['company_admin', 'campaign_manager'])
             .maybeSingle()
         : { data: null }
 
-      if (!adminRole) {
+      if (!privilegedRole) {
         return NextResponse.json({ valid: false, reason: 'not_authorized' })
       }
     }
