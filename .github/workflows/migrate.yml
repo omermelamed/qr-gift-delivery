@@ -23,12 +23,28 @@ jobs:
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
+      - name: Apply idempotent schema patches
+        # Migration 006 was marked as applied in the history before its SQL
+        # actually ran against the DB. This step applies it directly — the
+        # IF NOT EXISTS guards make it safe to run on every workflow execution.
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          SQL="ALTER TABLE companies ADD COLUMN IF NOT EXISTS logo_url TEXT; ALTER TABLE companies ADD COLUMN IF NOT EXISTS sms_template TEXT;"
+          PAYLOAD=$(jq -n --arg q "$SQL" '{"query": $q}')
+          curl -sf -X POST \
+            "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/database/query" \
+            -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
+
       - name: Sync migration history
         # The Supabase CLI stores only the numeric timestamp prefix (e.g.
         # "20240101000001") as the version, not the full filename. We
         # delete any stale/wrong-format records and insert just the timestamps
-        # for the 6 migrations already applied to the DB, so db push only runs
-        # the genuinely new ones (007-009).
+        # for all migrations already applied to the DB, so db push only runs
+        # genuinely new ones.
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
@@ -56,7 +72,10 @@ jobs:
             ('20240101000003'),
             ('20240101000004'),
             ('20240101000005'),
-            ('20240101000006')
+            ('20240101000006'),
+            ('20240101000007'),
+            ('20240101000008'),
+            ('20240101000009')
           ON CONFLICT (version) DO NOTHING;
           ENDSQL
           )

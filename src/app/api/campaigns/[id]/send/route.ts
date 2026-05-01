@@ -122,12 +122,12 @@ export async function POST(
     }
   }
 
-  if (dispatched > 0) {
-    await service
-      .from('campaigns')
-      .update({ sent_at: new Date().toISOString() })
-      .eq('id', campaignId)
-  }
+  // Stamp sent_at unconditionally — the campaign is "launched" regardless of
+  // individual SMS delivery results. Failures are surfaced via the dispatched/failed counts.
+  await service
+    .from('campaigns')
+    .update({ sent_at: new Date().toISOString() })
+    .eq('id', campaignId)
 
   const devPreviewUrl =
     process.env.TWILIO_MOCK === 'true'
