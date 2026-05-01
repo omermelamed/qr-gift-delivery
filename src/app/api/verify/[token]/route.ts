@@ -11,10 +11,10 @@ export async function POST(
 
   const supabase = createServiceClient()
 
-  // Fetch token row with campaign closed_at in one query
+  // Fetch token row with campaign info in one query
   const { data: tokenRow } = await supabase
     .from('gift_tokens')
-    .select('id, employee_name, redeemed, campaign_id, campaigns(closed_at)')
+    .select('id, employee_name, redeemed, campaign_id, campaigns(closed_at, company_id)')
     .eq('token', token)
     .single()
 
@@ -22,12 +22,12 @@ export async function POST(
     return NextResponse.json({ valid: false, reason: 'invalid' })
   }
 
-  const campaign = tokenRow.campaigns as unknown as { closed_at: string | null } | null
+  const campaign = tokenRow.campaigns as unknown as { closed_at: string | null; company_id: string } | null
   if (campaign?.closed_at) {
     return NextResponse.json({ valid: false, reason: 'campaign_closed' })
   }
 
-  // Distributor restriction check
+  // Distributor restriction check — admins bypass it
   const { data: assignedDistributors, error: distError } = await supabase
     .from('campaign_distributors')
     .select('user_id')
@@ -37,11 +37,27 @@ export async function POST(
     return NextResponse.json({ valid: false, reason: 'invalid' }, { status: 500 })
   }
 
-  if (assignedDistributors && assignedDistributors.length > 0) {
+  if (assignedDistributors && assignedDistributors.length > 0 && distributorId) {
     const assignedIds = new Set(assignedDistributors.map((r) => r.user_id))
-    if (!distributorId || !assignedIds.has(distributorId)) {
-      return NextResponse.json({ valid: false, reason: 'not_authorized' })
+    if (!assignedIds.has(distributorId)) {
+      // Allow company admins even if not explicitly assigned to this campaign
+      const companyId = campaign?.company_id
+      const { data: adminRole } = companyId
+        ? await supabase
+            .from('user_company_roles')
+            .select('roles!inner(name)')
+            .eq('user_id', distributorId)
+            .eq('company_id', companyId)
+            .eq('roles.name', 'company_admin')
+            .maybeSingle()
+        : { data: null }
+
+      if (!adminRole) {
+        return NextResponse.json({ valid: false, reason: 'not_authorized' })
+      }
     }
+  } else if (assignedDistributors && assignedDistributors.length > 0 && !distributorId) {
+    return NextResponse.json({ valid: false, reason: 'not_authorized' })
   }
 
   if (tokenRow.redeemed) {

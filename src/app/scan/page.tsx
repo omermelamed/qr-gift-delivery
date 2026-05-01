@@ -153,14 +153,22 @@ export default function ScanPage() {
           </div>
         )}
 
-        {/* History button — shown when not in result state */}
+        {/* Back to admin + History — shown when not in result state */}
         {scanState !== 'result' && (
-          <button
-            onClick={() => setShowHistory(true)}
-            className="absolute bottom-8 right-6 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"
-          >
-            History {scanHistory.length > 0 && `(${scanHistory.length})`}
-          </button>
+          <>
+            <a
+              href="/admin"
+              className="absolute top-5 left-5 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"
+            >
+              ← Admin
+            </a>
+            <button
+              onClick={() => setShowHistory(true)}
+              className="absolute bottom-8 right-6 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"
+            >
+              History {scanHistory.length > 0 && `(${scanHistory.length})`}
+            </button>
+          </>
         )}
 
         {/* History bottom sheet */}

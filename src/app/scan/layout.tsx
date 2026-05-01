@@ -9,7 +9,8 @@ export default async function ScanLayout({ children }: { children: React.ReactNo
   if (!user) redirect('/login')
 
   const meta = user.app_metadata as JwtAppMetadata | undefined
-  if (meta?.role_name !== 'scanner') redirect('/login')
+  const allowed = meta?.role_name === 'scanner' || meta?.role_name === 'company_admin'
+  if (!allowed) redirect('/login')
 
   return <>{children}</>
 }
