@@ -25,7 +25,8 @@ jobs:
 
       - name: Sync migration history
         # Clears any stale records not matching local files, then marks
-        # 001-006 as already applied. 007-009 are left out so db push applies them.
+        # 20240101000001-20240101000006 as already applied so db push only
+        # applies the genuinely new migrations (007-009).
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
@@ -37,23 +38,23 @@ jobs:
           );
           DELETE FROM supabase_migrations.schema_migrations
           WHERE version NOT IN (
-            '001_initial_schema',
-            '002_rls_policies',
-            '003_seed_roles_permissions',
-            '004_storage_bucket',
-            '005_admin_columns',
-            '006_company_settings',
-            '007_campaign_close',
-            '008_campaign_distributors',
-            '009_employees_directory'
+            '20240101000001_initial_schema',
+            '20240101000002_rls_policies',
+            '20240101000003_seed_roles_permissions',
+            '20240101000004_storage_bucket',
+            '20240101000005_admin_columns',
+            '20240101000006_company_settings',
+            '20240101000007_campaign_close',
+            '20240101000008_campaign_distributors',
+            '20240101000009_employees_directory'
           );
           INSERT INTO supabase_migrations.schema_migrations (version) VALUES
-            ('001_initial_schema'),
-            ('002_rls_policies'),
-            ('003_seed_roles_permissions'),
-            ('004_storage_bucket'),
-            ('005_admin_columns'),
-            ('006_company_settings')
+            ('20240101000001_initial_schema'),
+            ('20240101000002_rls_policies'),
+            ('20240101000003_seed_roles_permissions'),
+            ('20240101000004_storage_bucket'),
+            ('20240101000005_admin_columns'),
+            ('20240101000006_company_settings')
           ON CONFLICT (version) DO NOTHING;
           ENDSQL
           )
@@ -63,18 +64,6 @@ jobs:
             -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
             -H "Content-Type: application/json" \
             -d "$PAYLOAD"
-
-      - name: Debug - show remote migration history
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-        run: |
-          echo "=== Remote migration history ==="
-          curl -s -X POST \
-            "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/database/query" \
-            -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
-            -H "Content-Type: application/json" \
-            -d '{"query": "SELECT version FROM supabase_migrations.schema_migrations ORDER BY version"}' | jq '.'
 
       - name: Apply new migrations
         run: supabase db push --yes
