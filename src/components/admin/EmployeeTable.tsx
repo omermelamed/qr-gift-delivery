@@ -167,14 +167,6 @@ export function EmployeeTable({
           <h2 className="font-semibold text-zinc-900">Employees <span className="text-zinc-400 font-normal">({rows.length})</span></h2>
           <div className="flex items-center gap-2">
             {resendMsg && <p className="text-sm text-green-700">{resendMsg}</p>}
-            {isDraft && (
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
-              >
-                + Add employee
-              </button>
-            )}
             <button
               onClick={handleResend}
               disabled={resending || unclaimedCount === 0}
