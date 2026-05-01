@@ -23,10 +23,9 @@ jobs:
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      - name: Bootstrap migration history for pre-existing schema
-        # Inserts records for migrations already applied directly to the DB
-        # so the CLI won't try to re-run them. Remove versions from this list
-        # once the migration history table is fully in sync.
+      - name: Sync migration history
+        # Clears any stale records not matching local files, then marks
+        # 001-006 as already applied. 007-009 are left out so db push applies them.
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
@@ -35,6 +34,18 @@ jobs:
           CREATE SCHEMA IF NOT EXISTS supabase_migrations;
           CREATE TABLE IF NOT EXISTS supabase_migrations.schema_migrations (
             version text NOT NULL PRIMARY KEY
+          );
+          DELETE FROM supabase_migrations.schema_migrations
+          WHERE version NOT IN (
+            '001_initial_schema',
+            '002_rls_policies',
+            '003_seed_roles_permissions',
+            '004_storage_bucket',
+            '005_admin_columns',
+            '006_company_settings',
+            '007_campaign_close',
+            '008_campaign_distributors',
+            '009_employees_directory'
           );
           INSERT INTO supabase_migrations.schema_migrations (version) VALUES
             ('001_initial_schema'),
