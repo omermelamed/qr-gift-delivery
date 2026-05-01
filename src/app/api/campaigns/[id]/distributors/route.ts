@@ -75,17 +75,25 @@ export async function POST(
 
   const service = createServiceClient()
 
-  // Verify target user is a scanner in this company
+  // Verify target user is a scanner or admin in this company
+  const { data: { user: targetUser } } = await service.auth.admin.getUserById(userId)
+  const targetMeta = targetUser?.app_metadata as JwtAppMetadata | undefined
+
   const { data: ucr } = await service
     .from('user_company_roles')
     .select('roles(name)')
     .eq('user_id', userId)
     .eq('company_id', appMeta.company_id)
-    .single()
+    .maybeSingle()
 
   const targetRole = ucr?.roles as unknown as { name: string } | null
-  if (!ucr || targetRole?.name !== 'scanner') {
-    return NextResponse.json({ error: 'User is not a scanner in this company' }, { status: 422 })
+  const isEligible =
+    targetRole?.name === 'scanner' ||
+    targetRole?.name === 'company_admin' ||
+    targetMeta?.company_id === appMeta.company_id
+
+  if (!isEligible) {
+    return NextResponse.json({ error: 'User is not a member of this company' }, { status: 422 })
   }
 
   const { error } = await service
