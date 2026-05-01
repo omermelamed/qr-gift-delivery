@@ -3,6 +3,24 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import type { JwtAppMetadata } from '@/types'
 
+export async function GET() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const appMeta = user.app_metadata as JwtAppMetadata
+  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const service = createServiceClient()
+  const { data } = await service
+    .from('campaigns')
+    .select('id, name, campaign_date, sent_at')
+    .eq('company_id', appMeta.company_id)
+    .order('created_at', { ascending: false })
+
+  return NextResponse.json({ campaigns: data ?? [] })
+}
+
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

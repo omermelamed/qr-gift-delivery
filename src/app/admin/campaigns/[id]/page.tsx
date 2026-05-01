@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
-import { TokenUploader } from '@/components/admin/TokenUploader'
+import { CampaignPopulator } from '@/components/admin/CampaignPopulator'
 import { LaunchButton } from '@/components/admin/LaunchButton'
 import { CloseCampaignButton } from '@/components/admin/CloseCampaignButton'
 import { RedemptionProgress } from '@/components/admin/RedemptionProgress'
@@ -82,7 +82,7 @@ export default async function CampaignDetailPage({
             <DistributorAssignment campaignId={campaign.id} />
           )}
           {!campaign.sent_at && (
-            <TokenUploader campaignId={campaign.id} />
+            <CampaignPopulator campaignId={campaign.id} />
           )}
         </div>
 
