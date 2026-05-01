@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
-import { sendGiftMMS } from '@/lib/twilio'
+import { sendGiftMMS, isTwilioConfigured } from '@/lib/twilio'
 import { generateQrBuffer } from '@/lib/qr'
 import type { JwtAppMetadata } from '@/types'
 
@@ -61,6 +61,7 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to fetch tokens' }, { status: 500 })
   }
 
+  const smsSending = isTwilioConfigured()
   let dispatched = 0
   let failed = 0
 
@@ -87,7 +88,7 @@ export async function POST(
             .eq('id', token.id)
         }
 
-        if (process.env.TWILIO_MOCK !== 'true') {
+        if (smsSending) {
           await sendGiftMMS({
             to: token.phone_number,
             employeeName: token.employee_name,
@@ -129,10 +130,5 @@ export async function POST(
     .update({ sent_at: new Date().toISOString() })
     .eq('id', campaignId)
 
-  const devPreviewUrl =
-    process.env.TWILIO_MOCK === 'true'
-      ? `${process.env.NEXT_PUBLIC_APP_URL}/dev/preview/${campaignId}`
-      : undefined
-
-  return NextResponse.json({ dispatched, failed, campaignId, devPreviewUrl })
+  return NextResponse.json({ dispatched, failed, campaignId, smsSending })
 }

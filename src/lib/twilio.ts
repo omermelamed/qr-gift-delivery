@@ -10,6 +10,15 @@ interface SendGiftMMSResult {
   sid: string
 }
 
+export function isTwilioConfigured(): boolean {
+  if (process.env.TWILIO_MOCK === 'true') return true
+  return !!(
+    process.env.TWILIO_ACCOUNT_SID &&
+    process.env.TWILIO_AUTH_TOKEN &&
+    process.env.TWILIO_PHONE_NUMBER
+  )
+}
+
 export async function sendGiftMMS(options: SendGiftMMSOptions): Promise<SendGiftMMSResult> {
   if (process.env.TWILIO_MOCK === 'true') {
     return { sid: 'mock' }

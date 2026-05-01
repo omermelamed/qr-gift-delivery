@@ -64,6 +64,14 @@ export default async function CampaignDetailPage({
         <div className="flex items-center gap-3 flex-shrink-0">
           <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} />
           {!campaign.sent_at && <DeleteCampaignButton campaignId={campaign.id} redirectAfter />}
+          {campaign.sent_at && (
+            <Link
+              href={`/admin/campaigns/${campaign.id}/qr`}
+              className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
+            >
+              View QR Codes
+            </Link>
+          )}
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
           {canLaunch && (
             <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} />
