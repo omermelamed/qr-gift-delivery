@@ -36,19 +36,26 @@ export default async function TeamPage() {
     .select('user_id, role_id, roles(name)')
     .eq('company_id', appMeta.company_id)
 
-  const companyUserIds = (ucr ?? []).map((r) => r.user_id)
+  const companyUserIds = new Set((ucr ?? []).map((r) => r.user_id))
 
   const { data: { users: allUsers } } = await service.auth.admin.listUsers({ perPage: 1000 })
-  const companyUsers = allUsers.filter((u) => companyUserIds.includes(u.id))
+
+  // Include users from user_company_roles AND users whose app_metadata.company_id
+  // matches (e.g. the initial company admin set up without a UCR row)
+  const companyUsers = allUsers.filter((u) => {
+    const meta = u.app_metadata as JwtAppMetadata | undefined
+    return companyUserIds.has(u.id) || meta?.company_id === appMeta.company_id
+  })
 
   const members: Member[] = companyUsers.map((u) => {
     const ucrRow = (ucr ?? []).find((r) => r.user_id === u.id)
     const roleRow = ucrRow?.roles as unknown as { name: string } | null
+    const meta = u.app_metadata as JwtAppMetadata | undefined
     return {
       id: u.id,
       email: u.email ?? '',
       name: u.user_metadata?.full_name ?? u.email?.split('@')[0] ?? '—',
-      role_name: roleRow?.name ?? (u.app_metadata as JwtAppMetadata)?.role_name ?? '—',
+      role_name: roleRow?.name ?? meta?.role_name ?? '—',
       isPending: !u.last_sign_in_at,
       isSelf: u.id === user.id,
     }

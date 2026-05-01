@@ -11,6 +11,7 @@ import { DistributorAssignment } from '@/components/admin/DistributorAssignment'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
+import { CampaignNotes } from '@/components/admin/CampaignNotes'
 
 export default async function CampaignDetailPage({
   params,
@@ -94,6 +95,7 @@ export default async function CampaignDetailPage({
           {!campaign.sent_at && (
             <CampaignPopulator campaignId={campaign.id} />
           )}
+          <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
         </div>
 
         {/* Right column */}
