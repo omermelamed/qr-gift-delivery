@@ -82,3 +82,36 @@ describe('POST /api/campaigns', () => {
     expect(await res.json()).toEqual({ id: 'campaign-new' })
   })
 })
+
+describe('GET /api/campaigns', () => {
+  beforeEach(() => {
+    vi.resetAllMocks()
+    mockGetUser.mockResolvedValue({
+      data: {
+        user: {
+          id: 'admin-1',
+          app_metadata: { company_id: 'co-1', role_id: 'role-1', role_name: 'company_admin' },
+        },
+      },
+    })
+  })
+
+  it('returns 401 when unauthenticated', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null } })
+    const { GET } = await import('@/app/api/campaigns/route')
+    const res = await GET()
+    expect(res.status).toBe(401)
+  })
+
+  it('returns company-scoped campaign list', async () => {
+    mockFromService.mockReturnValue({
+      select: () => ({ eq: () => ({ order: () => Promise.resolve({ data: [{ id: 'c-1', name: 'Campaign 1', campaign_date: null, sent_at: null }], error: null }) }) }),
+    })
+    const { GET } = await import('@/app/api/campaigns/route')
+    const res = await GET()
+    const body = await res.json()
+    expect(res.status).toBe(200)
+    expect(body.campaigns).toHaveLength(1)
+    expect(body.campaigns[0].id).toBe('c-1')
+  })
+})

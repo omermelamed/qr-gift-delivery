@@ -105,7 +105,7 @@ describe('POST /api/employees/import', () => {
     const req = new NextRequest('http://localhost/api/employees/import', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rows: [{ employee_name: 'Alice', phone: '+111' }, { employee_name: 'Bob', phone: '+222' }] }),
+      body: JSON.stringify({ rows: [{ employee_name: 'Alice', phone: '+15550001111' }, { employee_name: 'Bob', phone: '+15550002222' }] }),
     })
     const res = await POST(req)
     const body = await res.json()

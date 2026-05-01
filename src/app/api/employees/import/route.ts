@@ -17,11 +17,11 @@ export async function POST(request: NextRequest) {
   if (inputRows.length === 0) return NextResponse.json({ error: 'No rows to import' }, { status: 400 })
 
   const rows = inputRows
-    .filter((r) => r.employee_name?.trim() && r.phone?.trim())
+    .filter((r) => r.employee_name?.trim() && normalizePhone(r.phone ?? ''))
     .map((r) => ({
       company_id: appMeta.company_id,
       employee_name: r.employee_name.trim(),
-      phone: normalizePhone(r.phone) ?? r.phone.trim(),
+      phone: normalizePhone(r.phone)!,
       department: r.department?.trim() || null,
     }))
 

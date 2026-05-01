@@ -18,7 +18,11 @@ export async function PATCH(
 
   const body = await request.json().catch(() => ({}))
   const updates: Record<string, string | null> = {}
-  if (body.employee_name !== undefined) updates.employee_name = body.employee_name?.trim() || null
+  if (body.employee_name !== undefined) {
+    const trimmed = body.employee_name?.trim()
+    if (!trimmed) return NextResponse.json({ error: 'employee_name cannot be empty' }, { status: 400 })
+    updates.employee_name = trimmed
+  }
   if (body.phone !== undefined) {
     const phone = normalizePhone(body.phone ?? '')
     if (!phone) return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })

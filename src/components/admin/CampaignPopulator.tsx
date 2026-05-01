@@ -58,11 +58,17 @@ export function CampaignPopulator({ campaignId }: { campaignId: string }) {
     setMessage(null)
     try {
       if (saveToDirectory) {
-        await fetch('/api/employees/import', {
+        const importRes = await fetch('/api/employees/import', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ rows: validRows.map(({ name, phone_number, department }) => ({ employee_name: name, phone: phone_number, department })) }),
         })
+        if (!importRes.ok) {
+          const importData = await importRes.json()
+          setMessage({ text: importData.error ?? 'Failed to save to directory', type: 'error' })
+          setUploading(false)
+          return
+        }
       }
       const res = await fetch(`/api/campaigns/${campaignId}/tokens`, {
         method: 'POST',
