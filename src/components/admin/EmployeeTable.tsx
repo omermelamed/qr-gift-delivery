@@ -90,19 +90,42 @@ export function EmployeeTable({
 
   const hasDepts = rows.some((r) => r.department != null)
 
+  // Fetch assigned distributors once on mount
   useEffect(() => {
     if (isDraft) return
     fetch(`/api/campaigns/${campaignId}/distributors`)
       .then((r) => r.json())
       .then((data) => {
         const map: Record<string, string> = {}
-        for (const d of data.distributors ?? []) {
-          map[d.userId] = d.name
-        }
+        for (const d of data.distributors ?? []) map[d.userId] = d.name
         setDistributorNames(map)
       })
       .catch(() => {})
   }, [campaignId, isDraft])
+
+  // Resolve names for redeemed_by IDs not in the distributors map (e.g. admins)
+  useEffect(() => {
+    if (isDraft) return
+    const unresolved = [...new Set(
+      rows.filter((r) => r.redeemed_by && !distributorNames[r.redeemed_by]).map((r) => r.redeemed_by!)
+    )]
+    if (unresolved.length === 0) return
+    fetch('/api/users/resolve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids: unresolved }),
+    })
+      .then((r) => r.json())
+      .then(({ users }) => {
+        if (!users?.length) return
+        setDistributorNames((prev) => {
+          const next = { ...prev }
+          for (const u of users) next[u.id] = u.name
+          return next
+        })
+      })
+      .catch(() => {})
+  }, [campaignId, isDraft, rows, distributorNames])
 
   useEffect(() => {
     if (!hasDepts) setGroupByDept(false)
