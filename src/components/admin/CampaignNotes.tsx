@@ -108,12 +108,12 @@ export function CampaignNotes({
   }
 
   return (
-    <div className="bg-white border border-zinc-200 rounded-xl flex flex-col">
+    <div className="bg-white border border-zinc-200 rounded-xl flex flex-col h-full">
       <div className="px-4 py-3 border-b border-zinc-100">
         <h3 className="text-sm font-semibold text-zinc-900">Notes</h3>
       </div>
 
-      <div className="flex flex-col gap-3 p-4 max-h-80 overflow-y-auto">
+      <div className="flex flex-col gap-3 p-4 flex-1 overflow-y-auto min-h-0">
         {loading ? (
           <p className="text-xs text-zinc-400 text-center py-4">Loading…</p>
         ) : notes.length === 0 ? (

@@ -36,33 +36,35 @@ export function RedemptionProgress({
   const pending = total - claimed
 
   return (
-    <div className="bg-white rounded-xl border border-zinc-200 p-5">
-      {/* Stat cards */}
-      <div className="grid grid-cols-3 gap-3 mb-5">
-        <div className="text-center">
-          <p className="text-2xl font-bold text-zinc-900">{total}</p>
-          <p className="text-xs text-zinc-400 mt-0.5">Total</p>
+    <div className="bg-white rounded-xl border border-zinc-200 p-5 flex items-center gap-6">
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-5 mb-4">
+          <div>
+            <p className="text-3xl font-bold text-zinc-900">{claimed}</p>
+            <p className="text-xs text-zinc-400 mt-0.5">Claimed</p>
+          </div>
+          <div className="w-px h-9 bg-zinc-100" />
+          <div>
+            <p className="text-3xl font-bold text-amber-500">{pending}</p>
+            <p className="text-xs text-zinc-400 mt-0.5">Pending</p>
+          </div>
+          <div className="w-px h-9 bg-zinc-100" />
+          <div>
+            <p className="text-3xl font-bold text-zinc-300">{total}</p>
+            <p className="text-xs text-zinc-400 mt-0.5">Total</p>
+          </div>
         </div>
-        <div className="text-center">
-          <p className="text-2xl font-bold text-indigo-600">{claimed}</p>
-          <p className="text-xs text-zinc-400 mt-0.5">Claimed</p>
+        <div className="w-full bg-zinc-100 rounded-full h-2.5">
+          <div
+            className="h-2.5 rounded-full transition-all duration-500"
+            style={{ width: `${pct}%`, backgroundColor: 'var(--brand,#6366f1)' }}
+          />
         </div>
-        <div className="text-center">
-          <p className="text-2xl font-bold text-amber-500">{pending}</p>
-          <p className="text-xs text-zinc-400 mt-0.5">Pending</p>
-        </div>
+        <p className="text-xs text-zinc-400 mt-1.5">{claimed} of {total} employees redeemed</p>
       </div>
-
-      {/* Progress bar */}
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-zinc-700">Redemption</span>
-        <span className="text-sm font-semibold text-indigo-600">{pct}%</span>
-      </div>
-      <div className="w-full bg-zinc-100 rounded-full h-2.5">
-        <div
-          className="bg-gradient-to-r from-indigo-500 to-violet-500 h-2.5 rounded-full transition-all duration-500"
-          style={{ width: `${pct}%` }}
-        />
+      <div className="flex-shrink-0 text-right">
+        <p className="text-5xl font-bold tabular-nums" style={{ color: 'var(--brand,#6366f1)' }}>{pct}%</p>
+        <p className="text-xs text-zinc-400 mt-0.5">redeemed</p>
       </div>
     </div>
   )

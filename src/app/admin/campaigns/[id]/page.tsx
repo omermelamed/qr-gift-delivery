@@ -45,11 +45,12 @@ export default async function CampaignDetailPage({
 
   const allTokens = tokens ?? []
   const claimedCount = allTokens.filter((t) => t.redeemed).length
-  const canLaunch = !campaign.sent_at && allTokens.length > 0
+  const isDraft = !campaign.sent_at
+  const canLaunch = isDraft && allTokens.length > 0
   const canClose = !!campaign.sent_at && !campaign.closed_at
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-6">
         <Link href="/admin" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors">
@@ -57,14 +58,14 @@ export default async function CampaignDetailPage({
         </Link>
       </div>
 
-      <div className="flex items-start justify-between gap-4 mb-8">
+      <div className="flex items-start justify-between gap-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900">{campaign.name}</h1>
           <p className="text-sm text-zinc-400 mt-0.5">{campaign.campaign_date ?? '—'}</p>
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
           <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} />
-          {!campaign.sent_at && <DeleteCampaignButton campaignId={campaign.id} redirectAfter />}
+          {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter />}
           {campaign.sent_at && (
             <Link
               href={`/admin/campaigns/${campaign.id}/qr`}
@@ -80,32 +81,57 @@ export default async function CampaignDetailPage({
         </div>
       </div>
 
-      {/* Two-column layout */}
-      <div className="flex gap-6 items-start">
-        {/* Left rail */}
-        <div className="w-72 flex-shrink-0 flex flex-col gap-4">
-          <RedemptionProgress
-            campaignId={campaign.id}
-            initialClaimed={claimedCount}
-            total={allTokens.length}
-          />
-          {!campaign.sent_at && (
-            <DistributorAssignment campaignId={campaign.id} />
-          )}
-          {!campaign.sent_at && (
-            <CampaignPopulator campaignId={campaign.id} />
-          )}
-          <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
-        </div>
+      {/* ── Bento grid ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
 
-        {/* Right column */}
-        <div className="flex-1 min-w-0">
-          <EmployeeTable
-            campaignId={campaign.id}
-            initialRows={allTokens}
-            isDraft={!campaign.sent_at}
-          />
-        </div>
+        {isDraft ? (
+          <>
+            {/* Draft: Populator (2 cols) + Distributor (1 col) */}
+            <div className="lg:col-span-2">
+              <CampaignPopulator campaignId={campaign.id} />
+            </div>
+            <div>
+              <DistributorAssignment campaignId={campaign.id} />
+            </div>
+
+            {/* Employee table (2 cols) + Notes (1 col) */}
+            <div className="lg:col-span-2">
+              <EmployeeTable
+                campaignId={campaign.id}
+                initialRows={allTokens}
+                isDraft={isDraft}
+              />
+            </div>
+            <div>
+              <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
+            </div>
+          </>
+        ) : (
+          <>
+            {/* Running/Closed: Progress bar (2 cols) | Notes spans both rows (1 col) */}
+            <div className="lg:col-span-2">
+              <RedemptionProgress
+                campaignId={campaign.id}
+                initialClaimed={claimedCount}
+                total={allTokens.length}
+              />
+            </div>
+
+            {/* Notes — right column spanning 2 rows */}
+            <div className="lg:row-span-2 lg:self-stretch">
+              <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
+            </div>
+
+            {/* Employee table (2 cols, row 2) */}
+            <div className="lg:col-span-2">
+              <EmployeeTable
+                campaignId={campaign.id}
+                initialRows={allTokens}
+                isDraft={isDraft}
+              />
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
