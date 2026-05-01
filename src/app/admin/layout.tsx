@@ -11,7 +11,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
   const meta = user.app_metadata as JwtAppMetadata | undefined
-  if (!meta?.role_name || !ADMIN_ROLES.includes(meta.role_name)) redirect('/login')
+  if (!meta?.role_name || !ADMIN_ROLES.includes(meta.role_name)) redirect('/unauthorized')
 
   const service = createServiceClient()
   let company: { logo_url?: string | null; theme_color?: string | null } | null = null

@@ -8,7 +8,7 @@ export default async function PlatformLayout({ children }: { children: React.Rea
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
   const meta = user.app_metadata as JwtAppMetadata | undefined
-  if (meta?.role_name !== 'platform_admin') redirect('/login')
+  if (meta?.role_name !== 'platform_admin') redirect('/unauthorized')
 
   return (
     <div className="flex min-h-screen">

@@ -17,6 +17,7 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const resetSuccess = searchParams.get('reset') === 'success'
+  const nextPath = searchParams.get('next')
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -30,7 +31,8 @@ function LoginForm() {
         return
       }
       const meta = data.user.app_metadata as JwtAppMetadata | undefined
-      router.push(meta?.role_name === 'scanner' ? '/scan' : '/admin')
+      const defaultPath = meta?.role_name === 'scanner' ? '/scan' : '/admin'
+      router.push(nextPath ?? defaultPath)
     } finally {
       setLoading(false)
     }
