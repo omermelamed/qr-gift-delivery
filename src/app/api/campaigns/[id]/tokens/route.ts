@@ -52,12 +52,14 @@ export async function POST(
       .in('id', employeeIds)
       .eq('company_id', appMeta.company_id)
 
-    insertRows = (employees ?? []).map((e) => ({
-      campaign_id: campaignId,
-      employee_name: e.employee_name,
-      phone_number: e.phone,
-      department: e.department,
-    }))
+    insertRows = (employees ?? [])
+      .filter((e) => !!e.phone)  // skip team members without a phone number set
+      .map((e) => ({
+        campaign_id: campaignId,
+        employee_name: e.employee_name,
+        phone_number: e.phone!,
+        department: e.department,
+      }))
   } else if (source === 'clone') {
     const sourceCampaignId: string | undefined = body.sourceCampaignId
     if (!sourceCampaignId) return NextResponse.json({ error: 'sourceCampaignId required' }, { status: 400 })
