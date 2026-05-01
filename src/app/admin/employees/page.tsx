@@ -5,9 +5,10 @@ import { AddDirectoryEmployeeModal } from '@/components/admin/AddDirectoryEmploy
 import { ImportDirectoryModal } from '@/components/admin/ImportDirectoryModal'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 
-type Employee = { id: string; employee_name: string; phone: string; department: string | null }
+type Employee = { id: string; employee_name: string; phone: string | null; department: string | null; user_id?: string | null }
 
-function maskPhone(phone: string) {
+function maskPhone(phone: string | null) {
+  if (!phone) return null
   return phone.replace(/\d(?=\d{4})/g, '•')
 }
 
@@ -19,6 +20,7 @@ export default function EmployeesPage() {
   const [showImport, setShowImport] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
+  const [editPhone, setEditPhone] = useState('')
   const [editDept, setEditDept] = useState('')
   const [removeTarget, setRemoveTarget] = useState<Employee | null>(null)
   const [removeLoading, setRemoveLoading] = useState(false)
@@ -36,7 +38,9 @@ export default function EmployeesPage() {
   const departments = [...new Set(employees.map((e) => e.department).filter(Boolean) as string[])].sort()
 
   const filtered = employees.filter((e) => {
-    const matchSearch = !search || e.employee_name.toLowerCase().includes(search.toLowerCase()) || (e.department ?? '').toLowerCase().includes(search.toLowerCase())
+    const matchSearch = !search ||
+      e.employee_name.toLowerCase().includes(search.toLowerCase()) ||
+      (e.department ?? '').toLowerCase().includes(search.toLowerCase())
     const matchDept = !deptFilter || e.department === deptFilter
     return matchSearch && matchDept
   })
@@ -55,13 +59,23 @@ export default function EmployeesPage() {
     const res = await fetch(`/api/employees/${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ employee_name: editName, department: editDept || null }),
+      body: JSON.stringify({ employee_name: editName, phone: editPhone || null, department: editDept || null }),
     })
     if (res.ok) {
-      setEmployees((prev) => prev.map((e) => e.id === id ? { ...e, employee_name: editName, department: editDept || null } : e))
+      setEmployees((prev) => prev.map((e) => e.id === id
+        ? { ...e, employee_name: editName, phone: editPhone || null, department: editDept || null }
+        : e
+      ))
       setEditingId(null)
       showToast('Employee updated')
     }
+  }
+
+  function startEdit(e: Employee) {
+    setEditingId(e.id)
+    setEditName(e.employee_name)
+    setEditPhone(e.phone ?? '')
+    setEditDept(e.department ?? '')
   }
 
   return (
@@ -75,7 +89,7 @@ export default function EmployeesPage() {
           <button onClick={() => setShowImport(true)} className="border border-zinc-200 rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors">
             Import CSV
           </button>
-          <button onClick={() => setShowAdd(true)} className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all">
+          <button onClick={() => setShowAdd(true)} className="text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all" style={{ backgroundColor: 'var(--brand,#6366f1)' }}>
             + Add employee
           </button>
         </div>
@@ -83,9 +97,9 @@ export default function EmployeesPage() {
 
       <div className="flex gap-3 mb-4">
         <input type="text" placeholder="Search by name or department…" value={search} onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+          className="flex-1 border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:border-transparent" />
         {departments.length > 0 && (
-          <select value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)} className="border border-zinc-200 rounded-lg px-3 py-2 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+          <select value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)} className="border border-zinc-200 rounded-lg px-3 py-2 text-sm text-zinc-700 focus:outline-none">
             <option value="">All departments</option>
             {departments.map((d) => <option key={d} value={d}>{d}</option>)}
           </select>
@@ -113,15 +127,21 @@ export default function EmployeesPage() {
                   {editingId === e.id ? (
                     <>
                       <td className="px-5 py-2">
-                        <input value={editName} onChange={(ev) => setEditName(ev.target.value)} className="border border-zinc-200 rounded-lg px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                        <input value={editName} onChange={(ev) => setEditName(ev.target.value)}
+                          className="border border-zinc-200 rounded-lg px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                       </td>
-                      <td className="px-5 py-2 font-mono text-xs text-zinc-500">{maskPhone(e.phone)}</td>
                       <td className="px-5 py-2">
-                        <input value={editDept} onChange={(ev) => setEditDept(ev.target.value)} placeholder="Department" className="border border-zinc-200 rounded-lg px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                        <input value={editPhone} onChange={(ev) => setEditPhone(ev.target.value)}
+                          placeholder="+1234567890"
+                          className="border border-zinc-200 rounded-lg px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono" />
+                      </td>
+                      <td className="px-5 py-2">
+                        <input value={editDept} onChange={(ev) => setEditDept(ev.target.value)} placeholder="Department"
+                          className="border border-zinc-200 rounded-lg px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                       </td>
                       <td className="px-5 py-2 text-right">
                         <div className="flex justify-end gap-2">
-                          <button onClick={() => handleSaveEdit(e.id)} className="text-xs font-medium text-indigo-600 hover:text-indigo-700">Save</button>
+                          <button onClick={() => handleSaveEdit(e.id)} className="text-xs font-medium" style={{ color: 'var(--brand,#6366f1)' }}>Save</button>
                           <button onClick={() => setEditingId(null)} className="text-xs font-medium text-zinc-400 hover:text-zinc-600">Cancel</button>
                         </div>
                       </td>
@@ -129,11 +149,16 @@ export default function EmployeesPage() {
                   ) : (
                     <>
                       <td className="px-5 py-3 font-medium text-zinc-900">{e.employee_name}</td>
-                      <td className="px-5 py-3 font-mono text-xs text-zinc-500">{maskPhone(e.phone)}</td>
+                      <td className="px-5 py-3 font-mono text-xs text-zinc-500">
+                        {e.phone
+                          ? maskPhone(e.phone)
+                          : <button onClick={() => startEdit(e)} className="text-xs text-amber-500 hover:text-amber-600 font-medium">+ Add phone</button>
+                        }
+                      </td>
                       <td className="px-5 py-3 text-zinc-500">{e.department ?? <span className="text-zinc-300">—</span>}</td>
                       <td className="px-5 py-3 text-right">
                         <div className="flex justify-end gap-3">
-                          <button onClick={() => { setEditingId(e.id); setEditName(e.employee_name); setEditDept(e.department ?? '') }} className="text-zinc-400 hover:text-zinc-700 transition-colors">
+                          <button onClick={() => startEdit(e)} className="text-zinc-400 hover:text-zinc-700 transition-colors">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>

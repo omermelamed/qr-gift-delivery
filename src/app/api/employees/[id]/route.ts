@@ -24,9 +24,13 @@ export async function PATCH(
     updates.employee_name = trimmed
   }
   if (body.phone !== undefined) {
-    const phone = normalizePhone(body.phone ?? '')
-    if (!phone) return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
-    updates.phone = phone
+    if (!body.phone) {
+      updates.phone = null  // allow clearing phone
+    } else {
+      const phone = normalizePhone(body.phone)
+      if (!phone) return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
+      updates.phone = phone
+    }
   }
   if (body.department !== undefined) updates.department = body.department?.trim() || null
 
