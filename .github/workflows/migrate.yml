@@ -24,14 +24,31 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Apply idempotent schema patches
-        # Migration 006 was marked as applied in the history before its SQL
-        # actually ran against the DB. This step applies it directly — the
-        # IF NOT EXISTS guards make it safe to run on every workflow execution.
+        # Migrations 004 and 006 were marked as applied in the history before
+        # their SQL actually ran against the DB. All statements here are safe
+        # to re-run on every workflow execution.
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
         run: |
-          SQL="ALTER TABLE companies ADD COLUMN IF NOT EXISTS logo_url TEXT; ALTER TABLE companies ADD COLUMN IF NOT EXISTS sms_template TEXT;"
+          SQL=$(cat << 'ENDSQL'
+          ALTER TABLE companies ADD COLUMN IF NOT EXISTS logo_url TEXT;
+          ALTER TABLE companies ADD COLUMN IF NOT EXISTS sms_template TEXT;
+          INSERT INTO storage.buckets (id, name, public)
+            VALUES ('qr-codes', 'qr-codes', true)
+            ON CONFLICT (id) DO NOTHING;
+          DO $$ BEGIN
+            CREATE POLICY "qr_codes_public_read" ON storage.objects
+              FOR SELECT USING (bucket_id = 'qr-codes');
+          EXCEPTION WHEN duplicate_object THEN NULL;
+          END $$;
+          DO $$ BEGIN
+            CREATE POLICY "qr_codes_service_insert" ON storage.objects
+              FOR INSERT WITH CHECK (bucket_id = 'qr-codes');
+          EXCEPTION WHEN duplicate_object THEN NULL;
+          END $$;
+          ENDSQL
+          )
           PAYLOAD=$(jq -n --arg q "$SQL" '{"query": $q}')
           curl -sf -X POST \
             "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/database/query" \
