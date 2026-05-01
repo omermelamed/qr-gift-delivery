@@ -2,8 +2,8 @@ import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
 import { RemoveMemberButton } from '@/components/admin/RemoveMemberButton'
-import { ResendInviteButton } from '@/components/admin/ResendInviteButton'
 import { InviteButton } from '@/components/admin/InviteButton'
+import { EditMemberButton } from '@/components/admin/EditMemberButton'
 
 type Member = {
   id: string
@@ -11,6 +11,7 @@ type Member = {
   name: string
   role_name: string
   isPending: boolean
+  isDeactivated: boolean
   isSelf: boolean
 }
 
@@ -51,12 +52,14 @@ export default async function TeamPage() {
     const ucrRow = (ucr ?? []).find((r) => r.user_id === u.id)
     const roleRow = ucrRow?.roles as unknown as { name: string } | null
     const meta = u.app_metadata as JwtAppMetadata | undefined
+    const bannedUntil = (u as unknown as { banned_until?: string }).banned_until
     return {
       id: u.id,
       email: u.email ?? '',
       name: u.user_metadata?.full_name ?? u.email?.split('@')[0] ?? '—',
       role_name: roleRow?.name ?? meta?.role_name ?? '—',
       isPending: !u.last_sign_in_at,
+      isDeactivated: !!(bannedUntil && new Date(bannedUntil) > new Date()),
       isSelf: u.id === user.id,
     }
   })
@@ -96,16 +99,26 @@ export default async function TeamPage() {
                   <td className="px-5 py-3 text-zinc-600">{ROLE_LABELS[m.role_name] ?? m.role_name}</td>
                   <td className="px-5 py-3">
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                      m.isPending ? 'bg-violet-100 text-violet-700' : 'bg-green-100 text-green-700'
+                      m.isDeactivated
+                        ? 'bg-zinc-100 text-zinc-500'
+                        : m.isPending
+                        ? 'bg-violet-100 text-violet-700'
+                        : 'bg-green-100 text-green-700'
                     }`}>
-                      {m.isPending ? 'Pending' : 'Active'}
+                      {m.isDeactivated ? 'Deactivated' : m.isPending ? 'Pending' : 'Active'}
                     </span>
                   </td>
                   <td className="px-5 py-3 text-right">
                     <div className="flex items-center justify-end gap-2">
-                      {m.isPending && !m.isSelf && (
-                        <ResendInviteButton userId={m.id} />
-                      )}
+                      <EditMemberButton
+                        userId={m.id}
+                        name={m.name}
+                        email={m.email}
+                        roleName={m.role_name}
+                        isActive={!m.isDeactivated}
+                        isPending={m.isPending}
+                        isSelf={m.isSelf}
+                      />
                       {!m.isSelf && <RemoveMemberButton userId={m.id} name={m.name} />}
                     </div>
                   </td>
