@@ -47,6 +47,24 @@ jobs:
               FOR INSERT WITH CHECK (bucket_id = 'qr-codes');
           EXCEPTION WHEN duplicate_object THEN NULL;
           END $$;
+          INSERT INTO storage.buckets (id, name, public)
+            VALUES ('logos', 'logos', true)
+            ON CONFLICT (id) DO NOTHING;
+          DO $$ BEGIN
+            CREATE POLICY "logos_public_read" ON storage.objects
+              FOR SELECT USING (bucket_id = 'logos');
+          EXCEPTION WHEN duplicate_object THEN NULL;
+          END $$;
+          DO $$ BEGIN
+            CREATE POLICY "logos_service_insert" ON storage.objects
+              FOR INSERT WITH CHECK (bucket_id = 'logos');
+          EXCEPTION WHEN duplicate_object THEN NULL;
+          END $$;
+          DO $$ BEGIN
+            CREATE POLICY "logos_service_update" ON storage.objects
+              FOR UPDATE USING (bucket_id = 'logos');
+          EXCEPTION WHEN duplicate_object THEN NULL;
+          END $$;
           ENDSQL
           )
           PAYLOAD=$(jq -n --arg q "$SQL" '{"query": $q}')
