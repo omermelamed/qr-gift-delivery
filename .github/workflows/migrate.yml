@@ -80,6 +80,17 @@ jobs:
             WHERE r.name = 'campaign_manager' AND p.name = 'tokens:scan'
             ON CONFLICT DO NOTHING;
           ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS scheduled_at TIMESTAMPTZ;
+          CREATE TABLE IF NOT EXISTS audit_events (
+            id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            company_id    UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+            actor_id      UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+            action        TEXT NOT NULL,
+            resource_type TEXT NOT NULL,
+            resource_id   UUID,
+            metadata      JSONB NOT NULL DEFAULT '{}',
+            created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+          );
+          CREATE INDEX IF NOT EXISTS audit_events_company_idx ON audit_events (company_id, created_at DESC);
           ENDSQL
           )
           PAYLOAD=$(jq -n --arg q "$SQL" '{"query": $q}')
@@ -120,7 +131,8 @@ jobs:
             '20240501000012',
             '20240501000013',
             '20240501000014',
-            '20240502000015'
+            '20240502000015',
+            '20240502000016'
           );
           INSERT INTO supabase_migrations.schema_migrations (version) VALUES
             ('20240101000001'),
