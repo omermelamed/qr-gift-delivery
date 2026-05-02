@@ -55,6 +55,9 @@ export async function sendGiftMMS(options: SendGiftMMSOptions): Promise<SendGift
     throw new Error(`Twilio API error: ${response.statusText}`)
   }
 
-  const data = (await response.json()) as { sid: string }
+  const data = (await response.json()) as { sid: string; status: string; error_code?: number; error_message?: string }
+  if (data.status === 'failed' || data.status === 'undelivered') {
+    throw new Error(`Twilio message ${data.status}: ${data.error_message ?? data.error_code ?? 'unknown error'}`)
+  }
   return { sid: data.sid }
 }

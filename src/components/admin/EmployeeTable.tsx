@@ -228,7 +228,7 @@ export function EmployeeTable({
                         <td className="px-3 py-2.5">
                           {row.sms_sent_at
                             ? <span className="text-green-600 text-xs font-medium">✓ Sent</span>
-                            : <span className="text-zinc-300">—</span>}
+                            : isDraft ? <span className="text-zinc-300">—</span> : <span className="text-amber-500 text-xs font-medium">Not sent</span>}
                         </td>
                         <td className="px-3 py-2.5">
                           {row.redeemed
