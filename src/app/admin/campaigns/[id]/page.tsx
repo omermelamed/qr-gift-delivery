@@ -12,6 +12,7 @@ import { EmployeeTable } from '@/components/admin/EmployeeTable'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { CampaignNotes } from '@/components/admin/CampaignNotes'
+import { DepartmentBreakdown } from '@/components/admin/DepartmentBreakdown'
 
 export default async function CampaignDetailPage({
   params,
@@ -105,6 +106,9 @@ export default async function CampaignDetailPage({
             <div>
               <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
             </div>
+            <div className="lg:col-span-2">
+              <DepartmentBreakdown campaignId={campaign.id} />
+            </div>
           </>
         ) : (
           <>
@@ -130,6 +134,10 @@ export default async function CampaignDetailPage({
             </div>
             <div className="lg:self-stretch">
               <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
+            </div>
+            {/* Row 3: Department breakdown (2 cols) */}
+            <div className="lg:col-span-2">
+              <DepartmentBreakdown campaignId={campaign.id} />
             </div>
           </>
         )}
