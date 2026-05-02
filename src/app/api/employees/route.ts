@@ -4,40 +4,57 @@ import { normalizePhone } from '@/lib/phone'
 import type { JwtAppMetadata } from '@/types'
 
 async function syncTeamMembers(companyId: string, service: ReturnType<typeof import('@/lib/supabase/server').createServiceClient>) {
-  // Find all users belonging to this company (via UCR or app_metadata)
-  const [{ data: ucr }, { data: { users: allUsers } }] = await Promise.all([
-    service.from('user_company_roles').select('user_id').eq('company_id', companyId),
-    service.auth.admin.listUsers({ perPage: 1000 }),
-  ])
+  try {
+    // Find all users belonging to this company (via UCR or app_metadata)
+    const [ucrResult, listResult] = await Promise.all([
+      service.from('user_company_roles').select('user_id').eq('company_id', companyId),
+      service.auth.admin.listUsers({ perPage: 1000 }),
+    ])
 
-  const ucrIds = new Set((ucr ?? []).map((r) => r.user_id))
-  const companyUsers = allUsers.filter((u) => {
-    const meta = u.app_metadata as JwtAppMetadata | undefined
-    return ucrIds.has(u.id) || meta?.company_id === companyId
-  })
+    if (ucrResult.error) console.error('[syncTeamMembers] UCR error:', ucrResult.error)
+    if (listResult.error) console.error('[syncTeamMembers] listUsers error:', listResult.error)
 
-  if (companyUsers.length === 0) return
+    const ucr = ucrResult.data
+    const allUsers = listResult.data?.users ?? []
+    console.log(`[syncTeamMembers] company=${companyId} ucr=${ucr?.length ?? 0} allUsers=${allUsers.length}`)
 
-  // Find which user IDs already have an employee record
-  const { data: existing } = await service
-    .from('employees')
-    .select('user_id')
-    .eq('company_id', companyId)
-    .not('user_id', 'is', null)
+    const ucrIds = new Set((ucr ?? []).map((r) => r.user_id))
+    const companyUsers = allUsers.filter((u) => {
+      const meta = u.app_metadata as JwtAppMetadata | undefined
+      return ucrIds.has(u.id) || meta?.company_id === companyId
+    })
 
-  const syncedIds = new Set((existing ?? []).map((e) => e.user_id))
+    console.log(`[syncTeamMembers] companyUsers=${companyUsers.length}`)
+    if (companyUsers.length === 0) return
 
-  const toInsert = companyUsers
-    .filter((u) => !syncedIds.has(u.id))
-    .map((u) => ({
-      company_id: companyId,
-      employee_name: u.user_metadata?.full_name ?? u.email?.split('@')[0] ?? 'Unknown',
-      phone: null,
-      user_id: u.id,
-    }))
+    // Find which user IDs already have an employee record
+    const { data: existing, error: existingErr } = await service
+      .from('employees')
+      .select('user_id')
+      .eq('company_id', companyId)
+      .not('user_id', 'is', null)
 
-  if (toInsert.length > 0) {
-    await service.from('employees').insert(toInsert)
+    if (existingErr) console.error('[syncTeamMembers] existing query error:', existingErr)
+
+    const syncedIds = new Set((existing ?? []).map((e) => e.user_id))
+
+    const toInsert = companyUsers
+      .filter((u) => !syncedIds.has(u.id))
+      .map((u) => ({
+        company_id: companyId,
+        employee_name: u.user_metadata?.full_name ?? u.email?.split('@')[0] ?? 'Unknown',
+        phone: null,
+        user_id: u.id,
+      }))
+
+    console.log(`[syncTeamMembers] toInsert=${toInsert.length}`, toInsert.map(r => r.employee_name))
+
+    if (toInsert.length > 0) {
+      const { error: insertErr } = await service.from('employees').insert(toInsert)
+      if (insertErr) console.error('[syncTeamMembers] insert error:', insertErr)
+    }
+  } catch (err) {
+    console.error('[syncTeamMembers] unexpected error:', err)
   }
 }
 

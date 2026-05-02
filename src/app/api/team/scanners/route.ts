@@ -12,43 +12,25 @@ export async function GET() {
 
   const service = createServiceClient()
 
-  const { data: ucr } = await service
-    .from('user_company_roles')
-    .select('user_id, roles(name)')
-    .eq('company_id', appMeta.company_id)
+  // Get all users who belong to this company — via UCR or app_metadata
+  const [{ data: ucr }, listResult] = await Promise.all([
+    service.from('user_company_roles').select('user_id').eq('company_id', appMeta.company_id),
+    service.auth.admin.listUsers({ perPage: 1000 }),
+  ])
 
-  // Include both scanners and admins — admins can distribute too
-  const eligibleUserIds = (ucr ?? [])
-    .filter((row) => {
-      const role = row.roles as unknown as { name: string } | null
-      return role?.name === 'scanner' || role?.name === 'company_admin'
-    })
-    .map((row) => row.user_id)
+  const ucrIds = new Set((ucr ?? []).map((r) => r.user_id))
+  const allUsers = listResult.data?.users ?? []
 
-  // Also include users whose app_metadata marks them as admin for this company
-  // (initial admins may not have a UCR row)
-  const { data: { users: allUsers } } = await service.auth.admin.listUsers({ perPage: 1000 })
-  const adminsByMeta = allUsers
-    .filter((u) => {
-      const meta = u.app_metadata as JwtAppMetadata | undefined
-      return meta?.company_id === appMeta.company_id &&
-        meta?.role_name === 'company_admin' &&
-        !eligibleUserIds.includes(u.id)
-    })
-    .map((u) => u.id)
+  const companyUsers = allUsers.filter((u) => {
+    const meta = u.app_metadata as JwtAppMetadata | undefined
+    return ucrIds.has(u.id) || meta?.company_id === appMeta.company_id
+  })
 
-  const allEligibleIds = [...new Set([...eligibleUserIds, ...adminsByMeta])]
-
-  const scanners = await Promise.all(
-    allEligibleIds.map(async (userId) => {
-      const { data: { user: u } } = await service.auth.admin.getUserById(userId)
-      return {
-        id: userId,
-        name: u?.user_metadata?.full_name ?? u?.email?.split('@')[0] ?? userId,
-        email: u?.email ?? '',
-      }
-    })
-  )
+  const scanners = companyUsers.map((u) => ({
+    id: u.id,
+    name: u.user_metadata?.full_name ?? u.email?.split('@')[0] ?? u.id,
+    email: u.email ?? '',
+  }))
 
   return NextResponse.json({ scanners })
 }

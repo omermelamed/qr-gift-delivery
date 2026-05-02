@@ -39,7 +39,8 @@ export async function GET(
 
   const distributors = await Promise.all(
     (rows ?? []).map(async (row) => {
-      const { data: { user: u } } = await service.auth.admin.getUserById(row.user_id)
+      const userResult = await service.auth.admin.getUserById(row.user_id)
+      const u = userResult.data?.user
       return {
         userId: row.user_id,
         name: u?.user_metadata?.full_name ?? u?.email?.split('@')[0] ?? row.user_id,
@@ -76,7 +77,8 @@ export async function POST(
   const service = createServiceClient()
 
   // Verify target user is a scanner or admin in this company
-  const { data: { user: targetUser } } = await service.auth.admin.getUserById(userId)
+  const targetResult = await service.auth.admin.getUserById(userId)
+  const targetUser = targetResult.data?.user
   const targetMeta = targetUser?.app_metadata as JwtAppMetadata | undefined
 
   const { data: ucr } = await service

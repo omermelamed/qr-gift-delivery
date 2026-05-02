@@ -39,7 +39,8 @@ export default async function TeamPage() {
 
   const companyUserIds = new Set((ucr ?? []).map((r) => r.user_id))
 
-  const { data: { users: allUsers } } = await service.auth.admin.listUsers({ perPage: 1000 })
+  const listResult = await service.auth.admin.listUsers({ perPage: 1000 })
+  const allUsers = listResult.data?.users ?? []
 
   // Include users from user_company_roles AND users whose app_metadata.company_id
   // matches (e.g. the initial company admin set up without a UCR row)

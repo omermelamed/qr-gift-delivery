@@ -66,6 +66,19 @@ jobs:
               FOR UPDATE USING (bucket_id = 'logos');
           EXCEPTION WHEN duplicate_object THEN NULL;
           END $$;
+          ALTER TABLE employees ALTER COLUMN phone DROP NOT NULL;
+          ALTER TABLE employees ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL;
+          CREATE UNIQUE INDEX IF NOT EXISTS employees_company_user_idx
+            ON employees (company_id, user_id)
+            WHERE user_id IS NOT NULL;
+          INSERT INTO role_permissions (role_id, permission_id)
+            SELECT r.id, p.id FROM roles r, permissions p
+            WHERE r.name = 'company_admin' AND p.name = 'tokens:scan'
+            ON CONFLICT DO NOTHING;
+          INSERT INTO role_permissions (role_id, permission_id)
+            SELECT r.id, p.id FROM roles r, permissions p
+            WHERE r.name = 'campaign_manager' AND p.name = 'tokens:scan'
+            ON CONFLICT DO NOTHING;
           ENDSQL
           )
           PAYLOAD=$(jq -n --arg q "$SQL" '{"query": $q}')
