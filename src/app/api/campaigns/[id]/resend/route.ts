@@ -35,11 +35,20 @@ export async function POST(
 
   if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
 
-  const { data: tokens } = await service
+  const body = await _request.json().catch(() => ({}))
+  const tokenIds: string[] | undefined = Array.isArray(body.tokenIds) ? body.tokenIds : undefined
+
+  let query = service
     .from('gift_tokens')
     .select('id, employee_name, phone_number, qr_image_url')
     .eq('campaign_id', campaignId)
     .eq('redeemed', false)
+
+  if (tokenIds && tokenIds.length > 0) {
+    query = query.in('id', tokenIds)
+  }
+
+  const { data: tokens } = await query
 
   if (!tokens || tokens.length === 0) {
     return NextResponse.json({ dispatched: 0, failed: 0 })

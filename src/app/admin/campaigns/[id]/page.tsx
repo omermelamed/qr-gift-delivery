@@ -99,7 +99,7 @@ export default async function CampaignDetailPage({
             </a>
           )}
           {campaign.sent_at && !campaign.closed_at && (
-            <ReminderButton campaignId={campaign.id} unredeemedCount={unredeemedCount} />
+            <ReminderButton campaignId={campaign.id} tokens={allTokens} />
           )}
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
           {canLaunch && (
