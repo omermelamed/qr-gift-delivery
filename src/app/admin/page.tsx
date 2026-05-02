@@ -38,8 +38,8 @@ export default async function AdminPage() {
   }
 
   const totalCampaigns = list.length
-  const totalGifts = [...statsMap.values()].reduce((s, v) => s + v.total, 0)
-  const totalRedeemed = [...statsMap.values()].reduce((s, v) => s + v.redeemed, 0)
+  let totalGifts = 0, totalRedeemed = 0
+  for (const v of statsMap.values()) { totalGifts += v.total; totalRedeemed += v.redeemed }
   const totalUnredeemed = totalGifts - totalRedeemed
   const overallPct = totalGifts > 0 ? Math.round((totalRedeemed / totalGifts) * 100) : 0
 
