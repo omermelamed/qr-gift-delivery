@@ -97,7 +97,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
   const { userId } = await params
@@ -108,6 +108,9 @@ export async function DELETE(
   if (userId === user.id) {
     return NextResponse.json({ error: 'You cannot remove yourself' }, { status: 400 })
   }
+
+  const body = await request.json().catch(() => ({}))
+  const keepEmployee: boolean = body.keepEmployee === true
 
   const service = createServiceClient()
 
@@ -121,6 +124,22 @@ export async function DELETE(
 
   const { error: metaError } = await service.auth.admin.updateUserById(userId, { app_metadata: {} })
   if (metaError) console.error('[team/remove] failed to clear app_metadata:', metaError.message)
+
+  if (keepEmployee) {
+    // Unlink user_id so the employee record stays but is no longer team-managed
+    await service
+      .from('employees')
+      .update({ user_id: null })
+      .eq('user_id', userId)
+      .eq('company_id', appMeta.company_id)
+  } else {
+    // Delete the employee record entirely
+    await service
+      .from('employees')
+      .delete()
+      .eq('user_id', userId)
+      .eq('company_id', appMeta.company_id)
+  }
 
   return NextResponse.json({ success: true })
 }
