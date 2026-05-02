@@ -62,6 +62,18 @@ export async function DELETE(
   if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const service = createServiceClient()
+
+  // Team-synced employees (user_id set) must be removed via Team page
+  const { data: emp } = await service
+    .from('employees')
+    .select('user_id')
+    .eq('id', id)
+    .eq('company_id', appMeta.company_id)
+    .single()
+
+  if (!emp) return NextResponse.json({ error: 'Employee not found' }, { status: 404 })
+  if (emp.user_id) return NextResponse.json({ error: 'Team members can only be removed from the Team page' }, { status: 422 })
+
   await service
     .from('employees')
     .delete()
