@@ -13,6 +13,7 @@ import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { CampaignNotes } from '@/components/admin/CampaignNotes'
 import { DepartmentBreakdown } from '@/components/admin/DepartmentBreakdown'
+import { DistributorStats } from '@/components/admin/DistributorStats'
 
 export default async function CampaignDetailPage({
   params,
@@ -134,6 +135,9 @@ export default async function CampaignDetailPage({
             </div>
             <div className="lg:self-stretch">
               <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
+            </div>
+            <div>
+              <DistributorStats campaignId={campaign.id} total={claimedCount} />
             </div>
             {/* Row 3: Department breakdown (2 cols) */}
             <div className="lg:col-span-2">
