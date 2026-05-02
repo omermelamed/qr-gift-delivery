@@ -73,7 +73,7 @@ export default async function CampaignDetailPage({
             </p>
           )}
         </div>
-        <div className="flex items-center gap-3 flex-shrink-0">
+        <div className="group flex items-center gap-3 flex-shrink-0">
           <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} />
           {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter />}
           <DuplicateCampaignButton
