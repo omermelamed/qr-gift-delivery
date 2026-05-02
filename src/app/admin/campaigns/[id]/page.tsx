@@ -137,7 +137,7 @@ export default async function CampaignDetailPage({
               <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
             </div>
             <div>
-              <DistributorStats campaignId={campaign.id} total={claimedCount} />
+              <DistributorStats campaignId={campaign.id} total={allTokens.length} />
             </div>
             {/* Row 3: Department breakdown (2 cols) */}
             <div className="lg:col-span-2">

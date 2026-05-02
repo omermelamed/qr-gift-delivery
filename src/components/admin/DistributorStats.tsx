@@ -17,21 +17,25 @@ export async function DistributorStats({ campaignId, total }: Props) {
   // Count per distributor
   const countMap = new Map<string, number>()
   for (const t of tokens) {
-    if (!t.redeemed_by) continue
     countMap.set(t.redeemed_by, (countMap.get(t.redeemed_by) ?? 0) + 1)
   }
 
   if (countMap.size === 0) return null
 
   // Fetch user display names
-  const rows = await Promise.all(
-    [...countMap.entries()].map(async ([userId, count]) => {
-      const result = await service.auth.admin.getUserById(userId)
-      const u = result.data?.user
-      const name = u?.user_metadata?.full_name ?? u?.email?.split('@')[0] ?? userId
-      return { userId, name, count }
-    })
-  )
+  let rows: { userId: string; name: string; count: number }[]
+  try {
+    rows = await Promise.all(
+      [...countMap.entries()].map(async ([userId, count]) => {
+        const result = await service.auth.admin.getUserById(userId)
+        const u = result.data?.user
+        const name = u?.user_metadata?.full_name ?? u?.email?.split('@')[0] ?? userId
+        return { userId, name, count }
+      })
+    )
+  } catch {
+    return null
+  }
 
   rows.sort((a, b) => b.count - a.count)
 
