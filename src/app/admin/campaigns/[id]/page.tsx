@@ -14,6 +14,8 @@ import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { CampaignNotes } from '@/components/admin/CampaignNotes'
 import { DepartmentBreakdown } from '@/components/admin/DepartmentBreakdown'
 import { DistributorStats } from '@/components/admin/DistributorStats'
+import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignButton'
+import { ReminderButton } from '@/components/admin/ReminderButton'
 
 export default async function CampaignDetailPage({
   params,
@@ -31,7 +33,7 @@ export default async function CampaignDetailPage({
 
   const { data: campaign } = await service
     .from('campaigns')
-    .select('id, name, campaign_date, sent_at, closed_at')
+    .select('id, name, campaign_date, sent_at, closed_at, scheduled_at')
     .eq('id', campaignId)
     .eq('company_id', appMeta.company_id)
     .single()
@@ -50,6 +52,7 @@ export default async function CampaignDetailPage({
   const isDraft = !campaign.sent_at
   const canLaunch = isDraft && allTokens.length > 0
   const canClose = !!campaign.sent_at && !campaign.closed_at
+  const unredeemedCount = allTokens.filter((t) => !t.redeemed).length
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -64,10 +67,20 @@ export default async function CampaignDetailPage({
         <div>
           <h1 className="text-2xl font-bold text-zinc-900">{campaign.name}</h1>
           <p className="text-sm text-zinc-400 mt-0.5">{campaign.campaign_date ?? '—'}</p>
+          {campaign.scheduled_at && !campaign.sent_at && (
+            <p className="text-xs text-amber-500 mt-1 font-medium">
+              Scheduled: {new Date(campaign.scheduled_at).toLocaleString()}
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-3 flex-shrink-0">
           <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} />
           {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter />}
+          <DuplicateCampaignButton
+            campaignId={campaign.id}
+            sourceName={campaign.name}
+            sourceDate={campaign.campaign_date}
+          />
           {campaign.sent_at && (
             <Link
               href={`/admin/campaigns/${campaign.id}/qr`}
@@ -84,6 +97,9 @@ export default async function CampaignDetailPage({
             >
               Export CSV
             </a>
+          )}
+          {campaign.sent_at && !campaign.closed_at && (
+            <ReminderButton campaignId={campaign.id} unredeemedCount={unredeemedCount} />
           )}
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
           {canLaunch && (
