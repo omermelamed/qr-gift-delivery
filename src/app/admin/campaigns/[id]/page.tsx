@@ -108,7 +108,7 @@ export default async function CampaignDetailPage({
           </>
         ) : (
           <>
-            {/* Running/Closed: Progress (2 cols) | Notes spans all 3 rows (1 col) */}
+            {/* Row 1: Progress (2 cols) | Distributor (1 col) */}
             <div className="lg:col-span-2">
               <RedemptionProgress
                 campaignId={campaign.id}
@@ -116,24 +116,20 @@ export default async function CampaignDetailPage({
                 total={allTokens.length}
               />
             </div>
-
-            {/* Notes — right column spanning all 3 rows */}
-            <div className="lg:row-span-3 lg:self-stretch">
-              <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
-            </div>
-
-            {/* Distributor assignment (2 cols, row 2) — always editable during campaign */}
-            <div className="lg:col-span-2">
+            <div>
               <DistributorAssignment campaignId={campaign.id} />
             </div>
 
-            {/* Employee table (2 cols, row 3) */}
+            {/* Row 2: Employee table (2 cols) | Notes (1 col) */}
             <div className="lg:col-span-2">
               <EmployeeTable
                 campaignId={campaign.id}
                 initialRows={allTokens}
                 isDraft={isDraft}
               />
+            </div>
+            <div className="lg:self-stretch">
+              <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
             </div>
           </>
         )}
