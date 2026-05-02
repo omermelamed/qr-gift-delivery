@@ -7,6 +7,7 @@ import Link from 'next/link'
 export default function NewCampaignPage() {
   const [name, setName] = useState('')
   const [campaignDate, setCampaignDate] = useState('')
+  const [scheduledAt, setScheduledAt] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -19,7 +20,11 @@ export default function NewCampaignPage() {
       const res = await fetch('/api/campaigns', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, campaignDate }),
+        body: JSON.stringify({
+          name,
+          campaignDate,
+          scheduledAt: scheduledAt || null,
+        }),
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? 'Failed to create campaign'); return }
@@ -67,6 +72,20 @@ export default function NewCampaignPage() {
             required
             className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="scheduled" className="text-sm font-medium text-zinc-700">
+            Auto-send at <span className="text-zinc-400 font-normal">(optional)</span>
+          </label>
+          <input
+            id="scheduled"
+            type="datetime-local"
+            value={scheduledAt}
+            onChange={(e) => setScheduledAt(e.target.value)}
+            className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          />
+          <p className="text-xs text-zinc-400">Leave blank to launch manually. Campaigns are checked hourly.</p>
         </div>
 
         <button

@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json().catch(() => ({}))
-  const { name, campaignDate } = body
+  const { name, campaignDate, scheduledAt } = body
 
   if (!name || typeof name !== 'string' || !name.trim()) {
     return NextResponse.json({ error: 'name is required' }, { status: 400 })
@@ -50,6 +50,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'campaignDate must be a valid date' }, { status: 400 })
   }
 
+  if (scheduledAt !== undefined && scheduledAt !== null && isNaN(Date.parse(scheduledAt))) {
+    return NextResponse.json({ error: 'scheduledAt must be a valid datetime' }, { status: 400 })
+  }
+
   const service = createServiceClient()
   const { data, error } = await service
     .from('campaigns')
@@ -58,6 +62,7 @@ export async function POST(request: NextRequest) {
       campaign_date: campaignDate,
       company_id: appMeta.company_id,
       created_by: user.id,
+      scheduled_at: scheduledAt ?? null,
     })
     .select('id')
     .single()
