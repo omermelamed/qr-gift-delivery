@@ -14,16 +14,27 @@ export async function POST(
 ) {
   const { id: campaignId } = await params
 
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // Accept either user session auth OR internal cron secret
+  const cronSecret = _request.headers.get('x-cron-secret')
+  const isCronCall = !!(cronSecret && cronSecret === process.env.CRON_SECRET)
 
-  const appMeta = user.app_metadata as JwtAppMetadata
-  const permissions = await fetchPermissions(appMeta.role_id)
-  if (!hasPermission(permissions, 'campaigns:launch')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  let companyId: string | undefined
+  let actorUserId: string | undefined
+
+  if (isCronCall) {
+    companyId = _request.headers.get('x-company-id') ?? undefined
+    if (!companyId) return NextResponse.json({ error: 'Missing company id' }, { status: 400 })
+  } else {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    actorUserId = user.id
+    const appMeta = user.app_metadata as JwtAppMetadata
+    const permissions = await fetchPermissions(appMeta.role_id)
+    if (!hasPermission(permissions, 'campaigns:launch')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+    companyId = appMeta.company_id
   }
 
   const service = createServiceClient()
@@ -32,7 +43,7 @@ export async function POST(
     .from('campaigns')
     .select('id, name, company_id, sent_at')
     .eq('id', campaignId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (campaignError || !campaign) {
