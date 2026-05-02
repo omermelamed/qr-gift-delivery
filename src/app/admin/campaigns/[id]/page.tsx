@@ -76,6 +76,15 @@ export default async function CampaignDetailPage({
               View QR Codes
             </Link>
           )}
+          {campaign.sent_at && (
+            <a
+              href={`/api/campaigns/${campaign.id}/export`}
+              download
+              className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
+            >
+              Export CSV
+            </a>
+          )}
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
           {canLaunch && (
             <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} />
