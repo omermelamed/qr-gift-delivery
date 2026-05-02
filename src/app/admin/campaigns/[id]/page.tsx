@@ -107,7 +107,7 @@ export default async function CampaignDetailPage({
               <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
             </div>
             <div className="lg:col-span-2">
-              <DepartmentBreakdown campaignId={campaign.id} />
+              <DepartmentBreakdown tokens={allTokens} />
             </div>
           </>
         ) : (
@@ -137,7 +137,7 @@ export default async function CampaignDetailPage({
             </div>
             {/* Row 3: Department breakdown (2 cols) */}
             <div className="lg:col-span-2">
-              <DepartmentBreakdown campaignId={campaign.id} />
+              <DepartmentBreakdown tokens={allTokens} />
             </div>
           </>
         )}

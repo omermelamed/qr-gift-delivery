@@ -1,18 +1,9 @@
-import { createServiceClient } from '@/lib/supabase/server'
+type TokenSlice = { department: string | null; redeemed: boolean }
+type Props = { tokens: TokenSlice[] }
 
-type Props = { campaignId: string }
+export function DepartmentBreakdown({ tokens }: Props) {
+  if (tokens.length === 0) return null
 
-export async function DepartmentBreakdown({ campaignId }: Props) {
-  const service = createServiceClient()
-
-  const { data: tokens } = await service
-    .from('gift_tokens')
-    .select('department, redeemed')
-    .eq('campaign_id', campaignId)
-
-  if (!tokens || tokens.length === 0) return null
-
-  // Group by department
   const map = new Map<string, { total: number; claimed: number }>()
   for (const t of tokens) {
     const key = t.department ?? '(No department)'
@@ -22,7 +13,6 @@ export async function DepartmentBreakdown({ campaignId }: Props) {
     if (t.redeemed) s.claimed++
   }
 
-  // Only render if there's more than one department (otherwise breakdown adds no value)
   if (map.size <= 1) return null
 
   const rows = [...map.entries()]
@@ -41,7 +31,7 @@ export async function DepartmentBreakdown({ campaignId }: Props) {
             </div>
             <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
               <div
-                className="h-full rounded-full transition-all"
+                className="h-full rounded-full"
                 style={{ width: `${pct}%`, backgroundColor: 'var(--brand, #6366f1)' }}
               />
             </div>
