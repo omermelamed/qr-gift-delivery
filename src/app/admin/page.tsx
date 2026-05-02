@@ -37,13 +37,16 @@ export default async function AdminPage() {
     if (t.redeemed) s.redeemed++
   }
 
+  const totalCampaigns = list.length
+  const totalGifts = [...statsMap.values()].reduce((s, v) => s + v.total, 0)
+  const totalRedeemed = [...statsMap.values()].reduce((s, v) => s + v.redeemed, 0)
+  const totalUnredeemed = totalGifts - totalRedeemed
+  const overallPct = totalGifts > 0 ? Math.round((totalRedeemed / totalGifts) * 100) : 0
+
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-900">Campaigns</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">{list.length} total</p>
-        </div>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold text-zinc-900">Campaigns</h1>
         <Link
           href="/admin/campaigns/new"
           className="text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all"
@@ -52,6 +55,22 @@ export default async function AdminPage() {
           + New Campaign
         </Link>
       </div>
+
+      {list.length > 0 && (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+          {[
+            { label: 'Campaigns', value: totalCampaigns },
+            { label: 'Gifts Sent', value: totalGifts },
+            { label: 'Redeemed', value: `${totalRedeemed} (${overallPct}%)` },
+            { label: 'Unredeemed', value: totalUnredeemed },
+          ].map(({ label, value }) => (
+            <div key={label} className="bg-white border border-zinc-200 rounded-xl p-4">
+              <p className="text-xs text-zinc-400 font-medium uppercase tracking-wide">{label}</p>
+              <p className="text-2xl font-bold text-zinc-900 mt-1">{value}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {list.length === 0 ? (
         <div className="text-center py-24 bg-white rounded-2xl border border-zinc-200">
