@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import { logAuditEvent } from '@/lib/audit'
 
 export async function POST(
   request: NextRequest,
@@ -14,7 +15,7 @@ export async function POST(
   // Fetch token row with campaign info in one query
   const { data: tokenRow } = await supabase
     .from('gift_tokens')
-    .select('id, employee_name, redeemed, campaign_id, campaigns(closed_at, company_id)')
+    .select('id, employee_name, redeemed, campaign_id, campaigns(closed_at, company_id, name)')
     .eq('token', token)
     .single()
 
@@ -22,7 +23,7 @@ export async function POST(
     return NextResponse.json({ valid: false, reason: 'invalid' })
   }
 
-  const campaign = tokenRow.campaigns as unknown as { closed_at: string | null; company_id: string } | null
+  const campaign = tokenRow.campaigns as unknown as { closed_at: string | null; company_id: string; name?: string } | null
   if (campaign?.closed_at) {
     return NextResponse.json({ valid: false, reason: 'campaign_closed' })
   }
@@ -82,6 +83,17 @@ export async function POST(
     .single()
 
   if (redeemed) {
+    logAuditEvent({
+      companyId: campaign?.company_id ?? '',
+      actorId: distributorId,
+      action: 'token.redeemed',
+      resourceType: 'gift_token',
+      resourceId: tokenRow.id,
+      metadata: {
+        employee_name: redeemed.employee_name,
+        campaign_name: (tokenRow.campaigns as unknown as { name?: string } | null)?.name ?? '',
+      },
+    })
     return NextResponse.json({ valid: true, employeeName: redeemed.employee_name })
   }
 

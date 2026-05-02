@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { sendGiftMMS, isTwilioConfigured } from '@/lib/twilio'
 import { generateQrBuffer } from '@/lib/qr'
+import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 
 const BATCH_SIZE = 50
@@ -140,6 +141,17 @@ export async function POST(
     .from('campaigns')
     .update({ sent_at: new Date().toISOString() })
     .eq('id', campaignId)
+
+  if (!isCronCall) {
+    logAuditEvent({
+      companyId: campaign.company_id,
+      actorId: actorUserId ?? null,
+      action: 'campaign.launched',
+      resourceType: 'campaign',
+      resourceId: campaignId,
+      metadata: { name: campaign.name, token_count: tokens.length },
+    })
+  }
 
   return NextResponse.json({ dispatched, failed, campaignId, smsSending })
 }

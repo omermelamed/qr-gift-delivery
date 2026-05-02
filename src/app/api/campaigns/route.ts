@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
+import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 
 export async function GET() {
@@ -70,6 +71,15 @@ export async function POST(request: NextRequest) {
   if (error || !data) {
     return NextResponse.json({ error: 'Failed to create campaign' }, { status: 500 })
   }
+
+  logAuditEvent({
+    companyId: appMeta.company_id,
+    actorId: user.id,
+    action: 'campaign.created',
+    resourceType: 'campaign',
+    resourceId: data.id,
+    metadata: { name: name.trim() },
+  })
 
   return NextResponse.json({ id: data.id }, { status: 201 })
 }

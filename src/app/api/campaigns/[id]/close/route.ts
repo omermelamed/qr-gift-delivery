@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
+import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 
 export async function POST(
@@ -23,7 +24,7 @@ export async function POST(
 
   const { data: campaign } = await service
     .from('campaigns')
-    .select('id, sent_at, closed_at')
+    .select('id, name, sent_at, closed_at')
     .eq('id', campaignId)
     .eq('company_id', appMeta.company_id)
     .single()
@@ -41,6 +42,15 @@ export async function POST(
   if (closeError) {
     return NextResponse.json({ error: 'Failed to close campaign' }, { status: 500 })
   }
+
+  logAuditEvent({
+    companyId: appMeta.company_id,
+    actorId: user.id,
+    action: 'campaign.closed',
+    resourceType: 'campaign',
+    resourceId: campaignId,
+    metadata: { name: campaign.name },
+  })
 
   return NextResponse.json({ success: true })
 }

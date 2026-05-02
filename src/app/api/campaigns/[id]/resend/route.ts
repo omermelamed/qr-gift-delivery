@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { sendGiftMMS } from '@/lib/twilio'
+import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 
 const BATCH_SIZE = 50
@@ -74,6 +75,15 @@ export async function POST(
       await new Promise((r) => setTimeout(r, DELAY_MS))
     }
   }
+
+  logAuditEvent({
+    companyId: appMeta.company_id,
+    actorId: user.id,
+    action: 'campaign.reminder_sent',
+    resourceType: 'campaign',
+    resourceId: campaignId,
+    metadata: { name: campaign.name, dispatched, failed },
+  })
 
   return NextResponse.json({ dispatched, failed })
 }

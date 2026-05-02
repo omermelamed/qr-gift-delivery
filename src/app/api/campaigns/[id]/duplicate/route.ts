@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
+import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 
 export async function POST(
@@ -41,6 +42,15 @@ export async function POST(
     .single()
 
   if (!newCampaign) return NextResponse.json({ error: 'Failed to create campaign' }, { status: 500 })
+
+  logAuditEvent({
+    companyId: appMeta.company_id,
+    actorId: user.id,
+    action: 'campaign.duplicated',
+    resourceType: 'campaign',
+    resourceId: newCampaign.id,
+    metadata: { name: name.trim(), source_id: sourceCampaignId },
+  })
 
   if (copyEmployees) {
     const { data: tokens } = await service
