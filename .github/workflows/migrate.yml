@@ -79,6 +79,7 @@ jobs:
             SELECT r.id, p.id FROM roles r, permissions p
             WHERE r.name = 'campaign_manager' AND p.name = 'tokens:scan'
             ON CONFLICT DO NOTHING;
+          ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS scheduled_at TIMESTAMPTZ;
           ENDSQL
           )
           PAYLOAD=$(jq -n --arg q "$SQL" '{"query": $q}')
@@ -118,7 +119,8 @@ jobs:
             '20240501000011',
             '20240501000012',
             '20240501000013',
-            '20240501000014'
+            '20240501000014',
+            '20240502000015'
           );
           INSERT INTO supabase_migrations.schema_migrations (version) VALUES
             ('20240101000001'),

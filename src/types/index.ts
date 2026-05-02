@@ -33,6 +33,7 @@ export type Campaign = {
   created_at: string
   sent_at: string | null
   closed_at: string | null
+  scheduled_at: string | null
 }
 
 export type GiftToken = {
