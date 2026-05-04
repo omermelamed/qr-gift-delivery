@@ -29,11 +29,8 @@ export function EmployeeTable({
   isDraft: boolean
 }) {
   const [rows, setRows] = useState(initialRows)
-  const [resending, setResending] = useState(false)
-
   // Sync rows when the server re-renders via router.refresh() (e.g. after populate)
   useEffect(() => { setRows(initialRows) }, [initialRows])
-  const [resendMsg, setResendMsg] = useState<string | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [groupByDept, setGroupByDept] = useState(false)
   const [distributorNames, setDistributorNames] = useState<Record<string, string>>({})
@@ -61,25 +58,6 @@ export function EmployeeTable({
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [campaignId])
-
-  async function handleResend() {
-    setResending(true)
-    setResendMsg(null)
-    try {
-      const res = await fetch(`/api/campaigns/${campaignId}/resend`, { method: 'POST' })
-      const data = await res.json()
-      if (!res.ok) {
-        setResendMsg(data.error ?? 'Resend failed')
-        return
-      }
-      setResendMsg(`Resent to ${data.dispatched} employees${data.failed > 0 ? ` · ${data.failed} failed` : ''}`)
-      setTimeout(() => setResendMsg(null), 4000)
-    } catch {
-      setResendMsg('Network error — please try again')
-    } finally {
-      setResending(false)
-    }
-  }
 
   function handleExport() {
     const a = document.createElement('a')
@@ -131,8 +109,6 @@ export function EmployeeTable({
     if (!hasDepts) setGroupByDept(false)
   }, [hasDepts])
 
-  const unclaimedCount = rows.filter((r) => !r.redeemed).length
-
   type GroupHeader = { _type: 'header'; department: string; claimed: number; total: number }
   type TableRow = TokenRow | GroupHeader
 
@@ -166,14 +142,6 @@ export function EmployeeTable({
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 className="font-semibold text-zinc-900">Employees <span className="text-zinc-400 font-normal">({rows.length})</span></h2>
           <div className="flex items-center gap-2">
-            {resendMsg && <p className="text-sm text-green-700">{resendMsg}</p>}
-            <button
-              onClick={handleResend}
-              disabled={resending || unclaimedCount === 0}
-              className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-700 disabled:opacity-40 hover:bg-zinc-50 transition-colors"
-            >
-              {resending ? 'Resending…' : `Resend (${unclaimedCount})`}
-            </button>
             <button
               onClick={handleExport}
               className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
