@@ -3,9 +3,9 @@
 import { useState, useCallback, useEffect } from 'react'
 import { QrScanner } from '@/components/QrScanner'
 import { createClient } from '@/lib/supabase/browser'
-import type { TokenVerifyResult } from '@/types'
+import type { TokenVerifyResult, GiftOption } from '@/types'
 
-type ScanState = 'scanning' | 'loading' | 'result'
+type ScanState = 'scanning' | 'loading' | 'gift_selection' | 'result'
 type ScanOutcome = 'success' | 'already_claimed' | 'invalid' | 'closed' | 'not_authorized'
 
 type ScanHistoryEntry = {
@@ -15,6 +15,8 @@ type ScanHistoryEntry = {
 }
 
 const TOKEN_PATTERN = /\/verify\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i
+
+const GIFT_COLORS = ['#6366f1', '#8b5cf6', '#f59e0b', '#14b8a6', '#f43f5e', '#f97316']
 
 function outcomeFromResult(result: TokenVerifyResult): ScanOutcome {
   if (result.valid) return 'success'
@@ -30,6 +32,11 @@ export default function ScanPage() {
   const [userId, setUserId] = useState<string | null>(null)
   const [scanHistory, setScanHistory] = useState<ScanHistoryEntry[]>([])
   const [showHistory, setShowHistory] = useState(false)
+  // Multi-gift state
+  const [pendingToken, setPendingToken] = useState<string | null>(null)
+  const [pendingEmployee, setPendingEmployee] = useState<string | null>(null)
+  const [giftOptions, setGiftOptions] = useState<GiftOption[]>([])
+  const [giftLoading, setGiftLoading] = useState(false)
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => {
@@ -64,6 +71,15 @@ export default function ScanPage() {
         r = { valid: false, reason: 'invalid' }
       }
 
+      // Multi-gift: show gift picker before confirming redemption
+      if (r.valid && r.needsGiftSelection) {
+        setPendingToken(token)
+        setPendingEmployee(r.employeeName)
+        setGiftOptions(r.gifts)
+        setScanState('gift_selection')
+        return
+      }
+
       const employeeName = r.valid ? r.employeeName : (r.reason === 'already_used' ? r.employeeName : null)
       setScanHistory((prev) => [{
         employeeName: employeeName ?? null,
@@ -76,15 +92,50 @@ export default function ScanPage() {
     [scanState, userId]
   )
 
+  async function handleGiftSelect(giftId: string) {
+    if (!pendingToken) return
+    setGiftLoading(true)
+    let r: TokenVerifyResult = { valid: false, reason: 'invalid' }
+    try {
+      const res = await fetch(`/api/verify/${pendingToken}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ distributorId: userId, giftId }),
+      })
+      r = await res.json()
+    } catch {
+      r = { valid: false, reason: 'invalid' }
+    }
+    setGiftLoading(false)
+    const employeeName = r.valid ? r.employeeName : (r.reason === 'already_used' ? r.employeeName : null)
+    setScanHistory((prev) => [{
+      employeeName: employeeName ?? pendingEmployee,
+      outcome: outcomeFromResult(r),
+      timestamp: new Date(),
+    }, ...prev].slice(0, 10))
+    setPendingToken(null)
+    setPendingEmployee(null)
+    setGiftOptions([])
+    setResult(r)
+    setScanState('result')
+  }
+
   function handleDismiss() {
     setResult(null)
+    setScanState('scanning')
+  }
+
+  function handleCancelGift() {
+    setPendingToken(null)
+    setPendingEmployee(null)
+    setGiftOptions([])
     setScanState('scanning')
   }
 
   return (
     <main className="flex flex-col bg-black overflow-hidden" style={{ height: '100dvh' }}>
       <div className="relative flex-1 overflow-hidden">
-        {/* Camera — absolute so it fills the container regardless of flex sizing */}
+        {/* Camera */}
         <div className="absolute inset-0">
           <QrScanner onResult={handleScan} active={scanState === 'scanning' && userId !== null} />
         </div>
@@ -107,6 +158,35 @@ export default function ScanPage() {
         {scanState === 'loading' && (
           <div className="absolute inset-0 flex items-center justify-center bg-black/70">
             <div className="w-10 h-10 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+          </div>
+        )}
+
+        {/* Gift selection takeover */}
+        {scanState === 'gift_selection' && (
+          <div className="absolute inset-0 flex flex-col bg-zinc-900 px-6 pt-12 pb-8">
+            <p className="text-white/60 text-sm text-center mb-1">Scanning for</p>
+            <p className="text-white text-2xl font-bold text-center mb-8">{pendingEmployee}</p>
+            <p className="text-white/80 text-sm font-medium text-center mb-4">Which gift did they take?</p>
+            <div className="flex flex-col gap-3 flex-1">
+              {giftOptions.map((gift, i) => (
+                <button
+                  key={gift.id}
+                  onClick={() => handleGiftSelect(gift.id)}
+                  disabled={giftLoading}
+                  className="w-full py-5 rounded-2xl text-white text-lg font-semibold disabled:opacity-50 active:scale-95 transition-transform"
+                  style={{ backgroundColor: GIFT_COLORS[i % GIFT_COLORS.length] }}
+                >
+                  {gift.name}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={handleCancelGift}
+              disabled={giftLoading}
+              className="mt-6 text-white/40 text-sm text-center w-full"
+            >
+              Cancel scan
+            </button>
           </div>
         )}
 
@@ -155,8 +235,8 @@ export default function ScanPage() {
           </div>
         )}
 
-        {/* Back to admin + History — shown when not in result state */}
-        {scanState !== 'result' && (
+        {/* Back to admin + History — hidden during gift_selection and result */}
+        {scanState !== 'result' && scanState !== 'gift_selection' && (
           <>
             <a
               href="/admin"
@@ -185,16 +265,12 @@ export default function ScanPage() {
             >
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-white font-semibold">Recent scans</h2>
-                <button
-                  onClick={() => setShowHistory(false)}
-                  className="text-zinc-400 hover:text-white transition-colors"
-                >
+                <button onClick={() => setShowHistory(false)} className="text-zinc-400 hover:text-white transition-colors">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
-
               {scanHistory.length === 0 ? (
                 <p className="text-zinc-400 text-sm text-center py-6">No scans yet this session</p>
               ) : (
