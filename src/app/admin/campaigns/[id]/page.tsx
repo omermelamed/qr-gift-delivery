@@ -8,6 +8,7 @@ import { LaunchButton } from '@/components/admin/LaunchButton'
 import { CloseCampaignButton } from '@/components/admin/CloseCampaignButton'
 import { RedemptionProgress } from '@/components/admin/RedemptionProgress'
 import { DistributorAssignment } from '@/components/admin/DistributorAssignment'
+import { GiftOptionsEditor } from '@/components/admin/GiftOptionsEditor'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
@@ -113,12 +114,13 @@ export default async function CampaignDetailPage({
 
         {isDraft ? (
           <>
-            {/* Draft: Populator (2 cols) + Distributor (1 col) */}
+            {/* Draft: Populator (2 cols) + Distributor + GiftOptions (1 col) */}
             <div className="lg:col-span-2">
               <CampaignPopulator campaignId={campaign.id} />
             </div>
-            <div>
+            <div className="flex flex-col gap-4">
               <DistributorAssignment campaignId={campaign.id} />
+              <GiftOptionsEditor campaignId={campaign.id} />
             </div>
 
             {/* Employee table (2 cols) + Notes (1 col) */}
