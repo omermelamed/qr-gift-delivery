@@ -48,6 +48,7 @@ export type GiftToken = {
   redeemed: boolean
   redeemed_at: string | null
   redeemed_by: string | null
+  gift_id: string | null
 }
 
 export type GiftOption = {
