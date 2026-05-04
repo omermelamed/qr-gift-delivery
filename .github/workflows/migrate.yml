@@ -80,6 +80,15 @@ jobs:
             WHERE r.name = 'campaign_manager' AND p.name = 'tokens:scan'
             ON CONFLICT DO NOTHING;
           ALTER TABLE campaigns ADD COLUMN IF NOT EXISTS scheduled_at TIMESTAMPTZ;
+          CREATE TABLE IF NOT EXISTS campaign_gifts (
+            id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+            campaign_id UUID NOT NULL REFERENCES campaigns(id) ON DELETE CASCADE,
+            name        TEXT NOT NULL,
+            position    INT  NOT NULL DEFAULT 0,
+            created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+          );
+          CREATE INDEX IF NOT EXISTS campaign_gifts_campaign_idx ON campaign_gifts (campaign_id, position);
+          ALTER TABLE gift_tokens ADD COLUMN IF NOT EXISTS gift_id UUID REFERENCES campaign_gifts(id) ON DELETE SET NULL;
           CREATE TABLE IF NOT EXISTS audit_events (
             id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             company_id    UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
@@ -132,7 +141,8 @@ jobs:
             '20240501000013',
             '20240501000014',
             '20240502000015',
-            '20240502000016'
+            '20240502000016',
+            '20240504000018'
           );
           INSERT INTO supabase_migrations.schema_migrations (version) VALUES
             ('20240101000001'),

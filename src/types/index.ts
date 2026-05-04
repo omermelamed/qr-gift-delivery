@@ -50,8 +50,15 @@ export type GiftToken = {
   redeemed_by: string | null
 }
 
+export type GiftOption = {
+  id: string
+  name: string
+  position: number
+}
+
 export type TokenVerifyResult =
-  | { valid: true; employeeName: string }
+  | { valid: true; employeeName: string; needsGiftSelection?: false }
+  | { valid: true; employeeName: string; needsGiftSelection: true; gifts: GiftOption[] }
   | { valid: false; reason: 'already_used'; employeeName: string }
   | { valid: false; reason: 'invalid' }
   | { valid: false; reason: 'campaign_closed' }
