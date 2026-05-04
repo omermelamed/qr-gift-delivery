@@ -13,6 +13,7 @@ type TokenRow = {
   redeemed: boolean
   redeemed_at: string | null
   redeemed_by: string | null
+  gift_id: string | null
 }
 
 function maskPhone(phone: string): string {
@@ -23,15 +24,21 @@ export function EmployeeTable({
   campaignId,
   initialRows,
   isDraft,
+  gifts = [],
 }: {
   campaignId: string
   initialRows: TokenRow[]
   isDraft: boolean
+  gifts?: { id: string; name: string }[]
 }) {
   const [rows, setRows] = useState(initialRows)
   // Sync rows when the server re-renders via router.refresh() (e.g. after populate)
   useEffect(() => { setRows(initialRows) }, [initialRows])
   const [showAddModal, setShowAddModal] = useState(false)
+
+  const GIFT_COLORS = ['#6366f1', '#8b5cf6', '#f59e0b', '#14b8a6', '#f43f5e', '#f97316']
+  const giftMap = new Map(gifts.map((g, i) => [g.id, { name: g.name, color: GIFT_COLORS[i % GIFT_COLORS.length] }]))
+  const showGiftCol = gifts.length > 0
   const [groupByDept, setGroupByDept] = useState(false)
   const [distributorNames, setDistributorNames] = useState<Record<string, string>>({})
 
@@ -170,6 +177,7 @@ export function EmployeeTable({
                 <th className="px-3 py-2 font-medium">Name</th>
                 <th className="px-3 py-2 font-medium">Phone</th>
                 <th className="px-3 py-2 font-medium">Department</th>
+                {showGiftCol && <th className="px-3 py-2 font-medium">Gift</th>}
                 <th className="px-3 py-2 font-medium">SMS</th>
                 <th className="px-3 py-2 font-medium">Claimed</th>
                 <th className="px-3 py-2 font-medium">Claimed At</th>
@@ -181,7 +189,7 @@ export function EmployeeTable({
                 ? buildGroupedRows().map((row) =>
                     '_type' in row ? (
                       <tr key={`header-${row.department}`} className="bg-zinc-50">
-                        <td colSpan={7} className="px-3 py-1.5 text-xs font-semibold text-zinc-500">
+                        <td colSpan={showGiftCol ? 8 : 7} className="px-3 py-1.5 text-xs font-semibold text-zinc-500">
                           {row.department} · {row.claimed}/{row.total} claimed
                         </td>
                       </tr>
@@ -193,6 +201,20 @@ export function EmployeeTable({
                         <td className="px-3 py-2.5 font-medium text-zinc-800">{row.employee_name}</td>
                         <td className="px-3 py-2.5 font-mono text-xs text-zinc-500">{maskPhone(row.phone_number)}</td>
                         <td className="px-3 py-2.5 text-zinc-500">{row.department ?? <span className="text-zinc-300">—</span>}</td>
+                        {showGiftCol && (
+                          <td className="px-3 py-2.5">
+                            {row.gift_id && giftMap.get(row.gift_id) ? (
+                              <span
+                                className="text-white text-xs font-medium px-2 py-0.5 rounded-full"
+                                style={{ backgroundColor: giftMap.get(row.gift_id)!.color }}
+                              >
+                                {giftMap.get(row.gift_id)!.name}
+                              </span>
+                            ) : (
+                              <span className="text-zinc-300 text-xs">—</span>
+                            )}
+                          </td>
+                        )}
                         <td className="px-3 py-2.5">
                           {row.sms_sent_at
                             ? <span className="text-green-600 text-xs font-medium">✓ Sent</span>
@@ -222,6 +244,20 @@ export function EmployeeTable({
                       <td className="px-3 py-2.5 font-medium text-zinc-800">{r.employee_name}</td>
                       <td className="px-3 py-2.5 font-mono text-xs text-zinc-500">{maskPhone(r.phone_number)}</td>
                       <td className="px-3 py-2.5 text-zinc-500">{r.department ?? <span className="text-zinc-300">—</span>}</td>
+                      {showGiftCol && (
+                        <td className="px-3 py-2.5">
+                          {r.gift_id && giftMap.get(r.gift_id) ? (
+                            <span
+                              className="text-white text-xs font-medium px-2 py-0.5 rounded-full"
+                              style={{ backgroundColor: giftMap.get(r.gift_id)!.color }}
+                            >
+                              {giftMap.get(r.gift_id)!.name}
+                            </span>
+                          ) : (
+                            <span className="text-zinc-300 text-xs">—</span>
+                          )}
+                        </td>
+                      )}
                       <td className="px-3 py-2.5">
                         {r.sms_sent_at
                           ? <span className="text-green-600 text-xs font-medium">✓ Sent</span>
@@ -244,7 +280,7 @@ export function EmployeeTable({
                   ))}
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-3 py-12 text-center text-zinc-400 text-sm">
+                  <td colSpan={showGiftCol ? 8 : 7} className="px-3 py-12 text-center text-zinc-400 text-sm">
                     No employees yet. Upload a CSV or add one manually.
                   </td>
                 </tr>

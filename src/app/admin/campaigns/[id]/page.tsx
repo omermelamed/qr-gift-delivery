@@ -43,12 +43,20 @@ export default async function CampaignDetailPage({
 
   const { data: tokens } = await service
     .from('gift_tokens')
-    .select('id, employee_name, phone_number, department, sms_sent_at, redeemed, redeemed_at, redeemed_by')
+    .select('id, employee_name, phone_number, department, sms_sent_at, redeemed, redeemed_at, redeemed_by, gift_id')
     .eq('campaign_id', campaignId)
     .order('redeemed', { ascending: true })
     .order('employee_name', { ascending: true })
 
   const allTokens = tokens ?? []
+
+  const { data: giftsData } = await service
+    .from('campaign_gifts')
+    .select('id, name, position')
+    .eq('campaign_id', campaignId)
+    .order('position', { ascending: true })
+
+  const gifts = giftsData ?? []
   const claimedCount = allTokens.filter((t) => t.redeemed).length
   const isDraft = !campaign.sent_at
   const canLaunch = isDraft && allTokens.length > 0
@@ -129,6 +137,7 @@ export default async function CampaignDetailPage({
                 campaignId={campaign.id}
                 initialRows={allTokens}
                 isDraft={isDraft}
+                gifts={gifts}
               />
             </div>
             <div>
@@ -158,6 +167,7 @@ export default async function CampaignDetailPage({
                 campaignId={campaign.id}
                 initialRows={allTokens}
                 isDraft={isDraft}
+                gifts={gifts}
               />
             </div>
             <div className="lg:self-stretch">
