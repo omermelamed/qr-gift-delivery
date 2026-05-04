@@ -17,6 +17,7 @@ import { DepartmentBreakdown } from '@/components/admin/DepartmentBreakdown'
 import { DistributorStats } from '@/components/admin/DistributorStats'
 import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignButton'
 import { ReminderButton } from '@/components/admin/ReminderButton'
+import { GiftBreakdown } from '@/components/admin/GiftBreakdown'
 
 export default async function CampaignDetailPage({
   params,
@@ -149,13 +150,16 @@ export default async function CampaignDetailPage({
           </>
         ) : (
           <>
-            {/* Row 1: Progress (2 cols) | Distributor (1 col) */}
-            <div className="lg:col-span-2">
+            {/* Row 1: Progress + GiftBreakdown (2 cols) | Distributor (1 col) */}
+            <div className="lg:col-span-2 flex flex-col gap-4">
               <RedemptionProgress
                 campaignId={campaign.id}
                 initialClaimed={claimedCount}
                 total={allTokens.length}
               />
+              {gifts.length >= 2 && (
+                <GiftBreakdown gifts={gifts} tokens={allTokens} />
+              )}
             </div>
             <div>
               <DistributorAssignment campaignId={campaign.id} />
