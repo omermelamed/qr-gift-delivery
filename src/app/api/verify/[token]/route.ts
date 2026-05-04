@@ -9,6 +9,7 @@ export async function POST(
   const { token } = await params
   const body = await request.json().catch(() => ({}))
   const distributorId: string | null = body.distributorId ?? null
+  const giftId: string | null = body.giftId ?? null
 
   const supabase = createServiceClient()
 
@@ -41,7 +42,6 @@ export async function POST(
   if (assignedDistributors && assignedDistributors.length > 0 && distributorId) {
     const assignedIds = new Set(assignedDistributors.map((r) => r.user_id))
     if (!assignedIds.has(distributorId)) {
-      // Allow admins and campaign managers even if not explicitly assigned
       const companyId = campaign?.company_id
       const { data: privilegedRole } = companyId
         ? await supabase
@@ -61,6 +61,25 @@ export async function POST(
     return NextResponse.json({ valid: false, reason: 'not_authorized' })
   }
 
+  // Fetch gift options for this campaign
+  const { data: campaignGifts } = await supabase
+    .from('campaign_gifts')
+    .select('id, name, position')
+    .eq('campaign_id', tokenRow.campaign_id)
+    .order('position', { ascending: true })
+
+  const gifts = campaignGifts ?? []
+
+  // Multi-gift: ask scanner to pick before redeeming
+  if (gifts.length >= 2 && !giftId) {
+    return NextResponse.json({
+      valid: true,
+      needsGiftSelection: true,
+      employeeName: tokenRow.employee_name,
+      gifts: gifts.map((g) => ({ id: g.id, name: g.name, position: g.position })),
+    })
+  }
+
   if (tokenRow.redeemed) {
     return NextResponse.json({
       valid: false,
@@ -69,6 +88,9 @@ export async function POST(
     })
   }
 
+  // Auto-stamp single gift when campaign has exactly one option
+  const resolvedGiftId = giftId ?? (gifts.length === 1 ? gifts[0].id : null)
+
   // Atomic write: first writer wins
   const { data: redeemed } = await supabase
     .from('gift_tokens')
@@ -76,6 +98,7 @@ export async function POST(
       redeemed: true,
       redeemed_at: new Date().toISOString(),
       redeemed_by: distributorId,
+      gift_id: resolvedGiftId,
     })
     .eq('token', token)
     .eq('redeemed', false)
@@ -92,6 +115,7 @@ export async function POST(
       metadata: {
         employee_name: redeemed.employee_name,
         campaign_name: (tokenRow.campaigns as unknown as { name?: string } | null)?.name ?? '',
+        gift_id: resolvedGiftId,
       },
     })
     return NextResponse.json({ valid: true, employeeName: redeemed.employee_name })
