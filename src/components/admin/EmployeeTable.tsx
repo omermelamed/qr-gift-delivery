@@ -26,7 +26,7 @@ function EmployeeQrModal({
   target,
   onClose,
 }: {
-  target: TokenRow
+  target: TokenRow & { qr_image_url: string }
   onClose: () => void
 }) {
   useEffect(() => {
@@ -65,7 +65,7 @@ function EmployeeQrModal({
         </div>
 
         <img
-          src={target.qr_image_url!}
+          src={target.qr_image_url}
           alt={`QR for ${target.employee_name}`}
           width={320}
           height={320}
@@ -73,7 +73,7 @@ function EmployeeQrModal({
         />
 
         <p className="text-sm text-zinc-400 font-mono">
-          {target.phone_number.replace(/\d(?=\d{4})/g, '•')}
+          {maskPhone(target.phone_number)}
         </p>
 
         {target.redeemed && (
@@ -103,7 +103,7 @@ export function EmployeeTable({
   // Sync rows when the server re-renders via router.refresh() (e.g. after populate)
   useEffect(() => { setRows(initialRows) }, [initialRows])
   const [showAddModal, setShowAddModal] = useState(false)
-  const [enlarged, setEnlarged] = useState<TokenRow | null>(null)
+  const [enlarged, setEnlarged] = useState<(TokenRow & { qr_image_url: string }) | null>(null)
   const closeQr = useCallback(() => setEnlarged(null), [])
 
   const GIFT_COLORS = ['#6366f1', '#8b5cf6', '#f59e0b', '#14b8a6', '#f43f5e', '#f97316']
@@ -307,7 +307,7 @@ export function EmployeeTable({
                         {!isDraft && (
                           <td className="px-3 py-2.5">
                             <button
-                              onClick={() => row.qr_image_url && setEnlarged(row)}
+                              onClick={() => row.qr_image_url && setEnlarged(row as TokenRow & { qr_image_url: string })}
                               disabled={!row.qr_image_url}
                               className={`p-1 rounded transition-colors ${
                                 row.qr_image_url
@@ -368,7 +368,7 @@ export function EmployeeTable({
                       {!isDraft && (
                         <td className="px-3 py-2.5">
                           <button
-                            onClick={() => r.qr_image_url && setEnlarged(r)}
+                            onClick={() => r.qr_image_url && setEnlarged(r as TokenRow & { qr_image_url: string })}
                             disabled={!r.qr_image_url}
                             className={`p-1 rounded transition-colors ${
                               r.qr_image_url
