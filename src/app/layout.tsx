@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Heebo } from 'next/font/google'
+import { cookies } from 'next/headers'
 import './globals.css'
 import { LanguageProvider } from '@/lib/i18n/LanguageContext'
 import { LanguageToggle } from '@/components/ui/LanguageToggle'
@@ -12,9 +13,16 @@ export const metadata: Metadata = {
   description: 'Employee gift distribution platform',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookieStore = await cookies()
+  const locale = cookieStore.get('giftflow-locale')?.value === 'he' ? 'he' : 'en'
+
   return (
-    <html lang="en" className={`${inter.variable} ${heebo.variable}`}>
+    <html
+      lang={locale}
+      dir={locale === 'he' ? 'rtl' : 'ltr'}
+      className={`${inter.variable} ${heebo.variable}`}
+    >
       <body>
         <LanguageProvider>
           {children}

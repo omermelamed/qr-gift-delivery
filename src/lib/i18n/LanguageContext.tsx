@@ -29,7 +29,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.lang = locale
     document.documentElement.dir = locale === 'he' ? 'rtl' : 'ltr'
-    localStorage.setItem(STORAGE_KEY, locale)
+    try {
+      localStorage.setItem(STORAGE_KEY, locale)
+    } catch { /* storage unavailable */ }
     document.cookie = `${STORAGE_KEY}=${locale};path=/;max-age=31536000;SameSite=Lax`
   }, [locale])
 
