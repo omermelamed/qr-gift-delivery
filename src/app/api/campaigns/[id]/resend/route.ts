@@ -61,7 +61,7 @@ export async function POST(
     const batch = tokens.slice(i, i + BATCH_SIZE)
     const results = await Promise.allSettled(
       batch.map(async (token) => {
-        if (process.env.TWILIO_MOCK !== 'true') {
+        if (process.env.TWILIO_MOCK !== 'true' && token.phone_number) {
           await sendGiftMMS({
             to: token.phone_number,
             employeeName: token.employee_name,

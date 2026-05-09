@@ -100,7 +100,7 @@ export async function POST(
             .eq('id', token.id)
         }
 
-        if (smsSending) {
+        if (smsSending && token.phone_number) {
           await sendGiftMMS({
             to: token.phone_number,
             employeeName: token.employee_name,
