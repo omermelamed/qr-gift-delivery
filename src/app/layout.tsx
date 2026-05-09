@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Heebo } from 'next/font/google'
 import './globals.css'
+import { LanguageProvider } from '@/lib/i18n/LanguageContext'
+import { LanguageToggle } from '@/components/ui/LanguageToggle'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
+const heebo = Heebo({ subsets: ['hebrew'], variable: '--font-heebo', display: 'swap' })
 
 export const metadata: Metadata = {
   title: 'GiftFlow',
@@ -11,8 +14,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body>{children}</body>
+    <html lang="en" className={`${inter.variable} ${heebo.variable}`}>
+      <body>
+        <LanguageProvider>
+          {children}
+          <LanguageToggle />
+        </LanguageProvider>
+      </body>
     </html>
   )
 }

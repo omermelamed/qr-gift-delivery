@@ -17,3 +17,7 @@ body {
 .animate-scan-line {
   animation: scan-line 2s ease-in-out infinite;
 }
+
+:lang(he) {
+  font-family: var(--font-heebo), sans-serif;
+}
