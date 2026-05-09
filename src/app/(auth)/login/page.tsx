@@ -4,10 +4,12 @@ import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/browser'
 import type { JwtAppMetadata } from '@/types'
+import { useT } from '@/lib/i18n/useT'
 
 type Mode = 'signin' | 'forgot' | 'sent'
 
 function LoginForm() {
+  const t = useT()
   const [mode, setMode] = useState<Mode>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -61,11 +63,11 @@ function LoginForm() {
     <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-8 flex flex-col gap-5">
       {mode === 'signin' && (
         <>
-          <h1 className="text-lg font-semibold text-zinc-900">Sign in to your account</h1>
+          <h1 className="text-lg font-semibold text-zinc-900">{t('Sign in to your account')}</h1>
 
           {resetSuccess && (
             <p className="text-sm text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-2">
-              Password updated — sign in with your new password.
+              {t('Password updated — sign in with your new password.')}
             </p>
           )}
 
@@ -77,7 +79,7 @@ function LoginForm() {
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="email" className="text-sm font-medium text-zinc-700">Email</label>
+              <label htmlFor="email" className="text-sm font-medium text-zinc-700">{t('Email')}</label>
               <input
                 id="email"
                 type="email"
@@ -90,7 +92,7 @@ function LoginForm() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="password" className="text-sm font-medium text-zinc-700">Password</label>
+              <label htmlFor="password" className="text-sm font-medium text-zinc-700">{t('Password')}</label>
               <input
                 id="password"
                 type="password"
@@ -107,7 +109,7 @@ function LoginForm() {
               disabled={loading}
               className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all mt-1"
             >
-              {loading ? 'Signing in…' : 'Sign in'}
+              {loading ? t('Signing in…') : t('Sign in')}
             </button>
           </form>
 
@@ -115,15 +117,15 @@ function LoginForm() {
             onClick={() => { setError(null); setForgotEmail(email); setMode('forgot') }}
             className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors text-center"
           >
-            Forgot password?
+            {t('Forgot password?')}
           </button>
         </>
       )}
 
       {mode === 'forgot' && (
         <>
-          <h1 className="text-lg font-semibold text-zinc-900">Reset your password</h1>
-          <p className="text-sm text-zinc-500">Enter your email and we'll send a reset link.</p>
+          <h1 className="text-lg font-semibold text-zinc-900">{t('Reset your password')}</h1>
+          <p className="text-sm text-zinc-500">{t("Enter your email and we'll send a reset link.")}</p>
 
           {error && (
             <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
@@ -133,7 +135,7 @@ function LoginForm() {
 
           <form onSubmit={handleForgot} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="forgot-email" className="text-sm font-medium text-zinc-700">Email</label>
+              <label htmlFor="forgot-email" className="text-sm font-medium text-zinc-700">{t('Email')}</label>
               <input
                 id="forgot-email"
                 type="email"
@@ -150,7 +152,7 @@ function LoginForm() {
               disabled={loading}
               className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
             >
-              {loading ? 'Sending…' : 'Send reset link'}
+              {loading ? t('Sending…') : t('Send reset link')}
             </button>
           </form>
 
@@ -158,7 +160,7 @@ function LoginForm() {
             onClick={() => { setError(null); setMode('signin') }}
             className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors text-center"
           >
-            ← Back to sign in
+            {t('← Back to sign in')}
           </button>
         </>
       )}
@@ -170,16 +172,16 @@ function LoginForm() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-lg font-semibold text-zinc-900">Check your email</h1>
+          <h1 className="text-lg font-semibold text-zinc-900">{t('Check your email')}</h1>
           <p className="text-sm text-zinc-500">
-            We sent a reset link to <span className="font-medium text-zinc-700">{forgotEmail}</span>.
-            Click the link in the email to set a new password.
+            {t('We sent a reset link to')} <span className="font-medium text-zinc-700">{forgotEmail}</span>.
+            {t('Click the link in the email to set a new password.')}
           </p>
           <button
             onClick={() => setMode('signin')}
             className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors text-center"
           >
-            ← Back to sign in
+            {t('← Back to sign in')}
           </button>
         </>
       )}

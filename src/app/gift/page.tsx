@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useT } from '@/lib/i18n/useT'
 
 type Gift = {
   campaignName: string
@@ -10,6 +11,7 @@ type Gift = {
 }
 
 export default function GiftPage() {
+  const t = useT()
   const [phone, setPhone] = useState('')
   const [gifts, setGifts] = useState<Gift[] | null>(null)
   const [loading, setLoading] = useState(false)
@@ -28,12 +30,12 @@ export default function GiftPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error ?? 'Something went wrong')
+        setError(data.error ?? t('Something went wrong'))
         return
       }
       setGifts(data.gifts)
     } catch {
-      setError('Network error — please try again')
+      setError(t('Network error — please try again'))
     } finally {
       setLoading(false)
     }
@@ -44,13 +46,13 @@ export default function GiftPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-zinc-900">Check Your Gift</h1>
-          <p className="text-sm text-zinc-500 mt-1">Enter your phone number to see if you have an unclaimed gift.</p>
+          <h1 className="text-2xl font-bold text-zinc-900">{t('Check Your Gift')}</h1>
+          <p className="text-sm text-zinc-500 mt-1">{t('Enter your phone number to see if you have an unclaimed gift.')}</p>
         </div>
 
         <form onSubmit={handleLookup} className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-6 flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="phone" className="text-sm font-medium text-zinc-700">Phone number</label>
+            <label htmlFor="phone" className="text-sm font-medium text-zinc-700">{t('Phone number')}</label>
             <input
               id="phone"
               type="tel"
@@ -71,7 +73,7 @@ export default function GiftPage() {
             disabled={loading}
             className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
           >
-            {loading ? 'Looking up…' : 'Check'}
+            {loading ? t('Looking up…') : t('Check')}
           </button>
         </form>
 
@@ -79,7 +81,7 @@ export default function GiftPage() {
           <div className="mt-6">
             {gifts.length === 0 ? (
               <div className="text-center bg-white rounded-2xl border border-zinc-200 p-8">
-                <p className="text-zinc-500 text-sm">No unclaimed gifts found for this number.</p>
+                <p className="text-zinc-500 text-sm">{t('No unclaimed gifts found for this number.')}</p>
               </div>
             ) : (
               <div className="flex flex-col gap-3">
@@ -93,7 +95,7 @@ export default function GiftPage() {
                     <div className="mt-4 p-3 bg-indigo-50 rounded-lg">
                       <p className="text-sm text-indigo-700 font-medium">Hi {gift.employeeName}!</p>
                       <p className="text-sm text-indigo-600 mt-0.5">
-                        You have an unclaimed gift. Find a gift distributor and show them this screen to claim it.
+                        {t('You have an unclaimed gift. Find a gift distributor and show them this screen to claim it.')}
                       </p>
                     </div>
                   </div>
