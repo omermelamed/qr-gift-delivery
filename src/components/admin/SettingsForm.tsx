@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { LogoUploader } from '@/components/admin/LogoUploader'
+import { useT } from '@/lib/i18n/useT'
 
 const DEFAULT_TEMPLATE = "Hi {name}! Here's your QR code for your holiday gift. Scan to redeem: {link}"
 const MAX_SMS_CHARS = 160
@@ -29,6 +30,7 @@ type Props = {
 }
 
 export function SettingsForm({ companyId, initialName, initialLogoUrl, initialTemplate, initialThemeColor }: Props) {
+  const t = useT()
   const router = useRouter()
   const [name, setName] = useState(initialName)
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl)
@@ -37,7 +39,7 @@ export function SettingsForm({ companyId, initialName, initialLogoUrl, initialTe
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
 
-  const templateError = template && !template.includes('{link}') ? 'Template must contain {link}' : null
+  const templateError = template && !template.includes('{link}') ? t('Template must contain {link}') : null
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -51,12 +53,12 @@ export function SettingsForm({ companyId, initialName, initialLogoUrl, initialTe
         body: JSON.stringify({ name: name.trim(), logo_url: logoUrl, sms_template: template, theme_color: themeColor }),
       })
       const data = await res.json()
-      if (!res.ok) { setMessage({ text: data.error ?? 'Save failed', type: 'error' }); return }
-      setMessage({ text: 'Settings saved', type: 'success' })
+      if (!res.ok) { setMessage({ text: data.error ?? t('Save failed'), type: 'error' }); return }
+      setMessage({ text: t('Settings saved'), type: 'success' })
       // Refresh server components so sidebar logo + brand color update immediately
       router.refresh()
     } catch {
-      setMessage({ text: 'Network error — please try again', type: 'error' })
+      setMessage({ text: t('Network error — please try again'), type: 'error' })
     } finally {
       setSaving(false)
     }
@@ -66,10 +68,10 @@ export function SettingsForm({ companyId, initialName, initialLogoUrl, initialTe
     <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-zinc-200 divide-y divide-zinc-100">
       {/* Company identity */}
       <div className="p-6 flex flex-col gap-5">
-        <h2 className="font-semibold text-zinc-900">Company identity</h2>
+        <h2 className="font-semibold text-zinc-900">{t('Company identity')}</h2>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="co-name" className="text-sm font-medium text-zinc-700">Company name</label>
+          <label htmlFor="co-name" className="text-sm font-medium text-zinc-700">{t('Company name')}</label>
           <input
             id="co-name"
             type="text"
@@ -153,7 +155,7 @@ export function SettingsForm({ companyId, initialName, initialLogoUrl, initialTe
           className="text-white rounded-lg px-5 py-2 text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50"
           style={{ backgroundColor: themeColor }}
         >
-          {saving ? 'Saving…' : 'Save settings'}
+          {saving ? t('Saving…') : t('Save')}
         </button>
         {message && (
           <p className={`text-sm ${message.type === 'success' ? 'text-green-700' : 'text-red-600'}`}>
