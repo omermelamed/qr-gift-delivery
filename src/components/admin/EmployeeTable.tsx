@@ -14,6 +14,8 @@ type TokenRow = {
   redeemed_at: string | null
   redeemed_by: string | null
   gift_id: string | null
+  token: string
+  qr_image_url: string | null
 }
 
 function maskPhone(phone: string): string {
