@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect } from 'react'
 import { QrScanner } from '@/components/QrScanner'
 import { createClient } from '@/lib/supabase/browser'
+import { useT } from '@/lib/i18n/useT'
 import type { TokenVerifyResult, GiftOption } from '@/types'
 
 type ScanState = 'scanning' | 'loading' | 'gift_selection' | 'result'
@@ -27,6 +28,7 @@ function outcomeFromResult(result: TokenVerifyResult): ScanOutcome {
 }
 
 export default function ScanPage() {
+  const t = useT()
   const [scanState, setScanState] = useState<ScanState>('scanning')
   const [result, setResult] = useState<TokenVerifyResult | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
@@ -150,7 +152,7 @@ export default function ScanPage() {
               <span className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-indigo-400 rounded-br-lg" />
               <span className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-indigo-400 to-transparent animate-scan-line" style={{ top: '50%' }} />
             </div>
-            <p className="text-white/50 text-sm mt-6">Point camera at QR code</p>
+            <p className="text-white/50 text-sm mt-6">{t('Point camera at QR code')}</p>
           </div>
         )}
 
@@ -164,9 +166,9 @@ export default function ScanPage() {
         {/* Gift selection takeover */}
         {scanState === 'gift_selection' && (
           <div className="absolute inset-0 flex flex-col bg-zinc-900 px-6 pt-12 pb-8">
-            <p className="text-white/60 text-sm text-center mb-1">Scanning for</p>
+            <p className="text-white/60 text-sm text-center mb-1">{t('Scanning for')}</p>
             <p className="text-white text-2xl font-bold text-center mb-8">{pendingEmployee}</p>
-            <p className="text-white/80 text-sm font-medium text-center mb-4">Which gift did they take?</p>
+            <p className="text-white/80 text-sm font-medium text-center mb-4">{t('Which gift did they take?')}</p>
             <div className="flex flex-col gap-3 flex-1">
               {giftOptions.map((gift, i) => (
                 <button
@@ -185,7 +187,7 @@ export default function ScanPage() {
               disabled={giftLoading}
               className="mt-6 text-white/40 text-sm text-center w-full"
             >
-              Cancel scan
+              {t('Cancel scan')}
             </button>
           </div>
         )}
@@ -205,33 +207,33 @@ export default function ScanPage() {
             {result.valid ? (
               <>
                 <p className="text-white text-4xl font-bold text-center px-8">{result.employeeName}</p>
-                <p className="text-white/80 text-lg">Gift collected</p>
+                <p className="text-white/80 text-lg">{t('Gift collected')}</p>
               </>
             ) : result.reason === 'campaign_closed' ? (
               <>
-                <p className="text-white text-3xl font-bold">Campaign closed</p>
-                <p className="text-white/80 text-lg">No further gifts can be claimed</p>
+                <p className="text-white text-3xl font-bold">{t('Campaign closed')}</p>
+                <p className="text-white/80 text-lg">{t('No further gifts can be claimed')}</p>
               </>
             ) : result.reason === 'not_authorized' ? (
               <>
-                <p className="text-white text-3xl font-bold">Not authorised</p>
-                <p className="text-white/80 text-lg">You are not assigned to this campaign</p>
+                <p className="text-white text-3xl font-bold">{t('Not authorised')}</p>
+                <p className="text-white/80 text-lg">{t('You are not assigned to this campaign')}</p>
               </>
             ) : result.reason === 'already_used' ? (
               <>
-                <p className="text-white text-3xl font-bold">Already claimed</p>
+                <p className="text-white text-3xl font-bold">{t('Already claimed')}</p>
                 {result.employeeName && (
                   <p className="text-white/80 text-lg">{result.employeeName}</p>
                 )}
               </>
             ) : (
               <>
-                <p className="text-white text-3xl font-bold">Could not verify</p>
-                <p className="text-white/80 text-lg">Try again</p>
+                <p className="text-white text-3xl font-bold">{t('Could not verify')}</p>
+                <p className="text-white/80 text-lg">{t('Try again')}</p>
               </>
             )}
 
-            <p className="text-white/40 text-sm absolute bottom-10">Tap anywhere to scan next</p>
+            <p className="text-white/40 text-sm absolute bottom-10">{t('Tap anywhere to scan next')}</p>
           </div>
         )}
 
@@ -240,15 +242,15 @@ export default function ScanPage() {
           <>
             <a
               href="/admin"
-              className="absolute top-5 left-5 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"
+              className="absolute top-5 start-5 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"
             >
-              ← Admin
+              {t('← Admin')}
             </a>
             <button
               onClick={() => setShowHistory(true)}
-              className="absolute bottom-8 right-6 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"
+              className="absolute bottom-8 end-6 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"
             >
-              History {scanHistory.length > 0 && `(${scanHistory.length})`}
+              {t('History')} {scanHistory.length > 0 && `(${scanHistory.length})`}
             </button>
           </>
         )}
@@ -264,7 +266,7 @@ export default function ScanPage() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-white font-semibold">Recent scans</h2>
+                <h2 className="text-white font-semibold">{t('Recent scans')}</h2>
                 <button onClick={() => setShowHistory(false)} className="text-zinc-400 hover:text-white transition-colors">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -272,7 +274,7 @@ export default function ScanPage() {
                 </button>
               </div>
               {scanHistory.length === 0 ? (
-                <p className="text-zinc-400 text-sm text-center py-6">No scans yet this session</p>
+                <p className="text-zinc-400 text-sm text-center py-6">{t('No scans yet this session')}</p>
               ) : (
                 <ul className="flex flex-col gap-3">
                   {scanHistory.map((entry, i) => (
@@ -293,9 +295,9 @@ export default function ScanPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-white truncate">
                           {entry.employeeName ??
-                            (entry.outcome === 'invalid' ? 'Invalid QR code' :
-                             entry.outcome === 'not_authorized' ? 'Not authorised' :
-                             entry.outcome === 'closed' ? 'Campaign closed' : 'Unknown')}
+                            (entry.outcome === 'invalid' ? t('Invalid QR code') :
+                             entry.outcome === 'not_authorized' ? t('Not auth.') :
+                             entry.outcome === 'closed' ? t('Campaign closed') : 'Unknown')}
                         </p>
                         <p className="text-xs text-zinc-400">
                           {entry.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -305,10 +307,10 @@ export default function ScanPage() {
                         entry.outcome === 'success' ? 'text-green-400' :
                         entry.outcome === 'already_claimed' ? 'text-amber-400' : 'text-red-400'
                       }`}>
-                        {entry.outcome === 'success' ? 'Claimed' :
-                         entry.outcome === 'already_claimed' ? 'Already claimed' :
-                         entry.outcome === 'closed' ? 'Closed' :
-                         entry.outcome === 'not_authorized' ? 'Not auth.' : 'Invalid'}
+                        {entry.outcome === 'success' ? t('Claimed') :
+                         entry.outcome === 'already_claimed' ? t('Already claimed') :
+                         entry.outcome === 'closed' ? t('Closed') :
+                         entry.outcome === 'not_authorized' ? t('Not auth.') : t('Invalid')}
                       </span>
                     </li>
                   ))}
