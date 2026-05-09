@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { AddDirectoryEmployeeModal } from '@/components/admin/AddDirectoryEmployeeModal'
 import { ImportDirectoryModal } from '@/components/admin/ImportDirectoryModal'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { useT } from '@/lib/i18n/useT'
 
 type Employee = { id: string; employee_name: string; phone: string | null; department: string | null; user_id?: string | null }
 
@@ -13,6 +14,7 @@ function maskPhone(phone: string | null) {
 }
 
 export default function EmployeesPage() {
+  const t = useT()
   const [employees, setEmployees] = useState<Employee[]>([])
   const [search, setSearch] = useState('')
   const [deptFilter, setDeptFilter] = useState('')
@@ -52,7 +54,7 @@ export default function EmployeesPage() {
     setEmployees((prev) => prev.filter((e) => e.id !== removeTarget.id))
     setRemoveTarget(null)
     setRemoveLoading(false)
-    showToast('Employee removed')
+    showToast(t('Employee removed'))
   }
 
   async function handleSaveEdit(id: string) {
@@ -67,7 +69,7 @@ export default function EmployeesPage() {
         : e
       ))
       setEditingId(null)
-      showToast('Employee updated')
+      showToast(t('Employee updated'))
     }
   }
 
@@ -82,25 +84,26 @@ export default function EmployeesPage() {
     <div className="p-8 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900">Employee Directory</h1>
+          <h1 className="text-2xl font-bold text-zinc-900">{t('Employee Directory')}</h1>
           <p className="text-sm text-zinc-500 mt-0.5">{employees.length} employee{employees.length !== 1 ? 's' : ''}</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setShowImport(true)} className="border border-zinc-200 rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors">
-            Import CSV
+            {t('Import CSV')}
           </button>
           <button onClick={() => setShowAdd(true)} className="text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all" style={{ backgroundColor: 'var(--brand,#6366f1)' }}>
-            + Add employee
+            {t('+ Add employee')}
           </button>
         </div>
       </div>
 
       <div className="flex gap-3 mb-4">
-        <input type="text" placeholder="Search by name or department…" value={search} onChange={(e) => setSearch(e.target.value)}
+        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+          placeholder={t('Search by name or department…')}
           className="flex-1 border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:border-transparent" />
         {departments.length > 0 && (
           <select value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)} className="border border-zinc-200 rounded-lg px-3 py-2 text-sm text-zinc-700 focus:outline-none">
-            <option value="">All departments</option>
+            <option value="">{t('All departments')}</option>
             {departments.map((d) => <option key={d} value={d}>{d}</option>)}
           </select>
         )}
@@ -109,15 +112,15 @@ export default function EmployeesPage() {
       <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden">
         {filtered.length === 0 ? (
           <div className="text-center py-16 text-zinc-400 text-sm">
-            {employees.length === 0 ? 'No employees yet. Add one or import from CSV.' : 'No employees match your search.'}
+            {employees.length === 0 ? t('No employees yet. Add one or import from CSV.') : t('No employees match your search.')}
           </div>
         ) : (
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="text-left text-xs text-zinc-400 border-b border-zinc-100">
-                <th className="px-5 py-3 font-medium">Name</th>
-                <th className="px-5 py-3 font-medium">Phone</th>
-                <th className="px-5 py-3 font-medium">Department</th>
+              <tr className="text-start text-xs text-zinc-400 border-b border-zinc-100">
+                <th className="px-5 py-3 font-medium">{t('Name')}</th>
+                <th className="px-5 py-3 font-medium">{t('Phone')}</th>
+                <th className="px-5 py-3 font-medium">{t('Department')}</th>
                 <th className="px-5 py-3 font-medium w-24" />
               </tr>
             </thead>
@@ -141,8 +144,8 @@ export default function EmployeesPage() {
                       </td>
                       <td className="px-5 py-2 text-right">
                         <div className="flex justify-end gap-2">
-                          <button onClick={() => handleSaveEdit(e.id)} className="text-xs font-medium" style={{ color: 'var(--brand,#6366f1)' }}>Save</button>
-                          <button onClick={() => setEditingId(null)} className="text-xs font-medium text-zinc-400 hover:text-zinc-600">Cancel</button>
+                          <button onClick={() => handleSaveEdit(e.id)} className="text-xs font-medium" style={{ color: 'var(--brand,#6366f1)' }}>{t('Save')}</button>
+                          <button onClick={() => setEditingId(null)} className="text-xs font-medium text-zinc-400 hover:text-zinc-600">{t('Cancel')}</button>
                         </div>
                       </td>
                     </>
@@ -152,7 +155,7 @@ export default function EmployeesPage() {
                       <td className="px-5 py-3 font-mono text-xs text-zinc-500">
                         {e.phone
                           ? maskPhone(e.phone)
-                          : <button onClick={() => startEdit(e)} className="text-xs text-amber-500 hover:text-amber-600 font-medium">+ Add phone</button>
+                          : <button onClick={() => startEdit(e)} className="text-xs text-amber-500 hover:text-amber-600 font-medium">{t('+ Add phone')}</button>
                         }
                       </td>
                       <td className="px-5 py-3 text-zinc-500">{e.department ?? <span className="text-zinc-300">—</span>}</td>
@@ -196,7 +199,7 @@ export default function EmployeesPage() {
       {showAdd && (
         <AddDirectoryEmployeeModal
           onClose={() => setShowAdd(false)}
-          onAdded={(emp) => { setEmployees((prev) => [...prev, emp].sort((a, b) => a.employee_name.localeCompare(b.employee_name))); showToast('Employee added') }}
+          onAdded={(emp) => { setEmployees((prev) => [...prev, emp].sort((a, b) => a.employee_name.localeCompare(b.employee_name))); showToast(t('Employee added')) }}
         />
       )}
 
