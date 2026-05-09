@@ -18,6 +18,7 @@ import { DistributorStats } from '@/components/admin/DistributorStats'
 import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignButton'
 import { ReminderButton } from '@/components/admin/ReminderButton'
 import { GiftBreakdown } from '@/components/admin/GiftBreakdown'
+import { CampaignDetailHeader } from '@/components/admin/CampaignDetailHeader'
 
 export default async function CampaignDetailPage({
   params,
@@ -67,22 +68,15 @@ export default async function CampaignDetailPage({
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="mb-6">
-        <Link href="/admin" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors">
-          ← Campaigns
-        </Link>
-      </div>
+      <CampaignDetailHeader
+        campaignName={campaign.name}
+        campaignDate={campaign.campaign_date}
+        scheduledAt={campaign.scheduled_at}
+        sentAt={campaign.sent_at}
+      />
 
       <div className="flex items-start justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-900">{campaign.name}</h1>
-          <p className="text-sm text-zinc-400 mt-0.5">{campaign.campaign_date ?? '—'}</p>
-          {campaign.scheduled_at && !campaign.sent_at && (
-            <p className="text-xs text-amber-500 mt-1 font-medium">
-              Scheduled: {new Date(campaign.scheduled_at).toLocaleString()}
-            </p>
-          )}
-        </div>
+        <div />
         <div className="group flex items-center gap-3 flex-shrink-0">
           <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} />
           {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter />}
