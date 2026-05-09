@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
+import { ResultCard } from '@/components/verify/ResultCard'
 
 export default async function VerifyPage({
   params,
@@ -35,22 +36,23 @@ export default async function VerifyPage({
     .single()
 
   if (!tokenRow) {
-    return <Result icon="✗" color="red" title="Invalid QR code" subtitle="This code doesn't exist." />
+    return <ResultCard icon="✗" color="red" title="Invalid QR code" subtitle="This code doesn't exist." />
   }
 
   const campaign = tokenRow.campaigns as unknown as { closed_at: string | null; company_id: string } | null
 
   if (campaign?.closed_at) {
-    return <Result icon="✗" color="red" title="Campaign closed" subtitle="No further gifts can be claimed." />
+    return <ResultCard icon="✗" color="red" title="Campaign closed" subtitle="No further gifts can be claimed." />
   }
 
   if (tokenRow.redeemed) {
     return (
-      <Result
+      <ResultCard
         icon="✗"
         color="red"
         title="Already claimed"
-        subtitle={`${tokenRow.employee_name} already redeemed this gift.`}
+        subtitlePrefix={tokenRow.employee_name}
+        subtitle="already redeemed this gift."
       />
     )
   }
@@ -78,7 +80,7 @@ export default async function VerifyPage({
 
       if (!adminRole) {
         return (
-          <Result
+          <ResultCard
             icon="✗"
             color="red"
             title="Not authorised"
@@ -104,7 +106,7 @@ export default async function VerifyPage({
 
   if (redeemed) {
     return (
-      <Result
+      <ResultCard
         icon="✓"
         color="green"
         title={redeemed.employee_name}
@@ -114,34 +116,5 @@ export default async function VerifyPage({
   }
 
   // Race: already redeemed between our check and write
-  return <Result icon="✗" color="red" title="Already claimed" subtitle="This gift was just redeemed." />
-}
-
-function Result({
-  icon,
-  color,
-  title,
-  subtitle,
-}: {
-  icon: string
-  color: 'green' | 'red'
-  title: string
-  subtitle: string
-}) {
-  const bg = color === 'green' ? 'bg-green-600' : 'bg-red-600'
-  return (
-    <main className={`flex flex-col items-center justify-center min-h-screen ${bg} gap-5 px-8`}>
-      <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg">
-        <span className="text-4xl">{icon}</span>
-      </div>
-      <p className="text-white text-4xl font-bold text-center">{title}</p>
-      <p className="text-white/80 text-lg text-center">{subtitle}</p>
-      <a
-        href="/scan"
-        className="mt-6 bg-white/20 hover:bg-white/30 text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
-      >
-        Back to scanner
-      </a>
-    </main>
-  )
+  return <ResultCard icon="✗" color="red" title="Already claimed" subtitle="This gift was just redeemed." />
 }
