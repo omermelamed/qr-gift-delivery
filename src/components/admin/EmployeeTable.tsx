@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/browser'
 import { AddEmployeeModal } from '@/components/admin/AddEmployeeModal'
 
@@ -22,6 +22,72 @@ function maskPhone(phone: string): string {
   return phone.replace(/\d(?=\d{4})/g, '•')
 }
 
+function EmployeeQrModal({
+  target,
+  onClose,
+}: {
+  target: TokenRow
+  onClose: () => void
+}) {
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') onClose()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-6"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl p-8 flex flex-col items-center gap-4 max-w-sm w-full"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between w-full">
+          <div>
+            <p className="font-bold text-zinc-900 text-lg">{target.employee_name}</p>
+            {target.department && (
+              <p className="text-sm text-zinc-400">{target.department}</p>
+            )}
+          </div>
+          <button
+            onClick={onClose}
+            className="text-zinc-400 hover:text-zinc-700 transition-colors p-1 rounded-lg hover:bg-zinc-100"
+            aria-label="Close"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <img
+          src={target.qr_image_url!}
+          alt={`QR for ${target.employee_name}`}
+          width={320}
+          height={320}
+          className="rounded-xl"
+        />
+
+        <p className="text-sm text-zinc-400 font-mono">
+          {target.phone_number.replace(/\d(?=\d{4})/g, '•')}
+        </p>
+
+        {target.redeemed && (
+          <span className="text-sm font-semibold px-3 py-1 rounded-full bg-zinc-100 text-zinc-500">
+            Already redeemed
+          </span>
+        )}
+
+        <p className="text-xs text-zinc-300">Click outside or press Esc to close</p>
+      </div>
+    </div>
+  )
+}
+
 export function EmployeeTable({
   campaignId,
   initialRows,
@@ -37,6 +103,8 @@ export function EmployeeTable({
   // Sync rows when the server re-renders via router.refresh() (e.g. after populate)
   useEffect(() => { setRows(initialRows) }, [initialRows])
   const [showAddModal, setShowAddModal] = useState(false)
+  const [enlarged, setEnlarged] = useState<TokenRow | null>(null)
+  const closeQr = useCallback(() => setEnlarged(null), [])
 
   const GIFT_COLORS = ['#6366f1', '#8b5cf6', '#f59e0b', '#14b8a6', '#f43f5e', '#f97316']
   const giftMap = new Map(gifts.map((g, i) => [g.id, { name: g.name, color: GIFT_COLORS[i % GIFT_COLORS.length] }]))
@@ -184,6 +252,7 @@ export function EmployeeTable({
                 <th className="px-3 py-2 font-medium">Claimed</th>
                 <th className="px-3 py-2 font-medium">Claimed At</th>
                 <th className="px-3 py-2 font-medium">Distributor</th>
+                {!isDraft && <th className="px-3 py-2 font-medium w-8" />}
               </tr>
             </thead>
             <tbody>
@@ -191,7 +260,7 @@ export function EmployeeTable({
                 ? buildGroupedRows().map((row) =>
                     '_type' in row ? (
                       <tr key={`header-${row.department}`} className="bg-zinc-50">
-                        <td colSpan={showGiftCol ? 8 : 7} className="px-3 py-1.5 text-xs font-semibold text-zinc-500">
+                        <td colSpan={showGiftCol ? (isDraft ? 8 : 9) : (isDraft ? 7 : 8)} className="px-3 py-1.5 text-xs font-semibold text-zinc-500">
                           {row.department} · {row.claimed}/{row.total} claimed
                         </td>
                       </tr>
@@ -235,6 +304,24 @@ export function EmployeeTable({
                             ? distributorNames[row.redeemed_by] ?? row.redeemed_by
                             : <span className="text-zinc-300">—</span>}
                         </td>
+                        {!isDraft && (
+                          <td className="px-3 py-2.5">
+                            <button
+                              onClick={() => row.qr_image_url && setEnlarged(row)}
+                              disabled={!row.qr_image_url}
+                              className={`p-1 rounded transition-colors ${
+                                row.qr_image_url
+                                  ? 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100'
+                                  : 'text-zinc-200 cursor-not-allowed'
+                              }`}
+                              aria-label={row.qr_image_url ? `View QR for ${row.employee_name}` : 'QR generating'}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                              </svg>
+                            </button>
+                          </td>
+                        )}
                       </tr>
                     )
                   )
@@ -278,11 +365,29 @@ export function EmployeeTable({
                           ? distributorNames[r.redeemed_by] ?? r.redeemed_by
                           : <span className="text-zinc-300">—</span>}
                       </td>
+                      {!isDraft && (
+                        <td className="px-3 py-2.5">
+                          <button
+                            onClick={() => r.qr_image_url && setEnlarged(r)}
+                            disabled={!r.qr_image_url}
+                            className={`p-1 rounded transition-colors ${
+                              r.qr_image_url
+                                ? 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100'
+                                : 'text-zinc-200 cursor-not-allowed'
+                            }`}
+                            aria-label={r.qr_image_url ? `View QR for ${r.employee_name}` : 'QR generating'}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                            </svg>
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   ))}
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={showGiftCol ? 8 : 7} className="px-3 py-12 text-center text-zinc-400 text-sm">
+                  <td colSpan={showGiftCol ? (isDraft ? 8 : 9) : (isDraft ? 7 : 8)} className="px-3 py-12 text-center text-zinc-400 text-sm">
                     No employees yet. Upload a CSV or add one manually.
                   </td>
                 </tr>
@@ -298,6 +403,7 @@ export function EmployeeTable({
           onClose={() => setShowAddModal(false)}
         />
       )}
+      {enlarged && <EmployeeQrModal target={enlarged} onClose={closeQr} />}
     </>
   )
 }
