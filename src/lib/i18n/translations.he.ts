@@ -147,4 +147,6 @@ export const he: Record<string, string> = {
   // Generic
   'Network error — please try again': 'שגיאת רשת — אנא נסה שוב',
   'Something went wrong': 'משהו השתבש',
+  'member': 'חבר',
+  'members': 'חברים',
 }

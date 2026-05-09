@@ -8,9 +8,10 @@ type Props = {
   title: string
   subtitle: string
   subtitlePrefix?: string
+  rawTitle?: boolean  // when true, render title as-is without translation lookup
 }
 
-export function ResultCard({ icon, color, title, subtitle, subtitlePrefix }: Props) {
+export function ResultCard({ icon, color, title, subtitle, subtitlePrefix, rawTitle }: Props) {
   const t = useT()
   const bg = color === 'green' ? 'bg-green-600' : 'bg-red-600'
   return (
@@ -18,7 +19,7 @@ export function ResultCard({ icon, color, title, subtitle, subtitlePrefix }: Pro
       <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg">
         <span className="text-4xl">{icon}</span>
       </div>
-      <p className="text-white text-4xl font-bold text-center">{t(title)}</p>
+      <p className="text-white text-4xl font-bold text-center">{rawTitle ? title : t(title)}</p>
       <p className="text-white/80 text-lg text-center">
         {subtitlePrefix ? `${subtitlePrefix} ${t(subtitle)}` : t(subtitle)}
       </p>

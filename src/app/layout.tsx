@@ -24,7 +24,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       className={`${inter.variable} ${heebo.variable}`}
     >
       <body>
-        <LanguageProvider>
+        <LanguageProvider initialLocale={locale}>
           {children}
           <LanguageToggle />
         </LanguageProvider>

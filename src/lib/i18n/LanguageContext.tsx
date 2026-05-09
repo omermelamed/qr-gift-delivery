@@ -16,15 +16,23 @@ const LanguageContext = createContext<LanguageContextValue>({
   setLocale: () => {},
 })
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('en')
+export function LanguageProvider({
+  children,
+  initialLocale,
+}: {
+  children: ReactNode
+  initialLocale?: Locale
+}) {
+  const [locale, setLocaleState] = useState<Locale>(initialLocale ?? 'en')
 
   useEffect(() => {
+    // Only read localStorage if no server-side locale was seeded (no cookie present)
+    if (initialLocale) return
     try {
       const stored = localStorage.getItem(STORAGE_KEY) as Locale | null
       if (stored === 'he') setLocaleState('he')
     } catch { /* storage unavailable */ }
-  }, [])
+  }, [initialLocale])
 
   useEffect(() => {
     document.documentElement.lang = locale

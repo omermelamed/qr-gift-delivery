@@ -33,7 +33,7 @@ export function TeamPageUI({ members }: Props) {
         <div>
           <h1 className="text-2xl font-bold text-zinc-900">{t('Team')}</h1>
           <p className="text-sm text-zinc-500 mt-0.5">
-            {members.length} {members.length !== 1 ? 'members' : 'member'}
+            {members.length} {members.length !== 1 ? t('members') : t('member')}
           </p>
         </div>
         <InviteButton />

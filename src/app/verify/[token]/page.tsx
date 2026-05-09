@@ -111,6 +111,7 @@ export default async function VerifyPage({
         color="green"
         title={redeemed.employee_name}
         subtitle="Gift collected!"
+        rawTitle
       />
     )
   }
