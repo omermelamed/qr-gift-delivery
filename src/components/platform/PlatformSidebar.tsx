@@ -3,8 +3,10 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/browser'
+import { useT } from '@/lib/i18n/useT'
 
 export function PlatformSidebar() {
+  const t = useT()
   const pathname = usePathname()
   const router = useRouter()
 
@@ -46,18 +48,18 @@ export function PlatformSidebar() {
       {/* Platform label */}
       <div className="px-3 py-2 border-b border-zinc-800 flex-shrink-0 overflow-hidden">
         <span className="text-xs text-zinc-500 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-75 uppercase tracking-wider font-medium">
-          Platform
+          {t('Platform')}
         </span>
       </div>
 
       {/* Nav */}
       <div className="flex flex-col gap-1 p-2 flex-1">
-        {navItem('/platform', 'Companies', isCompanies,
+        {navItem('/platform', t('Companies'), isCompanies,
           <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
           </svg>
         )}
-        {navItem('/platform/activity', 'Activity', isActivity,
+        {navItem('/platform/activity', t('Activity'), isActivity,
           <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
@@ -75,7 +77,7 @@ export function PlatformSidebar() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
           <span className="text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-75">
-            Sign out
+            {t('Sign out')}
           </span>
         </button>
       </div>
