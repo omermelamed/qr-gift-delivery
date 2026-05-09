@@ -142,7 +142,7 @@ export default function EmployeesPage() {
                         <input value={editDept} onChange={(ev) => setEditDept(ev.target.value)} placeholder="Department"
                           className="border border-zinc-200 rounded-lg px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                       </td>
-                      <td className="px-5 py-2 text-right">
+                      <td className="px-5 py-2 text-end">
                         <div className="flex justify-end gap-2">
                           <button onClick={() => handleSaveEdit(e.id)} className="text-xs font-medium" style={{ color: 'var(--brand,#6366f1)' }}>{t('Save')}</button>
                           <button onClick={() => setEditingId(null)} className="text-xs font-medium text-zinc-400 hover:text-zinc-600">{t('Cancel')}</button>
@@ -159,7 +159,7 @@ export default function EmployeesPage() {
                         }
                       </td>
                       <td className="px-5 py-3 text-zinc-500">{e.department ?? <span className="text-zinc-300">—</span>}</td>
-                      <td className="px-5 py-3 text-right">
+                      <td className="px-5 py-3 text-end">
                         <div className="flex justify-end gap-3">
                           <button onClick={() => startEdit(e)} className="text-zinc-400 hover:text-zinc-700 transition-colors">
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
