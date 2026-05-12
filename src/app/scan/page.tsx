@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import { isBatchDuplicate, playSuccess, playError } from '@/lib/batch-scan'
 import { QrScanner } from '@/components/QrScanner'
 import { createClient } from '@/lib/supabase/browser'
 import { useT } from '@/lib/i18n/useT'
@@ -32,6 +33,10 @@ export default function ScanPage() {
   const [pendingEmployee, setPendingEmployee] = useState<string | null>(null)
   const [giftOptions, setGiftOptions] = useState<GiftOption[]>([])
   const [giftLoading, setGiftLoading] = useState(false)
+  const [isBatchMode, setIsBatchMode] = useState(false)
+  const [showBatchSummary, setShowBatchSummary] = useState(false)
+  const [batchToast, setBatchToast] = useState<string | null>(null)
+  const lastScannedRef = useRef<{ token: string; time: number } | null>(null)
 
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => {
@@ -46,14 +51,30 @@ export default function ScanPage() {
 
       const match = text.match(TOKEN_PATTERN)
       if (!match) {
-        const r: TokenVerifyResult = { valid: false, reason: 'invalid' }
-        setResult(r)
-        setScanHistory((prev) => [{ employeeName: null, outcome: 'invalid' as ScanOutcome, timestamp: new Date() }, ...prev].slice(0, 10))
-        setScanState('result')
+        const entry: ScanHistoryEntry = { employeeName: null, outcome: 'invalid', timestamp: new Date() }
+        if (isBatchMode) {
+          if (isBatchDuplicate(lastScannedRef.current, 'invalid', Date.now())) {
+            setScanState('scanning')
+            return
+          }
+          setScanHistory((prev) => [entry, ...prev])
+          playError()
+          setScanState('scanning')
+        } else {
+          setResult({ valid: false, reason: 'invalid' })
+          setScanHistory((prev) => [entry, ...prev].slice(0, 10))
+          setScanState('result')
+        }
         return
       }
 
       const token = match[1]
+
+      if (isBatchMode && isBatchDuplicate(lastScannedRef.current, token, Date.now())) {
+        setScanState('scanning')
+        return
+      }
+
       let r: TokenVerifyResult = { valid: false, reason: 'invalid' }
       try {
         const res = await fetch(`/api/verify/${token}`, {
@@ -66,8 +87,13 @@ export default function ScanPage() {
         r = { valid: false, reason: 'invalid' }
       }
 
-      // Multi-gift: show gift picker before confirming redemption
+      // Multi-gift guard: exit batch mode and hand off to gift selection flow
       if (r.valid && r.needsGiftSelection) {
+        if (isBatchMode) {
+          setIsBatchMode(false)
+          setBatchToast('Batch mode paused — gift selection required')
+          setTimeout(() => setBatchToast(null), 3000)
+        }
         setPendingToken(token)
         setPendingEmployee(r.employeeName)
         setGiftOptions(r.gifts)
@@ -75,16 +101,26 @@ export default function ScanPage() {
         return
       }
 
-      const employeeName = r.valid ? r.employeeName : (r.reason === 'already_used' ? r.employeeName : null)
-      setScanHistory((prev) => [{
-        employeeName: employeeName ?? null,
-        outcome: outcomeFromResult(r),
-        timestamp: new Date(),
-      }, ...prev].slice(0, 10))
-      setResult(r)
-      setScanState('result')
+      const employeeName = r.valid
+        ? r.employeeName
+        : r.reason === 'already_used'
+        ? r.employeeName
+        : null
+      const outcome = outcomeFromResult(r)
+      const entry: ScanHistoryEntry = { employeeName, outcome, timestamp: new Date() }
+
+      if (isBatchMode) {
+        lastScannedRef.current = { token, time: Date.now() }
+        setScanHistory((prev) => [entry, ...prev])
+        outcome === 'success' ? playSuccess() : playError()
+        setScanState('scanning')
+      } else {
+        setResult(r)
+        setScanHistory((prev) => [entry, ...prev].slice(0, 10))
+        setScanState('result')
+      }
     },
-    [scanState, userId]
+    [scanState, userId, isBatchMode]
   )
 
   async function handleGiftSelect(giftId: string) {
