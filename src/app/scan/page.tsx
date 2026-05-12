@@ -57,6 +57,7 @@ export default function ScanPage() {
             setScanState('scanning')
             return
           }
+          lastScannedRef.current = { token: 'invalid', time: Date.now() }
           setScanHistory((prev) => [entry, ...prev])
           playError()
           setScanState('scanning')
