@@ -4,16 +4,9 @@ import { useState, useCallback, useEffect } from 'react'
 import { QrScanner } from '@/components/QrScanner'
 import { createClient } from '@/lib/supabase/browser'
 import { useT } from '@/lib/i18n/useT'
-import type { TokenVerifyResult, GiftOption } from '@/types'
+import type { TokenVerifyResult, GiftOption, ScanOutcome, ScanHistoryEntry } from '@/types'
 
 type ScanState = 'scanning' | 'loading' | 'gift_selection' | 'result'
-type ScanOutcome = 'success' | 'already_claimed' | 'invalid' | 'closed' | 'not_authorized'
-
-type ScanHistoryEntry = {
-  employeeName: string | null
-  outcome: ScanOutcome
-  timestamp: Date
-}
 
 const TOKEN_PATTERN = /\/verify\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i
 

@@ -70,3 +70,11 @@ export type JwtAppMetadata = {
   role_id: string
   role_name: 'platform_admin' | 'company_admin' | 'campaign_manager' | 'scanner'
 }
+
+export type ScanOutcome = 'success' | 'already_claimed' | 'invalid' | 'closed' | 'not_authorized'
+
+export type ScanHistoryEntry = {
+  employeeName: string | null
+  outcome: ScanOutcome
+  timestamp: Date
+}
