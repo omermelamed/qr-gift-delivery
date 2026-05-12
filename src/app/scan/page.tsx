@@ -214,7 +214,7 @@ export default function ScanPage() {
       if (r.valid && r.needsGiftSelection) {
         if (isBatchMode) {
           setIsBatchMode(false)
-          setBatchToast('Batch mode paused — gift selection required')
+          setBatchToast(t('Batch mode paused — gift selection required'))
           setTimeout(() => setBatchToast(null), 3000)
         }
         setPendingToken(token)
