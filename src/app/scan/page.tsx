@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback, useEffect, useRef } from 'react'
-import { isBatchDuplicate, playSuccess, playError } from '@/lib/batch-scan'
+import { isBatchDuplicate, getBatchSummary, playSuccess, playError } from '@/lib/batch-scan'
 import { QrScanner } from '@/components/QrScanner'
 import { createClient } from '@/lib/supabase/browser'
 import { useT } from '@/lib/i18n/useT'
@@ -19,6 +19,128 @@ function outcomeFromResult(result: TokenVerifyResult): ScanOutcome {
   if (result.reason === 'campaign_closed') return 'closed'
   if (result.reason === 'not_authorized') return 'not_authorized'
   return 'invalid'
+}
+
+function BatchScanList({ entries, t }: { entries: ScanHistoryEntry[]; t: (key: string) => string }) {
+  return (
+    <ul className="flex flex-col divide-y divide-zinc-800 overflow-y-auto flex-1">
+      {entries.length === 0 && (
+        <li className="flex items-center justify-center py-10 text-zinc-500 text-sm">
+          {t('Ready to scan')}
+        </li>
+      )}
+      {entries.map((entry, i) => (
+        <li
+          key={`${entry.timestamp.getTime()}-${i}`}
+          className="flex items-center gap-3 px-4 py-3"
+        >
+          <div
+            className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+              entry.outcome === 'success'
+                ? 'bg-green-500/20'
+                : entry.outcome === 'already_claimed'
+                ? 'bg-amber-500/20'
+                : 'bg-red-500/20'
+            }`}
+          >
+            {entry.outcome === 'success' ? (
+              <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            ) : entry.outcome === 'already_claimed' ? (
+              <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-white truncate">
+              {entry.employeeName ??
+                (entry.outcome === 'invalid' ? t('Invalid QR code') :
+                 entry.outcome === 'closed' ? t('Campaign closed') :
+                 entry.outcome === 'not_authorized' ? t('Not authorised') : t('Unknown'))}
+            </p>
+            <p className="text-xs text-zinc-400">
+              {entry.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </p>
+          </div>
+          <span
+            className={`text-xs font-medium flex-shrink-0 ${
+              entry.outcome === 'success'
+                ? 'text-green-400'
+                : entry.outcome === 'already_claimed'
+                ? 'text-amber-400'
+                : 'text-red-400'
+            }`}
+          >
+            {entry.outcome === 'success'
+              ? t('Claimed')
+              : entry.outcome === 'already_claimed'
+              ? t('Already claimed')
+              : entry.outcome === 'closed'
+              ? t('Closed')
+              : entry.outcome === 'not_authorized'
+              ? t('Not auth.')
+              : t('Invalid')}
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function BatchSummaryModal({
+  entries,
+  onDone,
+  t,
+}: {
+  entries: ScanHistoryEntry[]
+  onDone: () => void
+  t: (key: string) => string
+}) {
+  const summary = getBatchSummary(entries)
+  return (
+    <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/80 px-6">
+      <div className="bg-zinc-900 rounded-2xl p-6 w-full max-w-sm">
+        <h2 className="text-white text-xl font-bold text-center mb-6">{t('Session complete')}</h2>
+        <div className="flex flex-col gap-3 mb-6">
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-2 text-green-400 text-sm font-medium">
+              <span>✅</span>{t('Claimed')}
+            </span>
+            <span className="text-white font-bold text-lg">{summary.claimed}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-2 text-amber-400 text-sm font-medium">
+              <span>⚠️</span>{t('Already claimed')}
+            </span>
+            <span className="text-white font-bold text-lg">{summary.alreadyClaimed}</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="flex items-center gap-2 text-red-400 text-sm font-medium">
+              <span>❌</span>{t('Invalid')}
+            </span>
+            <span className="text-white font-bold text-lg">{summary.invalid}</span>
+          </div>
+          <div className="h-px bg-zinc-700 my-1" />
+          <div className="flex items-center justify-between">
+            <span className="text-zinc-400 text-sm">{t('Total scanned')}</span>
+            <span className="text-white font-bold text-lg">{summary.total}</span>
+          </div>
+        </div>
+        <button
+          onClick={onDone}
+          className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors"
+        >
+          {t('Done')}
+        </button>
+      </div>
+    </div>
+  )
 }
 
 export default function ScanPage() {
