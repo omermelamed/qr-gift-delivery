@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient as createAnonClient } from '@supabase/supabase-js'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import type { JwtAppMetadata } from '@/types'
 
@@ -70,11 +71,14 @@ export async function POST(request: NextRequest) {
     if (!existing) return NextResponse.json({ error: 'Invite failed' }, { status: 500 })
     targetUserId = existing.id
     isReInvite = true
-    // Send a magic link so the re-invited user gets an email
-    await service.auth.admin.generateLink({
-      type: 'magiclink',
+    // signInWithOtp actually sends the magic link email via Supabase's email provider
+    const anonClient = createAnonClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    )
+    await anonClient.auth.signInWithOtp({
       email,
-      options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/admin` },
+      options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/admin` },
     })
   } else {
     if (!invited?.user) return NextResponse.json({ error: 'Invite failed' }, { status: 500 })
