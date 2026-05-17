@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
   })
 
   if (inviteError) {
-    // User already exists — find them and re-add to the company
+    // User already exists — find them, re-add to the company, and send a magic link
     if (!inviteError.message.toLowerCase().includes('already been registered') &&
         !inviteError.message.toLowerCase().includes('already registered')) {
       return NextResponse.json({ error: inviteError.message }, { status: 500 })
@@ -68,6 +68,12 @@ export async function POST(request: NextRequest) {
     const existing = users.find((u) => u.email?.toLowerCase() === email.toLowerCase())
     if (!existing) return NextResponse.json({ error: 'Invite failed' }, { status: 500 })
     targetUserId = existing.id
+    // Send a magic link so the re-invited user gets an email
+    await service.auth.admin.generateLink({
+      type: 'magiclink',
+      email,
+      options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/admin` },
+    })
   } else {
     if (!invited?.user) return NextResponse.json({ error: 'Invite failed' }, { status: 500 })
     targetUserId = invited.user.id
