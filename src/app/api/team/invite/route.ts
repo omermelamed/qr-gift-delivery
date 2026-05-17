@@ -52,25 +52,36 @@ export async function POST(request: NextRequest) {
 
   if (!role) return NextResponse.json({ error: 'Role not found' }, { status: 500 })
 
+  let targetUserId: string
+
   const { data: invited, error: inviteError } = await service.auth.admin.inviteUserByEmail(email, {
     redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/admin`,
   })
-  if (inviteError || !invited?.user) {
-    return NextResponse.json({ error: inviteError?.message ?? 'Invite failed' }, { status: 500 })
+
+  if (inviteError) {
+    // User already exists — find them and re-add to the company
+    if (!inviteError.message.toLowerCase().includes('already been registered') &&
+        !inviteError.message.toLowerCase().includes('already registered')) {
+      return NextResponse.json({ error: inviteError.message }, { status: 500 })
+    }
+    const { data: { users } } = await service.auth.admin.listUsers({ perPage: 1000 })
+    const existing = users.find((u) => u.email?.toLowerCase() === email.toLowerCase())
+    if (!existing) return NextResponse.json({ error: 'Invite failed' }, { status: 500 })
+    targetUserId = existing.id
+  } else {
+    if (!invited?.user) return NextResponse.json({ error: 'Invite failed' }, { status: 500 })
+    targetUserId = invited.user.id
   }
 
-  const newUserId = invited.user.id
-
-  const { error: metaError } = await service.auth.admin.updateUserById(newUserId, {
+  const { error: metaError } = await service.auth.admin.updateUserById(targetUserId, {
     app_metadata: { company_id: appMeta.company_id, role_id: role.id, role_name: roleName },
   })
   if (metaError) return NextResponse.json({ error: 'Failed to set user metadata' }, { status: 500 })
 
-  const { error: ucrError } = await service.from('user_company_roles').insert({
-    user_id: newUserId,
-    company_id: appMeta.company_id,
-    role_id: role.id,
-  })
+  const { error: ucrError } = await service.from('user_company_roles').upsert(
+    { user_id: targetUserId, company_id: appMeta.company_id, role_id: role.id },
+    { onConflict: 'user_id,company_id' }
+  )
   if (ucrError) return NextResponse.json({ error: 'Failed to assign company role' }, { status: 500 })
 
   return NextResponse.json({ success: true })
