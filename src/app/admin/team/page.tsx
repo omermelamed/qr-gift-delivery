@@ -23,10 +23,7 @@ export default async function TeamPage() {
   const listResult = await service.auth.admin.listUsers({ perPage: 1000 })
   const allUsers = listResult.data?.users ?? []
 
-  const companyUsers = allUsers.filter((u) => {
-    const meta = u.app_metadata as JwtAppMetadata | undefined
-    return companyUserIds.has(u.id) || meta?.company_id === appMeta.company_id
-  })
+  const companyUsers = allUsers.filter((u) => companyUserIds.has(u.id))
 
   const members: Member[] = companyUsers.map((u) => {
     const ucrRow = (ucr ?? []).find((r) => r.user_id === u.id)

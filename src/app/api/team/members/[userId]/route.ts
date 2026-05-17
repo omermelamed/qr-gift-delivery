@@ -114,15 +114,21 @@ export async function DELETE(
 
   const service = createServiceClient()
 
-  const { error: deleteError } = await service
+  const { data: deletedRows, error: deleteError } = await service
     .from('user_company_roles')
     .delete()
     .eq('user_id', userId)
     .eq('company_id', appMeta.company_id)
+    .select()
 
   if (deleteError) return NextResponse.json({ error: 'Failed to remove member' }, { status: 500 })
+  if (!deletedRows || deletedRows.length === 0) {
+    return NextResponse.json({ error: `Member not found (userId=${userId}, companyId=${appMeta.company_id})` }, { status: 404 })
+  }
 
-  const { error: metaError } = await service.auth.admin.updateUserById(userId, { app_metadata: {} })
+  const { error: metaError } = await service.auth.admin.updateUserById(userId, {
+    app_metadata: { company_id: null, role_id: null, role_name: null },
+  })
   if (metaError) console.error('[team/remove] failed to clear app_metadata:', metaError.message)
 
   if (keepEmployee) {
