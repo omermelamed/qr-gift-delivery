@@ -122,8 +122,15 @@ export async function DELETE(
     .select()
 
   if (deleteError) return NextResponse.json({ error: 'Failed to remove member' }, { status: 500 })
+
+  // If no UCR row existed, verify the user belongs to this company via app_metadata
+  // (some admins are provisioned with app_metadata only, no UCR row)
   if (!deletedRows || deletedRows.length === 0) {
-    return NextResponse.json({ error: `Member not found (userId=${userId}, companyId=${appMeta.company_id})` }, { status: 404 })
+    const { data: { user: target } } = await service.auth.admin.getUserById(userId)
+    const targetMeta = target?.app_metadata as JwtAppMetadata | undefined
+    if (!target || targetMeta?.company_id !== appMeta.company_id) {
+      return NextResponse.json({ error: 'Member not found in your company' }, { status: 404 })
+    }
   }
 
   const { error: metaError } = await service.auth.admin.updateUserById(userId, {
