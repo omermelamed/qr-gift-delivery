@@ -11,6 +11,7 @@ export type Member = {
   name: string
   role_name: string
   isPending: boolean
+  isReinvited: boolean
   isDeactivated: boolean
   isSelf: boolean
 }
@@ -66,9 +67,10 @@ export function TeamPageUI({ members }: Props) {
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
                       m.isDeactivated ? 'bg-zinc-100 text-zinc-500'
                         : m.isPending ? 'bg-violet-100 text-violet-700'
+                        : m.isReinvited ? 'bg-amber-100 text-amber-700'
                         : 'bg-green-100 text-green-700'
                     }`}>
-                      {m.isDeactivated ? t('Deactivated') : m.isPending ? t('Pending') : t('Active')}
+                      {m.isDeactivated ? t('Deactivated') : m.isPending ? t('Pending') : m.isReinvited ? t('Re-invited') : t('Active')}
                     </span>
                   </td>
                   <td className="px-5 py-3 text-end">

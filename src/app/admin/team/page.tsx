@@ -33,12 +33,15 @@ export default async function TeamPage() {
     const roleRow = ucrRow?.roles as unknown as { name: string } | null
     const meta = u.app_metadata as JwtAppMetadata | undefined
     const bannedUntil = (u as unknown as { banned_until?: string }).banned_until
+    const reinvitedAt = (u.app_metadata as Record<string, unknown>)?.reinvited_at as string | undefined
+    const isReinvited = !!(reinvitedAt && (!u.last_sign_in_at || new Date(reinvitedAt) > new Date(u.last_sign_in_at)))
     return {
       id: u.id,
       email: u.email ?? '',
       name: u.user_metadata?.full_name ?? u.email?.split('@')[0] ?? '—',
       role_name: roleRow?.name ?? meta?.role_name ?? '—',
       isPending: !u.last_sign_in_at,
+      isReinvited,
       isDeactivated: !!(bannedUntil && new Date(bannedUntil) > new Date()),
       isSelf: u.id === user.id,
     }

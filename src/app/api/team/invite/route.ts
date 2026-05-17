@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
   if (!role) return NextResponse.json({ error: 'Role not found' }, { status: 500 })
 
   let targetUserId: string
+  let isReInvite = false
 
   const { data: invited, error: inviteError } = await service.auth.admin.inviteUserByEmail(email, {
     redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/admin`,
@@ -68,6 +69,7 @@ export async function POST(request: NextRequest) {
     const existing = users.find((u) => u.email?.toLowerCase() === email.toLowerCase())
     if (!existing) return NextResponse.json({ error: 'Invite failed' }, { status: 500 })
     targetUserId = existing.id
+    isReInvite = true
     // Send a magic link so the re-invited user gets an email
     await service.auth.admin.generateLink({
       type: 'magiclink',
@@ -80,7 +82,12 @@ export async function POST(request: NextRequest) {
   }
 
   const { error: metaError } = await service.auth.admin.updateUserById(targetUserId, {
-    app_metadata: { company_id: appMeta.company_id, role_id: role.id, role_name: roleName },
+    app_metadata: {
+      company_id: appMeta.company_id,
+      role_id: role.id,
+      role_name: roleName,
+      ...(isReInvite ? { reinvited_at: new Date().toISOString() } : {}),
+    },
   })
   if (metaError) return NextResponse.json({ error: 'Failed to set user metadata' }, { status: 500 })
 
