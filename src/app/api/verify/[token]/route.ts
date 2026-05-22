@@ -61,6 +61,14 @@ export async function POST(
     return NextResponse.json({ valid: false, reason: 'not_authorized' })
   }
 
+  if (tokenRow.redeemed) {
+    return NextResponse.json({
+      valid: false,
+      reason: 'already_used',
+      employeeName: tokenRow.employee_name,
+    })
+  }
+
   // Fetch gift options for this campaign
   const { data: campaignGifts } = await supabase
     .from('campaign_gifts')
@@ -70,21 +78,13 @@ export async function POST(
 
   const gifts = campaignGifts ?? []
 
-  // Multi-gift: ask scanner to pick before redeeming
-  if (gifts.length >= 2 && !giftId) {
+  // If campaign has gift options and no gift has been chosen yet, ask the scanner to pick
+  if (gifts.length >= 1 && !giftId) {
     return NextResponse.json({
       valid: true,
       needsGiftSelection: true,
       employeeName: tokenRow.employee_name,
       gifts: gifts.map((g) => ({ id: g.id, name: g.name, position: g.position })),
-    })
-  }
-
-  if (tokenRow.redeemed) {
-    return NextResponse.json({
-      valid: false,
-      reason: 'already_used',
-      employeeName: tokenRow.employee_name,
     })
   }
 
