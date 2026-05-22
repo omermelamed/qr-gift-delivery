@@ -64,6 +64,25 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
           <p className="text-sm text-zinc-500"><span className="font-medium text-indigo-600">Click to browse</span> or drag and drop</p>
           <p className="text-xs text-zinc-400 mt-1">.csv or .xlsx · columns: name, phone_number, department</p>
           <input ref={inputRef} type="file" accept=".csv,.xlsx,.xls" onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f) }} className="hidden" />
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              const csv = 'name,phone_number,department\nJane Smith,+1234567890,Engineering\nJohn Doe,+0987654321,Marketing'
+              const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
+              const a = document.createElement('a')
+              a.href = url
+              a.download = 'employees_template.csv'
+              a.click()
+              URL.revokeObjectURL(url)
+            }}
+            className="mt-3 inline-flex items-center gap-1 text-xs text-indigo-500 hover:text-indigo-700 transition-colors"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download template
+          </button>
         </div>
 
         {rows.length > 0 && (
