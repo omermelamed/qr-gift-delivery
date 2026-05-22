@@ -31,12 +31,21 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
 
   // Only employees with a phone can be selected for campaigns
   const selectableFiltered = filtered.filter((e) => !!e.phone)
+  const allFilteredSelected = selectableFiltered.length > 0 && selectableFiltered.every((e) => selected.has(e.id))
 
   function toggleAll() {
-    if (selected.size === selectableFiltered.length && selectableFiltered.length > 0) {
-      setSelected(new Set())
+    if (allFilteredSelected) {
+      setSelected((prev) => {
+        const next = new Set(prev)
+        selectableFiltered.forEach((e) => next.delete(e.id))
+        return next
+      })
     } else {
-      setSelected(new Set(selectableFiltered.map((e) => e.id)))
+      setSelected((prev) => {
+        const next = new Set(prev)
+        selectableFiltered.forEach((e) => next.add(e.id))
+        return next
+      })
     }
   }
 
@@ -85,7 +94,7 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
           className="flex-1 border border-zinc-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:border-transparent"
           style={{ '--tw-ring-color': 'var(--brand,#6366f1)' } as React.CSSProperties} />
         {departments.length > 0 && (
-          <select value={deptFilter} onChange={(e) => setDeptFilter(e.target.value)}
+          <select value={deptFilter} onChange={(e) => { setDeptFilter(e.target.value); setSelected(new Set()) }}
             className="border border-zinc-200 rounded-lg px-2 py-1.5 text-sm text-zinc-700 focus:outline-none">
             <option value="">All depts</option>
             {departments.map((d) => <option key={d} value={d}>{d}</option>)}
@@ -94,8 +103,10 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
       </div>
 
       <div className="flex items-center justify-between mb-2">
-        <button onClick={toggleAll} className="text-xs font-medium" style={{ color: 'var(--brand,#6366f1)' }}>
-          {selected.size === selectableFiltered.length && selectableFiltered.length > 0 ? 'Deselect all' : 'Select all'}
+        <button onClick={toggleAll} disabled={selectableFiltered.length === 0} className="text-xs font-medium disabled:opacity-40" style={{ color: 'var(--brand,#6366f1)' }}>
+          {allFilteredSelected
+            ? deptFilter ? `Deselect ${deptFilter}` : 'Deselect all'
+            : deptFilter ? `Select all in ${deptFilter}` : 'Select all'}
         </button>
         <span className="text-xs text-zinc-400">{selected.size} selected</span>
       </div>
