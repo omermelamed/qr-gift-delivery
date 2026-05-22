@@ -38,13 +38,33 @@ export async function GET(
 
   if (!tokens) return NextResponse.json({ error: 'Failed to fetch tokens' }, { status: 500 })
 
+  // Resolve redeemed_by UUIDs to human-readable names
+  const scannerIds = [...new Set(tokens.map((t) => t.redeemed_by).filter(Boolean) as string[])]
+  const scannerNames = new Map<string, string>()
+  if (scannerIds.length > 0) {
+    const { data: { users } } = await service.auth.admin.listUsers({ perPage: 1000 })
+    for (const u of users) {
+      if (scannerIds.includes(u.id)) {
+        scannerNames.set(u.id, u.user_metadata?.full_name ?? u.email ?? u.id)
+      }
+    }
+  }
+
   function csvEscape(v: unknown): string {
     return `"${String(v ?? '').replace(/"/g, '""')}"`
   }
 
   const header = 'name,phone_number,department,sms_sent_at,redeemed,redeemed_at,redeemed_by'
   const rows = tokens.map((t) =>
-    [t.employee_name, t.phone_number, t.department, t.sms_sent_at, t.redeemed, t.redeemed_at, t.redeemed_by]
+    [
+      t.employee_name,
+      t.phone_number,
+      t.department,
+      t.sms_sent_at,
+      t.redeemed,
+      t.redeemed_at,
+      t.redeemed_by ? (scannerNames.get(t.redeemed_by) ?? t.redeemed_by) : '',
+    ]
       .map(csvEscape)
       .join(',')
   )
