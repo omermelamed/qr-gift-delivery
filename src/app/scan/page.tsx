@@ -203,7 +203,7 @@ export default function ScanPage() {
         const res = await fetch(`/api/verify/${token}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ distributorId: userId }),
+          body: JSON.stringify({}),
         })
         r = await res.json()
       } catch {
@@ -254,7 +254,7 @@ export default function ScanPage() {
       const res = await fetch(`/api/verify/${pendingToken}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ distributorId: userId, giftId }),
+        body: JSON.stringify({ giftId }),
       })
       r = await res.json()
     } catch {

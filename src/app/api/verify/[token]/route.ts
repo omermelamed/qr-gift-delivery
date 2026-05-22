@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { logAuditEvent } from '@/lib/audit'
 
 export async function POST(
@@ -7,8 +7,17 @@ export async function POST(
   { params }: { params: Promise<{ token: string }> }
 ) {
   const { token } = await params
+
+  // Require authentication — unauthenticated callers cannot redeem tokens
+  const authClient = await createClient()
+  const { data: { user: caller } } = await authClient.auth.getUser()
+  if (!caller) {
+    return NextResponse.json({ valid: false, reason: 'not_authorized' })
+  }
+
   const body = await request.json().catch(() => ({}))
-  const distributorId: string | null = body.distributorId ?? null
+  // Use the authenticated user's ID — never trust the client-supplied distributorId
+  const distributorId: string = caller.id
   const giftId: string | null = body.giftId ?? null
 
   const supabase = createServiceClient()
