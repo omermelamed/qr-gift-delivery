@@ -364,4 +364,7 @@ export const he: Record<string, string> = {
   'optional': 'אופציונלי',
   'or': 'או',
   'Import': 'ייבא',
+
+  // QR-only (no phone) employees
+  'QR only': 'QR בלבד',
 }

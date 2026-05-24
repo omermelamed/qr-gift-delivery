@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { normalizePhone } from '@/lib/phone'
 import { useT } from '@/lib/i18n/useT'
 
-type Employee = { id: string; employee_name: string; phone: string; department: string | null }
+type Employee = { id: string; employee_name: string; phone: string | null; department: string | null }
 
 type Props = {
   onClose: () => void
@@ -21,22 +21,23 @@ export function AddDirectoryEmployeeModal({ onClose, onAdded }: Props) {
   const [loading, setLoading] = useState(false)
 
   function handlePhoneBlur() {
+    if (!phone) return
     const normalized = normalizePhone(phone)
-    if (phone && !normalized) setPhoneError(t('Invalid phone number'))
-    else { setPhoneError(null); if (normalized) setPhone(normalized) }
+    if (!normalized) setPhoneError(t('Invalid phone number'))
+    else { setPhoneError(null); setPhone(normalized) }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    const normalized = normalizePhone(phone)
-    if (!normalized) { setPhoneError(t('Invalid phone number')); return }
+    const normalized = phone.trim() ? normalizePhone(phone) : null
+    if (phone.trim() && !normalized) { setPhoneError(t('Invalid phone number')); return }
     setLoading(true)
     setError(null)
     try {
       const res = await fetch('/api/employees', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ employee_name: name, phone: normalized, department: department || undefined }),
+        body: JSON.stringify({ employee_name: name, phone: normalized ?? undefined, department: department || undefined }),
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? t('Failed to add employee')); return }
@@ -66,8 +67,8 @@ export function AddDirectoryEmployeeModal({ onClose, onAdded }: Props) {
               className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-zinc-700">{t('Phone')}</label>
-            <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} onBlur={handlePhoneBlur} required
+            <label className="text-sm font-medium text-zinc-700">{t('Phone')} <span className="text-zinc-400">{t('(optional)')}</span></label>
+            <input type="tel" value={phone} onChange={(e) => { setPhone(e.target.value); setPhoneError(null) }} onBlur={handlePhoneBlur}
               className={`border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${phoneError ? 'border-red-300' : 'border-zinc-200'}`} />
             {phoneError && <p className="text-xs text-red-500">{phoneError}</p>}
           </div>

@@ -5,7 +5,7 @@ import { normalizePhone } from '@/lib/phone'
 import type { JwtAppMetadata } from '@/types'
 
 type InputRow = { name: string; phone_number: string; department?: string }
-type InsertRow = { campaign_id: string; employee_name: string; phone_number: string; department: string | null }
+type InsertRow = { campaign_id: string; employee_name: string; phone_number: string | null; department: string | null }
 type RowError = { row: number; reason: string }
 
 export async function POST(
@@ -52,14 +52,12 @@ export async function POST(
       .in('id', employeeIds)
       .eq('company_id', appMeta.company_id)
 
-    insertRows = (employees ?? [])
-      .filter((e) => !!e.phone)  // skip team members without a phone number set
-      .map((e) => ({
-        campaign_id: campaignId,
-        employee_name: e.employee_name,
-        phone_number: e.phone!,
-        department: e.department,
-      }))
+    insertRows = (employees ?? []).map((e) => ({
+      campaign_id: campaignId,
+      employee_name: e.employee_name,
+      phone_number: e.phone ?? null,
+      department: e.department,
+    }))
   } else if (source === 'clone') {
     const sourceCampaignId: string | undefined = body.sourceCampaignId
     if (!sourceCampaignId) return NextResponse.json({ error: 'sourceCampaignId required' }, { status: 400 })

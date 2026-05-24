@@ -292,9 +292,11 @@ export function EmployeeTable({
                           </td>
                         )}
                         <td className="px-3 py-2.5">
-                          {row.sms_sent_at
-                            ? <span className="text-green-600 text-xs font-medium">{t('✓ Sent')}</span>
-                            : isDraft ? <span className="text-zinc-300">—</span> : <span className="text-amber-500 text-xs font-medium">{t('Not sent')}</span>}
+                          {!row.phone_number
+                            ? <span className="text-zinc-400 text-xs font-medium">{t('QR only')}</span>
+                            : row.sms_sent_at
+                              ? <span className="text-green-600 text-xs font-medium">{t('✓ Sent')}</span>
+                              : isDraft ? <span className="text-zinc-300">—</span> : <span className="text-amber-500 text-xs font-medium">{t('Not sent')}</span>}
                         </td>
                         <td className="px-3 py-2.5">
                           {row.redeemed
@@ -353,9 +355,11 @@ export function EmployeeTable({
                         </td>
                       )}
                       <td className="px-3 py-2.5">
-                        {r.sms_sent_at
-                          ? <span className="text-green-600 text-xs font-medium">{t('✓ Sent')}</span>
-                          : <span className="text-zinc-300">—</span>}
+                        {!r.phone_number
+                          ? <span className="text-zinc-400 text-xs font-medium">{t('QR only')}</span>
+                          : r.sms_sent_at
+                            ? <span className="text-green-600 text-xs font-medium">{t('✓ Sent')}</span>
+                            : <span className="text-zinc-300">—</span>}
                       </td>
                       <td className="px-3 py-2.5">
                         {r.redeemed

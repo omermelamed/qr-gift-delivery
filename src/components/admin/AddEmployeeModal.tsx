@@ -19,8 +19,7 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
   const [loading, setLoading] = useState(false)
 
   function validatePhone() {
-    if (!phone.trim()) { setPhoneError(t('Phone number is required')); return false }
-    if (!normalizePhone(phone)) { setPhoneError(t('Invalid phone number')); return false }
+    if (phone.trim() && !normalizePhone(phone)) { setPhoneError(t('Invalid phone number')); return false }
     setPhoneError(null)
     return true
   }
@@ -73,7 +72,9 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="emp-phone" className="text-sm font-medium text-zinc-700">{t('Phone number')}</label>
+            <label htmlFor="emp-phone" className="text-sm font-medium text-zinc-700">
+              {t('Phone number')} <span className="text-zinc-400 font-normal">{t('(optional)')}</span>
+            </label>
             <input
               id="emp-phone"
               type="tel"
@@ -81,7 +82,6 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
               value={phone}
               onChange={(e) => { setPhone(e.target.value); setPhoneError(null) }}
               onBlur={validatePhone}
-              required
               className={`border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
                 phoneError ? 'border-red-300' : 'border-zinc-200'
               }`}

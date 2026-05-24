@@ -92,8 +92,8 @@ export async function POST(request: NextRequest) {
   const { employee_name, phone: rawPhone, department } = body
 
   if (!employee_name?.trim()) return NextResponse.json({ error: 'employee_name required' }, { status: 400 })
-  const phone = normalizePhone(rawPhone ?? '')
-  if (!phone) return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
+  const phone = rawPhone?.trim() ? normalizePhone(rawPhone) : null
+  if (rawPhone?.trim() && !phone) return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
 
   const service = createServiceClient()
   const { data, error } = await service

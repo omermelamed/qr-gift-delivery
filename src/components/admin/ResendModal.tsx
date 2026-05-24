@@ -7,6 +7,7 @@ type TokenSlice = {
   id: string
   employee_name: string
   department: string | null
+  phone_number: string | null
   redeemed: boolean
   sms_sent_at: string | null
 }
@@ -28,7 +29,7 @@ export function ResendModal({ campaignId, tokens, onClose, onDone }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const unredeemed = useMemo(() => tokens.filter((t) => !t.redeemed), [tokens])
+  const unredeemed = useMemo(() => tokens.filter((t) => !t.redeemed && !!t.phone_number), [tokens])
   const departments = useMemo(
     () => [...new Set(unredeemed.map((t) => t.department).filter(Boolean) as string[])].sort(),
     [unredeemed]

@@ -8,6 +8,7 @@ type TokenSlice = {
   id: string
   employee_name: string
   department: string | null
+  phone_number: string | null
   redeemed: boolean
   sms_sent_at: string | null
 }
@@ -22,7 +23,7 @@ export function ReminderButton({ campaignId, tokens }: Props) {
   const [showModal, setShowModal] = useState(false)
   const [result, setResult] = useState<{ dispatched: number; failed: number } | null>(null)
 
-  const unredeemedCount = tokens.filter((t) => !t.redeemed).length
+  const unredeemedCount = tokens.filter((t) => !t.redeemed && !!t.phone_number).length
   if (unredeemedCount === 0) return null
 
   return (

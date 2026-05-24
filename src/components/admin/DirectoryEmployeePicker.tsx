@@ -31,28 +31,25 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
     return matchSearch && matchDept
   })
 
-  // Only employees with a phone can be selected for campaigns
-  const selectableFiltered = filtered.filter((e) => !!e.phone)
-  const allFilteredSelected = selectableFiltered.length > 0 && selectableFiltered.every((e) => selected.has(e.id))
+  const allFilteredSelected = filtered.length > 0 && filtered.every((e) => selected.has(e.id))
 
   function toggleAll() {
     if (allFilteredSelected) {
       setSelected((prev) => {
         const next = new Set(prev)
-        selectableFiltered.forEach((e) => next.delete(e.id))
+        filtered.forEach((e) => next.delete(e.id))
         return next
       })
     } else {
       setSelected((prev) => {
         const next = new Set(prev)
-        selectableFiltered.forEach((e) => next.add(e.id))
+        filtered.forEach((e) => next.add(e.id))
         return next
       })
     }
   }
 
-  function toggle(id: string, hasPhone: boolean) {
-    if (!hasPhone) return
+  function toggle(id: string) {
     setSelected((prev) => {
       const next = new Set(prev)
       if (next.has(id)) next.delete(id); else next.add(id)
@@ -105,7 +102,7 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
       </div>
 
       <div className="flex items-center justify-between mb-2">
-        <button onClick={toggleAll} disabled={selectableFiltered.length === 0} className="text-xs font-medium disabled:opacity-40" style={{ color: 'var(--brand,#6366f1)' }}>
+        <button onClick={toggleAll} disabled={filtered.length === 0} className="text-xs font-medium disabled:opacity-40" style={{ color: 'var(--brand,#6366f1)' }}>
           {allFilteredSelected
             ? deptFilter ? `${t('Deselect all')} ${deptFilter}` : t('Deselect all')
             : deptFilter ? `${t('Select all')} ${deptFilter}` : t('Select all')}
@@ -114,33 +111,26 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
       </div>
 
       <div className="border border-zinc-100 rounded-xl overflow-hidden max-h-52 overflow-y-auto mb-3">
-        {filtered.map((e) => {
-          const hasPhone = !!e.phone
-          return (
-            <label
-              key={e.id}
-              className={`flex items-center gap-3 px-3 py-2 border-b border-zinc-50 last:border-0 ${
-                hasPhone ? 'hover:bg-zinc-50 cursor-pointer' : 'opacity-50 cursor-not-allowed'
-              }`}
-              title={hasPhone ? undefined : 'Add a phone number in the Employees directory first'}
-            >
-              <input
-                type="checkbox"
-                checked={selected.has(e.id)}
-                onChange={() => toggle(e.id, hasPhone)}
-                disabled={!hasPhone}
-                className="w-4 h-4 rounded border-zinc-300 focus:ring-indigo-500"
-              />
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-zinc-800 truncate">{e.employee_name}</p>
-                {e.department && <p className="text-xs text-zinc-400">{e.department}</p>}
-              </div>
-              {!hasPhone && (
-                <span className="text-xs text-amber-500 font-medium flex-shrink-0">{t('No phone')}</span>
-              )}
-            </label>
-          )
-        })}
+        {filtered.map((e) => (
+          <label
+            key={e.id}
+            className="flex items-center gap-3 px-3 py-2 border-b border-zinc-50 last:border-0 hover:bg-zinc-50 cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              checked={selected.has(e.id)}
+              onChange={() => toggle(e.id)}
+              className="w-4 h-4 rounded border-zinc-300 focus:ring-indigo-500"
+            />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-zinc-800 truncate">{e.employee_name}</p>
+              {e.department && <p className="text-xs text-zinc-400">{e.department}</p>}
+            </div>
+            {!e.phone && (
+              <span className="text-xs text-zinc-400 font-medium flex-shrink-0">{t('QR only')}</span>
+            )}
+          </label>
+        ))}
       </div>
 
       {message && (
