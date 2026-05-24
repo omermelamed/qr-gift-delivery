@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useT } from '@/lib/i18n/useT'
 
 const ROLE_OPTIONS = [
   { value: 'company_admin', label: 'Admin' },
@@ -20,6 +21,7 @@ type Props = {
 }
 
 export function EditMemberButton({ userId, name, email, roleName, isActive, isPending, isSelf }: Props) {
+  const t = useT()
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -52,7 +54,7 @@ export function EditMemberButton({ userId, name, email, roleName, isActive, isPe
       resetAndClose()
       router.refresh()
     } catch {
-      setError('Network error — please try again')
+      setError(t('Network error — please try again'))
     } finally {
       setSaving(false)
     }
@@ -81,20 +83,20 @@ export function EditMemberButton({ userId, name, email, roleName, isActive, isPe
         onClick={() => setOpen(true)}
         className="border border-zinc-200 rounded-lg px-3 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
       >
-        Edit
+        {t('Edit')}
       </button>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={resetAndClose}>
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="px-6 pt-6 pb-4 border-b border-zinc-100">
-              <h2 className="text-lg font-semibold text-zinc-900">Edit member</h2>
+              <h2 className="text-lg font-semibold text-zinc-900">{t('Edit member')}</h2>
             </div>
 
             <div className="p-6 flex flex-col gap-4">
               {/* Name */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-zinc-700">Name</label>
+                <label className="text-sm font-medium text-zinc-700">{t('Name')}</label>
                 <input
                   type="text"
                   value={form.name}
@@ -105,7 +107,7 @@ export function EditMemberButton({ userId, name, email, roleName, isActive, isPe
 
               {/* Email */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-zinc-700">Email</label>
+                <label className="text-sm font-medium text-zinc-700">{t('Email')}</label>
                 <input
                   type="email"
                   value={form.email}
@@ -117,7 +119,7 @@ export function EditMemberButton({ userId, name, email, roleName, isActive, isPe
               {/* Role — disabled for self */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-zinc-700">
-                  Role {isSelf && <span className="text-xs text-zinc-400 font-normal">(cannot change own role)</span>}
+                  {t('Role')} {isSelf && <span className="text-xs text-zinc-400 font-normal">{t('(cannot change own role)')}</span>}
                 </label>
                 <select
                   value={form.role_name}
@@ -126,7 +128,7 @@ export function EditMemberButton({ userId, name, email, roleName, isActive, isPe
                   className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[--brand] disabled:bg-zinc-50 disabled:text-zinc-400"
                 >
                   {ROLE_OPTIONS.map((r) => (
-                    <option key={r.value} value={r.value}>{r.label}</option>
+                    <option key={r.value} value={r.value}>{t(r.label)}</option>
                   ))}
                 </select>
               </div>
@@ -135,8 +137,8 @@ export function EditMemberButton({ userId, name, email, roleName, isActive, isPe
               {!isSelf && (
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-zinc-700">Status</p>
-                    <p className="text-xs text-zinc-400">Deactivated users cannot log in</p>
+                    <p className="text-sm font-medium text-zinc-700">{t('Status')}</p>
+                    <p className="text-xs text-zinc-400">{t('Deactivated users cannot log in')}</p>
                   </div>
                   <button
                     type="button"
@@ -161,7 +163,7 @@ export function EditMemberButton({ userId, name, email, roleName, isActive, isPe
                     disabled={emailAction === 'loading'}
                     className="text-xs border border-zinc-200 rounded-lg px-3 py-1.5 text-zinc-600 hover:bg-zinc-50 disabled:opacity-50 transition-colors"
                   >
-                    {emailAction === 'done' ? '✓ Invite sent' : emailAction === 'error' ? 'Failed' : emailAction === 'loading' ? 'Sending…' : 'Resend invite'}
+                    {emailAction === 'done' ? t('✓ Invite sent') : emailAction === 'error' ? t('Failed') : emailAction === 'loading' ? t('Sending…') : t('Resend invite')}
                   </button>
                 )}
                 {!isPending && (
@@ -171,7 +173,7 @@ export function EditMemberButton({ userId, name, email, roleName, isActive, isPe
                     disabled={emailAction === 'loading'}
                     className="text-xs border border-zinc-200 rounded-lg px-3 py-1.5 text-zinc-600 hover:bg-zinc-50 disabled:opacity-50 transition-colors"
                   >
-                    {emailAction === 'done' ? '✓ Email sent' : emailAction === 'error' ? 'Failed' : emailAction === 'loading' ? 'Sending…' : 'Send password reset'}
+                    {emailAction === 'done' ? t('✓ Email sent') : emailAction === 'error' ? t('Failed') : emailAction === 'loading' ? t('Sending…') : t('Send password reset')}
                   </button>
                 )}
               </div>
@@ -184,7 +186,7 @@ export function EditMemberButton({ userId, name, email, roleName, isActive, isPe
                 onClick={resetAndClose}
                 className="border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
               >
-                Cancel
+                {t('Cancel')}
               </button>
               <button
                 onClick={handleSave}
@@ -192,7 +194,7 @@ export function EditMemberButton({ userId, name, email, roleName, isActive, isPe
                 className="text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50"
                 style={{ backgroundColor: 'var(--brand,#6366f1)' }}
               >
-                {saving ? 'Saving…' : 'Save changes'}
+                {saving ? t('Saving…') : t('Save changes')}
               </button>
             </div>
           </div>

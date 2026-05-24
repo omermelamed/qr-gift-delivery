@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/browser'
 import { AddEmployeeModal } from '@/components/admin/AddEmployeeModal'
+import { useT } from '@/lib/i18n/useT'
 
 type TokenRow = {
   id: string
@@ -29,6 +30,7 @@ function EmployeeQrModal({
   target: TokenRow & { qr_image_url: string }
   onClose: () => void
 }) {
+  const t = useT()
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose()
@@ -80,11 +82,11 @@ function EmployeeQrModal({
 
         {target.redeemed && (
           <span className="text-sm font-semibold px-3 py-1 rounded-full bg-zinc-100 text-zinc-500">
-            Already redeemed
+            {t('Already redeemed')}
           </span>
         )}
 
-        <p className="text-xs text-zinc-300">Click outside or press Esc to close</p>
+        <p className="text-xs text-zinc-300">{t('Click outside or press Esc to close')}</p>
       </div>
     </div>
   )
@@ -101,6 +103,7 @@ export function EmployeeTable({
   isDraft: boolean
   gifts?: { id: string; name: string }[]
 }) {
+  const t = useT()
   const [rows, setRows] = useState(initialRows)
   // Sync rows when the server re-renders via router.refresh() (e.g. after populate)
   useEffect(() => { setRows(initialRows) }, [initialRows])
@@ -219,13 +222,13 @@ export function EmployeeTable({
     <>
       <div className="bg-white rounded-xl border border-zinc-200 p-5 flex flex-col min-h-0">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <h2 className="font-semibold text-zinc-900">Employees <span className="text-zinc-400 font-normal">({rows.length})</span></h2>
+          <h2 className="font-semibold text-zinc-900">{t('Employees')} <span className="text-zinc-400 font-normal">({rows.length})</span></h2>
           <div className="flex items-center gap-2">
             <button
               onClick={handleExport}
               className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
             >
-              Export CSV
+              {t('Export CSV')}
             </button>
             {hasDepts && (
               <button
@@ -236,7 +239,7 @@ export function EmployeeTable({
                     : 'border-zinc-200 text-zinc-700 hover:bg-zinc-50'
                 }`}
               >
-                By department
+                {t('By department')}
               </button>
             )}
           </div>
@@ -246,14 +249,14 @@ export function EmployeeTable({
           <table className="text-sm w-full border-collapse">
             <thead>
               <tr className="text-left text-xs text-zinc-400 border-b border-zinc-100">
-                <th className="px-3 py-2 font-medium">Name</th>
-                <th className="px-3 py-2 font-medium">Phone</th>
-                <th className="px-3 py-2 font-medium">Department</th>
-                {showGiftCol && <th className="px-3 py-2 font-medium">Gift</th>}
+                <th className="px-3 py-2 font-medium">{t('Name')}</th>
+                <th className="px-3 py-2 font-medium">{t('Phone')}</th>
+                <th className="px-3 py-2 font-medium">{t('Department')}</th>
+                {showGiftCol && <th className="px-3 py-2 font-medium">{t('Gift')}</th>}
                 <th className="px-3 py-2 font-medium">SMS</th>
-                <th className="px-3 py-2 font-medium">Claimed</th>
-                <th className="px-3 py-2 font-medium">Claimed At</th>
-                <th className="px-3 py-2 font-medium">Distributor</th>
+                <th className="px-3 py-2 font-medium">{t('Claimed')}</th>
+                <th className="px-3 py-2 font-medium">{t('Claimed At')}</th>
+                <th className="px-3 py-2 font-medium">{t('Distributor')}</th>
                 {!isDraft && <th className="px-3 py-2 font-medium w-8" />}
               </tr>
             </thead>
@@ -290,12 +293,12 @@ export function EmployeeTable({
                         )}
                         <td className="px-3 py-2.5">
                           {row.sms_sent_at
-                            ? <span className="text-green-600 text-xs font-medium">✓ Sent</span>
-                            : isDraft ? <span className="text-zinc-300">—</span> : <span className="text-amber-500 text-xs font-medium">Not sent</span>}
+                            ? <span className="text-green-600 text-xs font-medium">{t('✓ Sent')}</span>
+                            : isDraft ? <span className="text-zinc-300">—</span> : <span className="text-amber-500 text-xs font-medium">{t('Not sent')}</span>}
                         </td>
                         <td className="px-3 py-2.5">
                           {row.redeemed
-                            ? <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">Claimed</span>
+                            ? <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">{t('Claimed')}</span>
                             : <span className="text-zinc-300">—</span>}
                         </td>
                         <td className="px-3 py-2.5 text-xs text-zinc-400">
@@ -351,12 +354,12 @@ export function EmployeeTable({
                       )}
                       <td className="px-3 py-2.5">
                         {r.sms_sent_at
-                          ? <span className="text-green-600 text-xs font-medium">✓ Sent</span>
+                          ? <span className="text-green-600 text-xs font-medium">{t('✓ Sent')}</span>
                           : <span className="text-zinc-300">—</span>}
                       </td>
                       <td className="px-3 py-2.5">
                         {r.redeemed
-                          ? <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">Claimed</span>
+                          ? <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">{t('Claimed')}</span>
                           : <span className="text-zinc-300">—</span>}
                       </td>
                       <td className="px-3 py-2.5 text-xs text-zinc-400">
@@ -390,7 +393,7 @@ export function EmployeeTable({
               {rows.length === 0 && (
                 <tr>
                   <td colSpan={showGiftCol ? (isDraft ? 8 : 9) : (isDraft ? 7 : 8)} className="px-3 py-12 text-center text-zinc-400 text-sm">
-                    No employees yet. Upload a CSV or add one manually.
+                    {t('No employees yet. Upload a CSV or add one manually.')}
                   </td>
                 </tr>
               )}

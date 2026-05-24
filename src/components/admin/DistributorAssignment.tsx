@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useT } from '@/lib/i18n/useT'
 
 type Distributor = { userId: string; name: string; email: string }
 type ScannerUser = { id: string; name: string; email: string }
 
 export function DistributorAssignment({ campaignId }: { campaignId: string }) {
+  const t = useT()
   const [distributors, setDistributors] = useState<Distributor[]>([])
   const [scanners, setScanners] = useState<ScannerUser[]>([])
   const [showPicker, setShowPicker] = useState(false)
@@ -54,11 +56,11 @@ export function DistributorAssignment({ campaignId }: { campaignId: string }) {
 
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-5">
-      <h2 className="font-semibold text-zinc-900 mb-1">Distributors</h2>
+      <h2 className="font-semibold text-zinc-900 mb-1">{t('Distributors')}</h2>
       <p className="text-xs text-zinc-400 mb-4">
         {distributors.length === 0
-          ? 'Any scanner can scan this campaign'
-          : `${distributors.length} assigned`}
+          ? t('Any scanner can scan this campaign')
+          : `${distributors.length} ${t('assigned')}`}
       </p>
 
       {distributors.length > 0 && (
@@ -89,13 +91,13 @@ export function DistributorAssignment({ campaignId }: { campaignId: string }) {
           disabled={loading}
           className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors disabled:opacity-50"
         >
-          + Add distributor
+          {t('+ Add distributor')}
         </button>
 
         {showPicker && (
           <div className="absolute top-6 left-0 z-20 bg-white border border-zinc-200 rounded-xl shadow-lg p-2 w-64">
             {availableScanners.length === 0 ? (
-              <p className="text-sm text-zinc-400 px-2 py-1">No available scanners</p>
+              <p className="text-sm text-zinc-400 px-2 py-1">{t('No available scanners')}</p>
             ) : (
               availableScanners.map((s) => (
                 <button
@@ -112,7 +114,7 @@ export function DistributorAssignment({ campaignId }: { campaignId: string }) {
               onClick={() => setShowPicker(false)}
               className="w-full text-center text-xs text-zinc-400 mt-1 pt-1 border-t border-zinc-100 hover:text-zinc-600"
             >
-              Cancel
+              {t('Cancel')}
             </button>
           </div>
         )}

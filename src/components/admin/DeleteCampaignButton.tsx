@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { useT } from '@/lib/i18n/useT'
 
 export function DeleteCampaignButton({ campaignId, redirectAfter = false }: { campaignId: string; redirectAfter?: boolean }) {
   const [showConfirm, setShowConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const t = useT()
 
   async function handleDelete() {
     setLoading(true)
@@ -17,7 +19,7 @@ export function DeleteCampaignButton({ campaignId, redirectAfter = false }: { ca
       const res = await fetch(`/api/campaigns/${campaignId}`, { method: 'DELETE' })
       if (!res.ok) {
         const data = await res.json()
-        setError(data.error ?? 'Failed to delete campaign')
+        setError(data.error ?? t('Failed to delete campaign'))
         return
       }
       setShowConfirm(false)
@@ -27,7 +29,7 @@ export function DeleteCampaignButton({ campaignId, redirectAfter = false }: { ca
         router.refresh()
       }
     } catch {
-      setError('Network error — please try again')
+      setError(t('Network error — please try again'))
     } finally {
       setLoading(false)
     }
@@ -39,14 +41,14 @@ export function DeleteCampaignButton({ campaignId, redirectAfter = false }: { ca
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowConfirm(true) }}
         className="border border-red-200 rounded-lg px-3 py-1.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
       >
-        Delete
+        {t('Delete')}
       </button>
 
       {showConfirm && (
         <ConfirmModal
-          title="Delete campaign?"
-          message="This will permanently delete the campaign and all its employee records. This cannot be undone."
-          confirmLabel="Delete"
+          title={t('Delete campaign?')}
+          message={t('This will permanently delete the campaign and all its employee records. This cannot be undone.')}
+          confirmLabel={t('Delete')}
           loading={loading}
           error={error}
           onConfirm={handleDelete}

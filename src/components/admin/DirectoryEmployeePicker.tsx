@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useT } from '@/lib/i18n/useT'
 
 type Employee = { id: string; employee_name: string; phone: string | null; department: string | null; user_id?: string | null }
 
@@ -10,6 +11,7 @@ type Props = {
 }
 
 export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
+  const t = useT()
   const [employees, setEmployees] = useState<Employee[]>([])
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [search, setSearch] = useState('')
@@ -69,8 +71,8 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
         body: JSON.stringify({ source: 'directory', employeeIds: [...selected] }),
       })
       const data = await res.json()
-      if (!res.ok) { setMessage({ text: data.error ?? 'Failed to add employees', type: 'error' }); return }
-      setMessage({ text: `${data.inserted} employees added to campaign`, type: 'success' })
+      if (!res.ok) { setMessage({ text: data.error ?? t('Failed to add employee'), type: 'error' }); return }
+      setMessage({ text: `${data.inserted} ${t('employees added to campaign')}`, type: 'success' })
       setSelected(new Set())
       onAdded()
     } finally {
@@ -81,8 +83,8 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
   if (employees.length === 0) {
     return (
       <div className="text-center py-8 text-zinc-400 text-sm">
-        Your directory is empty.{' '}
-        <a href="/admin/employees" className="text-indigo-600 hover:underline">Add employees</a> first.
+        {t('Your directory is empty.')}{' '}
+        <a href="/admin/employees" className="text-indigo-600 hover:underline">{t('Add employees')}</a> first.
       </div>
     )
   }
@@ -90,13 +92,13 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
   return (
     <div>
       <div className="flex gap-2 mb-3">
-        <input type="text" placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)}
+        <input type="text" placeholder={t('Search…')} value={search} onChange={(e) => setSearch(e.target.value)}
           className="flex-1 border border-zinc-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:border-transparent"
           style={{ '--tw-ring-color': 'var(--brand,#6366f1)' } as React.CSSProperties} />
         {departments.length > 0 && (
           <select value={deptFilter} onChange={(e) => { setDeptFilter(e.target.value); setSelected(new Set()) }}
             className="border border-zinc-200 rounded-lg px-2 py-1.5 text-sm text-zinc-700 focus:outline-none">
-            <option value="">All depts</option>
+            <option value="">{t('All depts')}</option>
             {departments.map((d) => <option key={d} value={d}>{d}</option>)}
           </select>
         )}
@@ -105,10 +107,10 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
       <div className="flex items-center justify-between mb-2">
         <button onClick={toggleAll} disabled={selectableFiltered.length === 0} className="text-xs font-medium disabled:opacity-40" style={{ color: 'var(--brand,#6366f1)' }}>
           {allFilteredSelected
-            ? deptFilter ? `Deselect ${deptFilter}` : 'Deselect all'
-            : deptFilter ? `Select all in ${deptFilter}` : 'Select all'}
+            ? deptFilter ? `${t('Deselect all')} ${deptFilter}` : t('Deselect all')
+            : deptFilter ? `${t('Select all')} ${deptFilter}` : t('Select all')}
         </button>
-        <span className="text-xs text-zinc-400">{selected.size} selected</span>
+        <span className="text-xs text-zinc-400">{selected.size} {t('selected')}</span>
       </div>
 
       <div className="border border-zinc-100 rounded-xl overflow-hidden max-h-52 overflow-y-auto mb-3">
@@ -134,7 +136,7 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
                 {e.department && <p className="text-xs text-zinc-400">{e.department}</p>}
               </div>
               {!hasPhone && (
-                <span className="text-xs text-amber-500 font-medium flex-shrink-0">No phone</span>
+                <span className="text-xs text-amber-500 font-medium flex-shrink-0">{t('No phone')}</span>
               )}
             </label>
           )
@@ -151,7 +153,7 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
         className="w-full text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
         style={{ backgroundColor: 'var(--brand,#6366f1)' }}
       >
-        {loading ? 'Adding…' : `Add ${selected.size > 0 ? selected.size : ''} to campaign`}
+        {loading ? t('Adding…') : `${t('Add')} ${selected.size > 0 ? selected.size : ''} ${t('employees')}`}
       </button>
     </div>
   )

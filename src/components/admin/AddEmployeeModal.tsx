@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { normalizePhone } from '@/lib/phone'
+import { useT } from '@/lib/i18n/useT'
 
 type Props = {
   campaignId: string
@@ -9,6 +10,7 @@ type Props = {
 }
 
 export function AddEmployeeModal({ campaignId, onClose }: Props) {
+  const t = useT()
   const [name, setName] = useState('')
   const [phone, setPhone] = useState('')
   const [department, setDepartment] = useState('')
@@ -17,8 +19,8 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
   const [loading, setLoading] = useState(false)
 
   function validatePhone() {
-    if (!phone.trim()) { setPhoneError('Phone number is required'); return false }
-    if (!normalizePhone(phone)) { setPhoneError('Invalid phone number'); return false }
+    if (!phone.trim()) { setPhoneError(t('Phone number is required')); return false }
+    if (!normalizePhone(phone)) { setPhoneError(t('Invalid phone number')); return false }
     setPhoneError(null)
     return true
   }
@@ -35,10 +37,10 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
         body: JSON.stringify({ name: name.trim(), phone_number: phone.trim(), department: department.trim() || undefined }),
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error ?? 'Failed to add employee'); return }
+      if (!res.ok) { setError(data.error ?? t('Failed to add employee')); return }
       onClose()
     } catch {
-      setError('Network error — please try again')
+      setError(t('Network error — please try again'))
     } finally {
       setLoading(false)
     }
@@ -48,7 +50,7 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white rounded-2xl shadow-xl border border-zinc-200 p-6 w-full max-w-sm">
-        <h2 className="text-base font-semibold text-zinc-900 mb-4">Add employee</h2>
+        <h2 className="text-base font-semibold text-zinc-900 mb-4">{t('Add employee')}</h2>
 
         {error && (
           <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-4">
@@ -58,7 +60,7 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="emp-name" className="text-sm font-medium text-zinc-700">Name</label>
+            <label htmlFor="emp-name" className="text-sm font-medium text-zinc-700">{t('Name')}</label>
             <input
               id="emp-name"
               type="text"
@@ -71,7 +73,7 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="emp-phone" className="text-sm font-medium text-zinc-700">Phone number</label>
+            <label htmlFor="emp-phone" className="text-sm font-medium text-zinc-700">{t('Phone number')}</label>
             <input
               id="emp-phone"
               type="tel"
@@ -89,7 +91,7 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
 
           <div className="flex flex-col gap-1.5">
             <label htmlFor="emp-dept" className="text-sm font-medium text-zinc-700">
-              Department <span className="text-zinc-400 font-normal">(optional)</span>
+              {t('Department')} <span className="text-zinc-400 font-normal">{t('(optional)')}</span>
             </label>
             <input
               id="emp-dept"
@@ -108,14 +110,14 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
               disabled={loading}
               className="px-4 py-2 text-sm font-medium text-zinc-700 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors disabled:opacity-50"
             >
-              Cancel
+              {t('Cancel')}
             </button>
             <button
               type="submit"
               disabled={loading || !name.trim()}
               className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-violet-500 rounded-lg hover:brightness-110 transition-all disabled:opacity-50"
             >
-              {loading ? 'Adding…' : 'Add employee'}
+              {loading ? t('Adding…') : t('Add employee')}
             </button>
           </div>
         </form>

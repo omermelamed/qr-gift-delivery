@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/browser'
+import { useT } from '@/lib/i18n/useT'
 
 type Props = {
   companyId: string
@@ -10,6 +11,7 @@ type Props = {
 }
 
 export function LogoUploader({ companyId, currentUrl, onUploaded }: Props) {
+  const t = useT()
   const [preview, setPreview] = useState<string | null>(currentUrl)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -17,8 +19,8 @@ export function LogoUploader({ companyId, currentUrl, onUploaded }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   async function processFile(file: File) {
-    if (!file.type.startsWith('image/')) { setError('Please upload an image file (PNG, JPG, WebP)'); return }
-    if (file.size > 2 * 1024 * 1024) { setError('Image must be under 2 MB'); return }
+    if (!file.type.startsWith('image/')) { setError(t('Please upload an image file (PNG, JPG, WebP)')); return }
+    if (file.size > 2 * 1024 * 1024) { setError(t('Image must be under 2 MB')); return }
     setError(null)
     setUploading(true)
     try {
@@ -65,13 +67,13 @@ export function LogoUploader({ companyId, currentUrl, onUploaded }: Props) {
           }`}
         >
           {uploading ? (
-            <p className="text-sm text-zinc-500">Uploading...</p>
+            <p className="text-sm text-zinc-500">{t('Uploading...')}</p>
           ) : (
             <>
               <p className="text-sm text-zinc-500">
-                <span className="font-medium text-indigo-600">Click to upload</span> or drag and drop
+                <span className="font-medium text-indigo-600">{t('Click to upload')}</span> {t('or drag and drop')}
               </p>
-              <p className="text-xs text-zinc-400 mt-0.5">PNG, JPG, WebP · Max 2 MB</p>
+              <p className="text-xs text-zinc-400 mt-0.5">{t('PNG, JPG, WebP · Max 2 MB')}</p>
             </>
           )}
           <input

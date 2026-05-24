@@ -1,7 +1,12 @@
+'use client'
+
+import { useT } from '@/lib/i18n/useT'
+
 type TokenSlice = { department: string | null; redeemed: boolean }
 type Props = { tokens: TokenSlice[] }
 
 export function DepartmentBreakdown({ tokens }: Props) {
+  const t = useT()
   if (tokens.length === 0) return null
 
   const map = new Map<string, { total: number; claimed: number }>()
@@ -21,7 +26,7 @@ export function DepartmentBreakdown({ tokens }: Props) {
 
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-5">
-      <h2 className="font-semibold text-zinc-900 mb-4">By Department</h2>
+      <h2 className="font-semibold text-zinc-900 mb-4">{t('By Department')}</h2>
       <div className="flex flex-col gap-3">
         {rows.map(({ dept, claimed, total, pct }) => (
           <div key={dept}>

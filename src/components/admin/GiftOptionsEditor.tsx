@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useT } from '@/lib/i18n/useT'
 import type { GiftOption } from '@/types'
 
 type Props = { campaignId: string; disabled?: boolean }
 
 export function GiftOptionsEditor({ campaignId, disabled = false }: Props) {
+  const t = useT()
   const [gifts, setGifts] = useState<GiftOption[]>([])
   const [newName, setNewName] = useState('')
   const [loading, setLoading] = useState(false)
@@ -60,11 +62,11 @@ export function GiftOptionsEditor({ campaignId, disabled = false }: Props) {
 
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-5">
-      <h2 className="font-semibold text-zinc-900 mb-1">Gift Options</h2>
+      <h2 className="font-semibold text-zinc-900 mb-1">{t('Gift Options')}</h2>
       <p className="text-xs text-zinc-400 mb-4">
         {gifts.length === 0
-          ? 'No options — campaign will use single-gift flow'
-          : `${gifts.length} option${gifts.length !== 1 ? 's' : ''} defined`}
+          ? t('No options — campaign will use single-gift flow')
+          : `${gifts.length} ${gifts.length !== 1 ? t('options') : t('option')} ${t('defined')}`}
       </p>
 
       {gifts.length > 0 && (
@@ -89,8 +91,8 @@ export function GiftOptionsEditor({ campaignId, disabled = false }: Props) {
                     }}
                     className="flex-1 border border-zinc-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
-                  <button onClick={() => handleSaveEdit(g.id)} className="text-xs font-medium" style={{ color: 'var(--brand,#6366f1)' }}>Save</button>
-                  <button onClick={() => setEditingId(null)} className="text-xs text-zinc-400">Cancel</button>
+                  <button onClick={() => handleSaveEdit(g.id)} className="text-xs font-medium" style={{ color: 'var(--brand,#6366f1)' }}>{t('Save')}</button>
+                  <button onClick={() => setEditingId(null)} className="text-xs text-zinc-400">{t('Cancel')}</button>
                 </>
               ) : (
                 <>
@@ -127,7 +129,7 @@ export function GiftOptionsEditor({ campaignId, disabled = false }: Props) {
           <input
             ref={inputRef}
             type="text"
-            placeholder="e.g. Spa Voucher"
+            placeholder={t('e.g. Spa Voucher')}
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
             className="flex-1 border border-zinc-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
@@ -138,7 +140,7 @@ export function GiftOptionsEditor({ campaignId, disabled = false }: Props) {
             className="text-white rounded-lg px-3 py-1.5 text-sm font-medium disabled:opacity-50 hover:brightness-110 transition-all"
             style={{ backgroundColor: 'var(--brand,#6366f1)' }}
           >
-            Add
+            {t('Add')}
           </button>
         </form>
       )}

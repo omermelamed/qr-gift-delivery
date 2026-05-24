@@ -149,4 +149,219 @@ export const he: Record<string, string> = {
   'Something went wrong': 'משהו השתבש',
   'member': 'חבר',
   'members': 'חברים',
+  'Loading…': 'טוען…',
+  'Close': 'סגור',
+  'Delete': 'מחק',
+  'Edit': 'ערוך',
+  'Add': 'הוסף',
+  'Failed': 'נכשל',
+  'Uploading…': 'מעלה…',
+  'Select all': 'בחר הכל',
+  'Deselect all': 'בטל בחירת הכל',
+  'Not sent': 'לא נשלח',
+  'Search…': 'חפש…',
+  'All depts': 'כל המחלקות',
+  'Gift': 'מתנה',
+  'Distributor': 'מפיץ',
+  'Claimed At': 'מומש בתאריך',
+  'By department': 'לפי מחלקה',
+  'By Department': 'לפי מחלקה',
+  'selected': 'נבחרו',
+
+  // EmployeeTable
+  '✓ Sent': '✓ נשלח',
+  'Already redeemed': 'כבר מומש',
+  'Click outside or press Esc to close': 'לחץ מחוץ לחלון או Esc לסגירה',
+  'No employees yet. Upload a CSV or add one manually.': 'אין עובדים עדיין. העלה CSV או הוסף ידנית.',
+
+  // AddEmployeeModal / AddDirectoryEmployeeModal
+  'Add employee': 'הוסף עובד',
+  'Invalid phone number': 'מספר טלפון לא תקין',
+  'Phone number is required': 'מספר טלפון נדרש',
+  'Failed to add employee': 'שגיאה בהוספת עובד',
+  'Adding…': 'מוסיף…',
+
+  // CloseCampaignButton
+  'End campaign': 'סיים קמפיין',
+  'End campaign?': 'לסיים את הקמפיין?',
+  'All unredeemed QR codes will stop working immediately. This cannot be undone.': 'כל קודי ה-QR שלא מומשו יפסיקו לעבוד מיד. לא ניתן לבטל פעולה זו.',
+
+  // DeleteCampaignButton
+  'Delete campaign?': 'למחוק את הקמפיין?',
+  'This will permanently delete the campaign and all its employee records. This cannot be undone.': 'פעולה זו תמחק לצמיתות את הקמפיין וכל רשומות העובדים שלו. לא ניתן לבטל פעולה זו.',
+  'Failed to delete campaign': 'שגיאה במחיקת קמפיין',
+
+  // LaunchButton
+  '🚀 Launch Campaign': '🚀 הפעל קמפיין',
+  'Launch campaign?': 'להפעיל את הקמפיין?',
+  'Launch': 'הפעל',
+  'Launch failed': 'ההפעלה נכשלה',
+  'This cannot be undone.': 'לא ניתן לבטל פעולה זו.',
+
+  // StatusBadge
+  'Running': 'פעיל',
+  'Draft': 'טיוטה',
+
+  // RedemptionProgress
+  'Total': 'סה"כ',
+
+  // GiftBreakdown
+  'Gift Breakdown': 'פירוט מתנות',
+  'No gift recorded': 'לא נרשמה מתנה',
+
+  // DistributorAssignment
+  'Distributors': 'מפיצים',
+  'Any scanner can scan this campaign': 'כל סורק יכול לסרוק קמפיין זה',
+  '+ Add distributor': '+ הוסף מפיץ',
+  'No available scanners': 'אין סורקים זמינים',
+  'assigned': 'מוקצים',
+
+  // DirectoryEmployeePicker
+  'No phone': 'אין טלפון',
+  'Your directory is empty.': 'הספרייה שלך ריקה.',
+  'Add employees': 'הוסף עובדים',
+
+  // ResendModal
+  'Resend SMS': 'שלח שוב SMS',
+  'Not claimed yet': 'עדיין לא נדרשו',
+  'Manual selection': 'בחירה ידנית',
+  'All employees have already claimed their gift.': 'כל העובדים כבר קיבלו את מתנתם.',
+  'No department data available.': 'אין נתוני מחלקה זמינים.',
+  'Select a department…': 'בחר מחלקה…',
+  'Resend failed': 'שליחה חוזרת נכשלה',
+  'Send to': 'שלח ל-',
+
+  // InviteMemberModal
+  'Invite team member': 'הזמן חבר צוות',
+  'Invite failed': 'ההזמנה נכשלה',
+  'Invite sent': 'ההזמנה נשלחה',
+  'will receive a sign-in link by email.': 'יקבל קישור כניסה באימייל.',
+  'Send invite': 'שלח הזמנה',
+  'Scanner (Distributor)': 'סורק (מפיץ)',
+
+  // DuplicateCampaignButton
+  'Duplicate campaign': 'שכפל קמפיין',
+  'Copy employees from this campaign': 'העתק עובדים מקמפיין זה',
+  'Duplicating…': 'משכפל…',
+  'Duplicate': 'שכפל',
+  'Failed to duplicate campaign': 'שגיאה בשכפול קמפיין',
+  'Copy of': 'עותק של',
+
+  // EditMemberButton
+  'Edit member': 'ערוך חבר',
+  '(cannot change own role)': '(לא ניתן לשנות תפקיד)',
+  'Deactivated users cannot log in': 'משתמשים מושבתים אינם יכולים להתחבר',
+  'Resend invite': 'שלח שוב הזמנה',
+  'Send password reset': 'שלח איפוס סיסמה',
+  '✓ Invite sent': '✓ הזמנה נשלחה',
+  '✓ Email sent': '✓ אימייל נשלח',
+  'Save changes': 'שמור שינויים',
+
+  // RemoveMemberButton
+  'from team?': 'מהצוות?',
+  'will immediately lose access to GiftFlow. Choose what happens to their employee record.': 'יאבד גישה ל-GiftFlow מיד. בחר מה יקרה לרשומת העובד שלו.',
+  'Remove from team only': 'הסר מהצוות בלבד',
+  'Keep in employee directory (phone, department stay intact)': 'שמור בספריית העובדים (טלפון ומחלקה נשארים)',
+  'Remove completely': 'הסר לחלוטין',
+  'Remove from team and delete from employee directory': 'הסר מהצוות ומחק מספריית העובדים',
+  'Failed to remove member': 'שגיאה בהסרת חבר',
+  'Remove': 'הסר',
+
+  // GiftOptionsEditor
+  'Gift Options': 'אפשרויות מתנה',
+  'No options — campaign will use single-gift flow': 'ללא אפשרויות — הקמפיין ישתמש בזרימה למתנה אחת',
+  'e.g. Spa Voucher': 'לדוגמה: שובר ספא',
+  'option': 'אפשרות',
+  'options': 'אפשרויות',
+  'defined': 'מוגדרות',
+
+  // ReminderButton
+  'Resend SMS ({count})': 'שלח שוב SMS ({count})',
+  'failed': 'נכשלו',
+
+  // InviteButton
+  '+ Invite member': '+ הזמן חבר',
+
+  // ResendInviteButton
+  'Sent!': 'נשלח!',
+  'Resend': 'שלח שוב',
+
+  // CampaignNotes
+  'Notes': 'הערות',
+  'No notes yet. Be the first to add one.': 'אין הערות עדיין. היה הראשון להוסיף.',
+  'just now': 'הרגע',
+  'edited': 'נערך',
+  'Add a note…': 'הוסף הערה…',
+  'Post': 'פרסם',
+
+  // ImportDirectoryModal
+  'Import employees': 'ייבא עובדים',
+  'Click to browse': 'לחץ לעיון',
+  'or drag and drop': 'או גרור ושחרר',
+  'Download template': 'הורד תבנית',
+  'Importing…': 'מייבא…',
+  'Import failed': 'ייבוא נכשל',
+  'valid employees ready to import': 'עובדים תקינים מוכנים לייבוא',
+  'more rows': 'שורות נוספות',
+
+  // LogoUploader
+  'Please upload an image file (PNG, JPG, WebP)': 'אנא העלה קובץ תמונה (PNG, JPG, WebP)',
+  'Image must be under 2 MB': 'התמונה חייבת להיות עד 2 MB',
+  'Uploading...': 'מעלה...',
+  'Click to upload': 'לחץ להעלאה',
+  'PNG, JPG, WebP · Max 2 MB': 'PNG, JPG, WebP · עד 2 MB',
+
+  // CampaignPopulator
+  'Upload file': 'העלה קובץ',
+  'From directory': 'מספרייה',
+  'Clone campaign': 'שכפל קמפיין',
+  'Also save to employee directory': 'שמור גם בספריית העובדים',
+  'Copy all employees from another campaign into this one.': 'העתק את כל העובדים מקמפיין אחר לקמפיין זה.',
+  'No other campaigns to clone from.': 'אין קמפיינים אחרים לשכפול.',
+  'Select a campaign…': 'בחר קמפיין…',
+  'Cloning…': 'משכפל…',
+  'Clone employees': 'שכפל עובדים',
+  'Employees added from directory': 'עובדים נוספו מהספרייה',
+  'Failed to save to directory': 'שגיאה בשמירה לספרייה',
+  'Upload failed': 'ההעלאה נכשלה',
+  'valid': 'תקינים',
+  'invalid': 'לא תקינים',
+  'employees uploaded': 'עובדים הועלו',
+  'and saved to directory': 'ונשמרו בספרייה',
+  'employees cloned': 'עובדים שוכפלו',
+  'employees added to campaign': 'עובדים נוספו לקמפיין',
+
+  // TokenUploader
+  'Upload employees': 'העלה עובדים',
+  'Missing name': 'שם חסר',
+  'Invalid phone': 'טלפון לא תקין',
+
+  // DistributorStats
+  'Distributor Stats': 'סטטיסטיקות מפיצים',
+  'gift': 'מתנה',
+  'gifts': 'מתנות',
+
+  // ConfirmModal
+  'Confirm': 'אישור',
+
+  // RedemptionProgress
+  'employees redeemed': 'עובדים מומשו',
+
+  // CampaignPopulator / ResendModal dynamic
+  'employees': 'עובדים',
+  "who haven't claimed their gift yet.": "שטרם קיבלו את מתנתם.",
+  'Will resend to': 'ישלח מחדש ל-',
+  'in': 'ב',
+  'Will resend to {count} employees': 'ישלח מחדש ל-{count} עובדים',
+  "employee who hasn't claimed their gift yet.": "עובד שטרם קיבל את מתנתו.",
+  'Sent': 'נשלח',
+
+  // TokenUploader / CampaignPopulator shared
+  'Confirm Upload': 'אשר העלאה',
+  'more rows not shown': 'שורות נוספות לא מוצגות',
+  'Columns:': 'עמודות:',
+  'Accepts .csv or .xlsx — columns:': 'מקבל .csv או .xlsx — עמודות:',
+  'optional': 'אופציונלי',
+  'or': 'או',
+  'Import': 'ייבא',
 }

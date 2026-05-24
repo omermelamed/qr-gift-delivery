@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useT } from '@/lib/i18n/useT'
 
 type Props = { userId: string; name: string }
 
 export function RemoveMemberButton({ userId, name }: Props) {
+  const t = useT()
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -22,14 +24,14 @@ export function RemoveMemberButton({ userId, name }: Props) {
       })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        setError(data.error ?? 'Failed to remove member')
+        setError(data.error ?? t('Failed to remove member'))
         setShowModal(false)
         return
       }
       router.refresh()
       setShowModal(false)
     } catch {
-      setError('Network error — please try again')
+      setError(t('Network error — please try again'))
       setShowModal(false)
     } finally {
       setLoading(false)
@@ -52,9 +54,9 @@ export function RemoveMemberButton({ userId, name }: Props) {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
-            <h2 className="text-base font-semibold text-zinc-900 mb-1">Remove {name} from team?</h2>
+            <h2 className="text-base font-semibold text-zinc-900 mb-1">{t('Remove')} {name} {t('from team?')}</h2>
             <p className="text-sm text-zinc-500 mb-5">
-              {name} will immediately lose access to GiftFlow. Choose what happens to their employee record.
+              {name} {t('will immediately lose access to GiftFlow. Choose what happens to their employee record.')}
             </p>
 
             <div className="flex flex-col gap-2">
@@ -63,16 +65,16 @@ export function RemoveMemberButton({ userId, name }: Props) {
                 disabled={loading}
                 className="w-full text-left px-4 py-3 rounded-xl border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors disabled:opacity-50"
               >
-                <p className="text-sm font-medium text-zinc-800">Remove from team only</p>
-                <p className="text-xs text-zinc-400 mt-0.5">Keep in employee directory (phone, department stay intact)</p>
+                <p className="text-sm font-medium text-zinc-800">{t('Remove from team only')}</p>
+                <p className="text-xs text-zinc-400 mt-0.5">{t('Keep in employee directory (phone, department stay intact)')}</p>
               </button>
               <button
                 onClick={() => handleRemove(false)}
                 disabled={loading}
                 className="w-full text-left px-4 py-3 rounded-xl border border-red-100 hover:border-red-200 hover:bg-red-50 transition-colors disabled:opacity-50"
               >
-                <p className="text-sm font-medium text-red-600">Remove completely</p>
-                <p className="text-xs text-zinc-400 mt-0.5">Remove from team and delete from employee directory</p>
+                <p className="text-sm font-medium text-red-600">{t('Remove completely')}</p>
+                <p className="text-xs text-zinc-400 mt-0.5">{t('Remove from team and delete from employee directory')}</p>
               </button>
             </div>
 
@@ -81,7 +83,7 @@ export function RemoveMemberButton({ userId, name }: Props) {
               disabled={loading}
               className="mt-4 w-full text-center text-sm text-zinc-400 hover:text-zinc-600 transition-colors disabled:opacity-50"
             >
-              Cancel
+              {t('Cancel')}
             </button>
           </div>
         </div>

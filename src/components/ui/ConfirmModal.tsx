@@ -1,5 +1,7 @@
 'use client'
 
+import { useT } from '@/lib/i18n/useT'
+
 type Props = {
   title: string
   message: string
@@ -19,6 +21,7 @@ export function ConfirmModal({
   onConfirm,
   onCancel,
 }: Props) {
+  const t = useT()
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
@@ -37,7 +40,7 @@ export function ConfirmModal({
             disabled={loading}
             className="px-4 py-2 text-sm font-medium text-zinc-700 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors disabled:opacity-50"
           >
-            Cancel
+            {t('Cancel')}
           </button>
           <button
             onClick={onConfirm}

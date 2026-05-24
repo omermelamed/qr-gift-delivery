@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/browser'
+import { useT } from '@/lib/i18n/useT'
 
 export function RedemptionProgress({
   campaignId,
@@ -34,6 +35,7 @@ export function RedemptionProgress({
 
   const pct = total === 0 ? 0 : Math.round((claimed / total) * 100)
   const pending = total - claimed
+  const t = useT()
 
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-5 flex items-center gap-6">
@@ -41,17 +43,17 @@ export function RedemptionProgress({
         <div className="flex items-center gap-5 mb-4">
           <div>
             <p className="text-3xl font-bold text-zinc-900">{claimed}</p>
-            <p className="text-xs text-zinc-400 mt-0.5">Claimed</p>
+            <p className="text-xs text-zinc-400 mt-0.5">{t('Claimed')}</p>
           </div>
           <div className="w-px h-9 bg-zinc-100" />
           <div>
             <p className="text-3xl font-bold text-amber-500">{pending}</p>
-            <p className="text-xs text-zinc-400 mt-0.5">Pending</p>
+            <p className="text-xs text-zinc-400 mt-0.5">{t('Pending')}</p>
           </div>
           <div className="w-px h-9 bg-zinc-100" />
           <div>
             <p className="text-3xl font-bold text-zinc-300">{total}</p>
-            <p className="text-xs text-zinc-400 mt-0.5">Total</p>
+            <p className="text-xs text-zinc-400 mt-0.5">{t('Total')}</p>
           </div>
         </div>
         <div className="w-full bg-zinc-100 rounded-full h-2.5">
@@ -60,11 +62,11 @@ export function RedemptionProgress({
             style={{ width: `${pct}%`, backgroundColor: 'var(--brand,#6366f1)' }}
           />
         </div>
-        <p className="text-xs text-zinc-400 mt-1.5">{claimed} of {total} employees redeemed</p>
+        <p className="text-xs text-zinc-400 mt-1.5">{claimed} {t('of')} {total} {t('employees redeemed')}</p>
       </div>
       <div className="flex-shrink-0 text-right">
         <p className="text-5xl font-bold tabular-nums" style={{ color: 'var(--brand,#6366f1)' }}>{pct}%</p>
-        <p className="text-xs text-zinc-400 mt-0.5">redeemed</p>
+        <p className="text-xs text-zinc-400 mt-0.5">{t('redeemed')}</p>
       </div>
     </div>
   )

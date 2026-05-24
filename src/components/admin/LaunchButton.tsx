@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { useT } from '@/lib/i18n/useT'
 
 export function LaunchButton({ campaignId, employeeCount }: { campaignId: string; employeeCount: number }) {
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const t = useT()
 
   async function handleConfirm() {
     setLoading(true)
@@ -17,13 +19,13 @@ export function LaunchButton({ campaignId, employeeCount }: { campaignId: string
       const res = await fetch(`/api/campaigns/${campaignId}/send`, { method: 'POST' })
       const data = await res.json()
       if (!res.ok) {
-        setError(data.error ?? 'Launch failed')
+        setError(data.error ?? t('Launch failed'))
         setShowModal(false)
         return
       }
       router.refresh()
     } catch {
-      setError('Network error — please try again')
+      setError(t('Network error — please try again'))
     } finally {
       setLoading(false)
       setShowModal(false)
@@ -41,13 +43,13 @@ export function LaunchButton({ campaignId, employeeCount }: { campaignId: string
         onClick={() => setShowModal(true)}
         className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-5 py-2.5 text-sm font-semibold hover:brightness-110 transition-all"
       >
-        🚀 Launch Campaign
+        {t('🚀 Launch Campaign')}
       </button>
       {showModal && (
         <ConfirmModal
-          title="Launch campaign?"
-          message={`This will send QR codes via SMS to ${employeeCount} employee${employeeCount === 1 ? '' : 's'}. This cannot be undone.`}
-          confirmLabel="Launch"
+          title={t('Launch campaign?')}
+          message={`This will send QR codes via SMS to ${employeeCount} employee${employeeCount === 1 ? '' : 's'}. ${t('This cannot be undone.')}`}
+          confirmLabel={t('Launch')}
           loading={loading}
           onConfirm={handleConfirm}
           onCancel={() => setShowModal(false)}

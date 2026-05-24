@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { read, utils } from 'xlsx'
 import { normalizePhone } from '@/lib/phone'
 import { DirectoryEmployeePicker } from '@/components/admin/DirectoryEmployeePicker'
+import { useT } from '@/lib/i18n/useT'
 
 type Tab = 'upload' | 'directory' | 'clone'
 type ParsedRow = { name: string; phone_number: string; department?: string }
@@ -31,6 +32,7 @@ export function CampaignPopulator({ campaignId }: { campaignId: string }) {
   const [cloning, setCloning] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+  const t = useT()
 
   useEffect(() => {
     if (tab === 'clone' && campaigns.length === 0) {
@@ -77,7 +79,7 @@ export function CampaignPopulator({ campaignId }: { campaignId: string }) {
       })
       const data = await res.json()
       if (!res.ok) { setMessage({ text: data.error ?? 'Upload failed', type: 'error' }); return }
-      setMessage({ text: `${data.inserted} employees uploaded${saveToDirectory ? ' and saved to directory' : ''}`, type: 'success' })
+      setMessage({ text: `${data.inserted} ${t('employees uploaded')}${saveToDirectory ? ` ${t('and saved to directory')}` : ''}`, type: 'success' })
       setRows([])
       router.refresh()
     } finally {
@@ -97,7 +99,7 @@ export function CampaignPopulator({ campaignId }: { campaignId: string }) {
       })
       const data = await res.json()
       if (!res.ok) { setMessage({ text: data.error ?? 'Clone failed', type: 'error' }); return }
-      setMessage({ text: `${data.inserted} employees cloned`, type: 'success' })
+      setMessage({ text: `${data.inserted} ${t('employees cloned')}`, type: 'success' })
       router.refresh()
     } finally {
       setCloning(false)
@@ -115,22 +117,22 @@ export function CampaignPopulator({ campaignId }: { campaignId: string }) {
 
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-5">
-      <h2 className="font-semibold text-zinc-900 mb-4">Add employees</h2>
+      <h2 className="font-semibold text-zinc-900 mb-4">{t('Add employees')}</h2>
 
       {/* Tab bar */}
       <div className="flex bg-zinc-100 rounded-lg p-1 mb-5 gap-1">
-        {tabBtn('upload', 'Upload file')}
-        {tabBtn('directory', 'From directory')}
-        {tabBtn('clone', 'Clone campaign')}
+        {tabBtn('upload', t('Upload file'))}
+        {tabBtn('directory', t('From directory'))}
+        {tabBtn('clone', t('Clone campaign'))}
       </div>
 
       {/* Upload tab */}
       {tab === 'upload' && (
         <>
           <p className="text-xs text-zinc-400 mb-3">
-            Columns: <code className="bg-zinc-100 px-1 rounded font-mono">name</code>,{' '}
+            {t('Columns:')} <code className="bg-zinc-100 px-1 rounded font-mono">name</code>,{' '}
             <code className="bg-zinc-100 px-1 rounded font-mono">phone_number</code>,{' '}
-            <code className="bg-zinc-100 px-1 rounded font-mono">department</code> (optional)
+            <code className="bg-zinc-100 px-1 rounded font-mono">department</code> ({t('optional')})
           </p>
           <div
             role="button" tabIndex={0}
@@ -144,8 +146,8 @@ export function CampaignPopulator({ campaignId }: { campaignId: string }) {
             <svg className="w-8 h-8 text-zinc-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="text-sm text-zinc-500"><span className="font-medium text-indigo-600">Click to browse</span> or drag and drop</p>
-            <p className="text-xs text-zinc-400 mt-1">.csv or .xlsx</p>
+            <p className="text-sm text-zinc-500"><span className="font-medium text-indigo-600">{t('Click to browse')}</span> {t('or drag and drop')}</p>
+            <p className="text-xs text-zinc-400 mt-1">.csv {t('or')} .xlsx</p>
             <input ref={inputRef} type="file" accept=".csv,.xlsx,.xls"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f) }} className="hidden" />
           </div>
@@ -153,17 +155,17 @@ export function CampaignPopulator({ campaignId }: { campaignId: string }) {
           {rows.length > 0 && (
             <div className="mt-4">
               <p className="text-sm text-zinc-600 mb-3">
-                <span className="text-green-700 font-medium">{validRows.length} valid</span>
-                {invalidCount > 0 && <span className="text-red-600 font-medium"> · {invalidCount} invalid</span>}
+                <span className="text-green-700 font-medium">{validRows.length} {t('valid')}</span>
+                {invalidCount > 0 && <span className="text-red-600 font-medium"> · {invalidCount} {t('invalid')}</span>}
               </p>
               <label className="flex items-center gap-3 mb-4 cursor-pointer">
                 <input type="checkbox" checked={saveToDirectory} onChange={(e) => setSaveToDirectory(e.target.checked)}
                   className="w-4 h-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500" />
-                <span className="text-sm text-zinc-700">Also save to employee directory</span>
+                <span className="text-sm text-zinc-700">{t('Also save to employee directory')}</span>
               </label>
               <button onClick={handleUploadConfirm} disabled={validRows.length === 0 || uploading}
                 className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
-                {uploading ? 'Uploading…' : `Confirm Upload (${validRows.length} employees)`}
+                {uploading ? t('Uploading…') : `${t('Confirm Upload')} (${validRows.length} ${t('employees')})`}
               </button>
             </div>
           )}
@@ -174,28 +176,28 @@ export function CampaignPopulator({ campaignId }: { campaignId: string }) {
       {tab === 'directory' && (
         <DirectoryEmployeePicker campaignId={campaignId} onAdded={() => {
           router.refresh()
-          setMessage({ text: 'Employees added from directory', type: 'success' })
+          setMessage({ text: t('Employees added from directory'), type: 'success' })
         }} />
       )}
 
       {/* Clone tab */}
       {tab === 'clone' && (
         <div>
-          <p className="text-xs text-zinc-400 mb-3">Copy all employees from another campaign into this one.</p>
+          <p className="text-xs text-zinc-400 mb-3">{t('Copy all employees from another campaign into this one.')}</p>
           {campaigns.length === 0 ? (
-            <p className="text-sm text-zinc-400 text-center py-6">No other campaigns to clone from.</p>
+            <p className="text-sm text-zinc-400 text-center py-6">{t('No other campaigns to clone from.')}</p>
           ) : (
             <>
               <select value={cloneSource} onChange={(e) => setCloneSource(e.target.value)}
                 className="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent mb-4">
-                <option value="">Select a campaign…</option>
+                <option value="">{t('Select a campaign…')}</option>
                 {campaigns.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}{c.campaign_date ? ` (${c.campaign_date})` : ''}</option>
                 ))}
               </select>
               <button onClick={handleClone} disabled={!cloneSource || cloning}
                 className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
-                {cloning ? 'Cloning…' : 'Clone employees'}
+                {cloning ? t('Cloning…') : t('Clone employees')}
               </button>
             </>
           )}

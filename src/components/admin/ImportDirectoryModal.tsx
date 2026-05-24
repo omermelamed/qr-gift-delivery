@@ -2,11 +2,13 @@
 
 import { useState, useRef } from 'react'
 import { read, utils } from 'xlsx'
+import { useT } from '@/lib/i18n/useT'
 
 type Props = { onClose: () => void; onImported: (count: number) => void }
 type ParsedRow = { employee_name: string; phone: string; department?: string }
 
 export function ImportDirectoryModal({ onClose, onImported }: Props) {
+  const t = useT()
   const [rows, setRows] = useState<ParsedRow[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -38,7 +40,7 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
         body: JSON.stringify({ rows }),
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error ?? 'Import failed'); return }
+      if (!res.ok) { setError(data.error ?? t('Import failed')); return }
       onImported(data.upserted)
       onClose()
     } finally {
@@ -49,7 +51,7 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-6">
-        <h2 className="text-lg font-semibold text-zinc-900 mb-5">Import employees</h2>
+        <h2 className="text-lg font-semibold text-zinc-900 mb-5">{t('Import employees')}</h2>
         {error && <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-4">{error}</p>}
 
         <div
@@ -61,7 +63,7 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
           onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) processFile(f) }}
           className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors mb-4 ${isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-zinc-200 hover:border-indigo-300 hover:bg-zinc-50'}`}
         >
-          <p className="text-sm text-zinc-500"><span className="font-medium text-indigo-600">Click to browse</span> or drag and drop</p>
+          <p className="text-sm text-zinc-500"><span className="font-medium text-indigo-600">{t('Click to browse')}</span> {t('or drag and drop')}</p>
           <p className="text-xs text-zinc-400 mt-1">.csv or .xlsx · columns: name, phone_number, department</p>
           <input ref={inputRef} type="file" accept=".csv,.xlsx,.xls" onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f) }} className="hidden" />
           <button
@@ -81,20 +83,20 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            Download template
+            {t('Download template')}
           </button>
         </div>
 
         {rows.length > 0 && (
           <>
-            <p className="text-sm text-zinc-600 mb-3"><span className="font-medium text-green-700">{rows.length} valid employees</span> ready to import</p>
+            <p className="text-sm text-zinc-600 mb-3"><span className="font-medium text-green-700">{rows.length} {t('valid employees ready to import')}</span></p>
             <div className="border border-zinc-100 rounded-xl overflow-hidden mb-4 max-h-48 overflow-y-auto">
               <table className="text-xs w-full border-collapse">
                 <thead>
                   <tr className="bg-zinc-50 text-zinc-500">
-                    <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">Name</th>
-                    <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">Phone</th>
-                    <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">Department</th>
+                    <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">{t('Name')}</th>
+                    <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">{t('Phone')}</th>
+                    <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">{t('Department')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -107,15 +109,15 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
                   ))}
                 </tbody>
               </table>
-              {rows.length > 20 && <p className="text-xs text-zinc-400 px-3 py-2">+{rows.length - 20} more rows</p>}
+              {rows.length > 20 && <p className="text-xs text-zinc-400 px-3 py-2">+{rows.length - 20} {t('more rows')}</p>}
             </div>
           </>
         )}
 
         <div className="flex gap-3">
-          <button onClick={onClose} className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors">Cancel</button>
+          <button onClick={onClose} className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors">{t('Cancel')}</button>
           <button onClick={handleImport} disabled={rows.length === 0 || loading} className="flex-1 bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
-            {loading ? 'Importing…' : `Import ${rows.length} employees`}
+            {loading ? t('Importing…') : `${t('Import')} ${rows.length} ${t('employees')}`}
           </button>
         </div>
       </div>

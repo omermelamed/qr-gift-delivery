@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { useT } from '@/lib/i18n/useT'
 
 export function CloseCampaignButton({ campaignId }: { campaignId: string }) {
   const [showConfirm, setShowConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const t = useT()
 
   async function handleClose() {
     setLoading(true)
@@ -23,7 +25,7 @@ export function CloseCampaignButton({ campaignId }: { campaignId: string }) {
       setShowConfirm(false)
       router.refresh()
     } catch {
-      setError('Network error — please try again')
+      setError(t('Network error — please try again'))
     } finally {
       setLoading(false)
     }
@@ -35,14 +37,14 @@ export function CloseCampaignButton({ campaignId }: { campaignId: string }) {
         onClick={() => setShowConfirm(true)}
         className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
       >
-        End campaign
+        {t('End campaign')}
       </button>
 
       {showConfirm && (
         <ConfirmModal
-          title="End campaign?"
-          message="All unredeemed QR codes will stop working immediately. This cannot be undone."
-          confirmLabel="End campaign"
+          title={t('End campaign?')}
+          message={t('All unredeemed QR codes will stop working immediately. This cannot be undone.')}
+          confirmLabel={t('End campaign')}
           loading={loading}
           error={error}
           onConfirm={handleClose}

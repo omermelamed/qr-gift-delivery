@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ResendModal } from '@/components/admin/ResendModal'
+import { useT } from '@/lib/i18n/useT'
 
 type TokenSlice = {
   id: string
@@ -17,6 +18,7 @@ type Props = {
 }
 
 export function ReminderButton({ campaignId, tokens }: Props) {
+  const t = useT()
   const [showModal, setShowModal] = useState(false)
   const [result, setResult] = useState<{ dispatched: number; failed: number } | null>(null)
 
@@ -27,14 +29,14 @@ export function ReminderButton({ campaignId, tokens }: Props) {
     <>
       {result && (
         <span className="text-xs text-zinc-500">
-          Sent {result.dispatched}{result.failed > 0 ? `, ${result.failed} failed` : ''}
+          {t('Sent')} {result.dispatched}{result.failed > 0 ? `, ${result.failed} ${t('failed')}` : ''}
         </span>
       )}
       <button
         onClick={() => setShowModal(true)}
         className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
       >
-        Resend SMS ({unredeemedCount})
+        {t('Resend SMS').replace('({count})', '')} ({unredeemedCount})
       </button>
 
       {showModal && (

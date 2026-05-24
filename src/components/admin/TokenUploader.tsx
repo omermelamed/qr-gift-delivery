@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { read, utils } from 'xlsx'
 import { normalizePhone } from '@/lib/phone'
+import { useT } from '@/lib/i18n/useT'
 
 type ParsedRow = { name: string; phone_number: string; department?: string }
 type ValidatedRow = ParsedRow & { _status: 'valid' | 'invalid'; _reason?: string }
@@ -17,6 +18,7 @@ function validateRows(raw: ParsedRow[]): ValidatedRow[] {
 }
 
 export function TokenUploader({ campaignId }: { campaignId: string }) {
+  const t = useT()
   const [rows, setRows] = useState<ValidatedRow[]>([])
   const [uploading, setUploading] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -65,7 +67,7 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
         setMessage({ text: data.error ?? 'Upload failed', type: 'error' })
         return
       }
-      setMessage({ text: `${data.inserted} employees uploaded`, type: 'success' })
+      setMessage({ text: `${data.inserted} ${t('employees uploaded')}`, type: 'success' })
       setRows([])
       router.refresh()
     } finally {
@@ -75,11 +77,11 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
 
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-5">
-      <h2 className="font-semibold text-zinc-900 mb-1">Upload employees</h2>
+      <h2 className="font-semibold text-zinc-900 mb-1">{t('Upload employees')}</h2>
       <p className="text-xs text-zinc-400 mb-4">
-        Accepts .csv or .xlsx — columns: <code className="font-mono bg-zinc-100 px-1 rounded">name</code>,{' '}
+        {t('Accepts .csv or .xlsx — columns:')} <code className="font-mono bg-zinc-100 px-1 rounded">name</code>,{' '}
         <code className="font-mono bg-zinc-100 px-1 rounded">phone_number</code>,{' '}
-        <code className="font-mono bg-zinc-100 px-1 rounded">department</code> (optional)
+        <code className="font-mono bg-zinc-100 px-1 rounded">department</code> ({t('optional')})
       </p>
 
       {/* Drop zone */}
@@ -103,9 +105,9 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
             d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
         <p className="text-sm text-zinc-500">
-          <span className="font-medium text-indigo-600">Click to browse</span> or drag and drop
+          <span className="font-medium text-indigo-600">{t('Click to browse')}</span> {t('or drag and drop')}
         </p>
-        <p className="text-xs text-zinc-400 mt-1">.csv or .xlsx</p>
+        <p className="text-xs text-zinc-400 mt-1">.csv {t('or')} .xlsx</p>
         <input
           ref={inputRef}
           type="file"
@@ -124,9 +126,9 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
       {rows.length > 0 && (
         <div className="mt-4">
           <p className="text-sm text-zinc-600 mb-3">
-            <span className="text-green-700 font-medium">{validRows.length} valid</span>
+            <span className="text-green-700 font-medium">{validRows.length} {t('valid')}</span>
             {invalidCount > 0 && (
-              <span className="text-red-600 font-medium"> · {invalidCount} invalid</span>
+              <span className="text-red-600 font-medium"> · {invalidCount} {t('invalid')}</span>
             )}
           </p>
 
@@ -134,10 +136,10 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
             <table className="text-xs w-full border-collapse">
               <thead>
                 <tr className="bg-zinc-50 text-zinc-500">
-                  <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">Name</th>
-                  <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">Phone</th>
-                  <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">Department</th>
-                  <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">Status</th>
+                  <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">{t('Name')}</th>
+                  <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">{t('Phone')}</th>
+                  <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">{t('Department')}</th>
+                  <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">{t('Status')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -154,7 +156,7 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
                     </td>
                     <td className="border-b border-zinc-100 px-3 py-1.5">
                       {r._status === 'invalid'
-                        ? <span className="text-red-500">{r._reason}</span>
+                        ? <span className="text-red-500">{t(r._reason ?? '')}</span>
                         : <span className="text-green-600">✓</span>}
                     </td>
                   </tr>
@@ -162,7 +164,7 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
               </tbody>
             </table>
             {rows.length > 10 && (
-              <p className="text-xs text-zinc-400 px-3 py-2">+{rows.length - 10} more rows not shown</p>
+              <p className="text-xs text-zinc-400 px-3 py-2">+{rows.length - 10} {t('more rows not shown')}</p>
             )}
           </div>
 
@@ -171,7 +173,7 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
             disabled={validRows.length === 0 || uploading}
             className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
           >
-            {uploading ? 'Uploading…' : `Confirm Upload (${validRows.length} employees)`}
+            {uploading ? t('Uploading…') : `${t('Confirm Upload')} (${validRows.length} ${t('employees')})`}
           </button>
         </div>
       )}
