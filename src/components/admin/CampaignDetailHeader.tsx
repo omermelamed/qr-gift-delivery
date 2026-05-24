@@ -24,7 +24,7 @@ export function CampaignDetailHeader({ campaignName, campaignDate, scheduledAt, 
         <p className="text-sm text-zinc-400 mt-0.5">{campaignDate ?? '—'}</p>
         {scheduledAt && !sentAt && (
           <p className="text-xs text-amber-500 mt-1 font-medium">
-            {t('Scheduled:')} {new Date(scheduledAt).toLocaleString()}
+            {t('Scheduled:')} {new Date(scheduledAt).toLocaleString(undefined, { hour12: false })}
           </p>
         )}
       </div>

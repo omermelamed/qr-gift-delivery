@@ -313,7 +313,7 @@ export function EmployeeTable({
                             : <span className="text-zinc-300">—</span>}
                         </td>
                         <td className="px-3 py-2.5 text-xs text-zinc-400">
-                          {row.redeemed_at ? new Date(row.redeemed_at).toLocaleString() : <span className="text-zinc-300">—</span>}
+                          {row.redeemed_at ? new Date(row.redeemed_at).toLocaleString(undefined, { hour12: false }) : <span className="text-zinc-300">—</span>}
                         </td>
                         <td className="px-3 py-2.5 text-xs text-zinc-400">
                           {row.redeemed_by
