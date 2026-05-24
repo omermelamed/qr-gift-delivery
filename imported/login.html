@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sign in | GiftFlow</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#dce9ff",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary": "#855300",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed": "#ffddb8",
+                    "tertiary-container": "#e29100",
+                    "surface-dim": "#cbdbf5",
+                    "secondary": "#545f73",
+                    "surface-variant": "#d3e4fe",
+                    "outline-variant": "#bbcabf",
+                    "on-tertiary-container": "#523200",
+                    "outline": "#6c7a71",
+                    "on-secondary-fixed": "#111c2d",
+                    "error-container": "#ffdad6",
+                    "surface": "#f8f9ff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-secondary-container": "#586377",
+                    "on-primary-container": "#00422b",
+                    "on-error-container": "#93000a",
+                    "surface-container-low": "#eff4ff",
+                    "on-background": "#0b1c30",
+                    "primary-fixed": "#6ffbbe",
+                    "inverse-primary": "#4edea3",
+                    "primary-fixed-dim": "#4edea3",
+                    "on-secondary-fixed-variant": "#3c475a",
+                    "surface-container-highest": "#d3e4fe",
+                    "secondary-fixed-dim": "#bcc7de",
+                    "background": "#f8f9ff",
+                    "surface-tint": "#006c49",
+                    "on-surface": "#0b1c30",
+                    "surface-bright": "#f8f9ff",
+                    "inverse-surface": "#213145",
+                    "surface-container": "#e5eeff",
+                    "primary": "#006c49",
+                    "on-tertiary-fixed": "#2a1700",
+                    "on-error": "#ffffff",
+                    "primary-container": "#10b981",
+                    "on-primary-fixed-variant": "#005236",
+                    "secondary-fixed": "#d8e3fb",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-primary-fixed": "#002113",
+                    "on-surface-variant": "#3c4a42",
+                    "secondary-container": "#d5e0f8",
+                    "on-secondary": "#ffffff",
+                    "on-primary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "xs": "4px",
+                    "xl": "40px",
+                    "sm": "8px",
+                    "base": "4px",
+                    "container-max": "1280px",
+                    "md": "16px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "mono-data": ["JetBrains Mono"],
+                    "headline-lg": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "title-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f8f9ff;
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .login-card-shadow {
+            box-shadow: 0px 4px 20px rgba(30, 41, 59, 0.05);
+        }
+        .input-focus-ring:focus {
+            outline: none;
+            border-color: #006c49;
+            box-shadow: 0 0 0 1px #006c49;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-md">
+<!-- Brand Header -->
+<header class="mb-xl flex flex-col items-center gap-sm">
+<div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-white text-[24px]" data-icon="card_giftcard">card_giftcard</span>
+</div>
+<h2 class="text-on-surface font-title-md text-title-md tracking-tight">GiftFlow</h2>
+</header>
+<!-- Main Sign-in Card -->
+<main class="w-full max-w-[400px]">
+<div class="bg-surface-container-lowest login-card-shadow rounded-xl p-lg border border-outline-variant">
+<header class="mb-lg">
+<h1 class="text-on-surface font-headline-lg-mobile text-headline-lg-mobile md:font-headline-lg md:text-headline-lg mb-xs">Sign in to your account</h1>
+<p class="text-on-surface-variant font-body-md text-body-md">Welcome back! Please enter your details.</p>
+</header>
+<form class="space-y-md" id="loginForm" onsubmit="return false;">
+<!-- Email Field -->
+<div class="space-y-xs">
+<label class="block text-on-surface-variant font-label-md text-label-md" for="email">Email Address</label>
+<input class="w-full h-[44px] px-md bg-surface border border-outline rounded-lg text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/50 input-focus-ring transition-all" id="email" name="email" placeholder="you@company.com" required="" type="email"/>
+</div>
+<!-- Password Field -->
+<div class="space-y-xs">
+<div class="flex justify-between items-center">
+<label class="block text-on-surface-variant font-label-md text-label-md" for="password">Password</label>
+</div>
+<div class="relative">
+<input class="w-full h-[44px] px-md bg-surface border border-outline rounded-lg text-on-surface font-body-md text-body-md placeholder:text-on-surface-variant/50 input-focus-ring transition-all" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<!-- Sign In Button -->
+<button class="w-full h-[48px] bg-primary hover:bg-on-primary-fixed-variant active:scale-[0.98] text-white font-title-md text-body-lg rounded-lg transition-all flex items-center justify-center gap-sm mt-lg" id="submitBtn" type="submit">
+<span>Sign in</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<div class="mt-lg text-center">
+<a class="text-on-secondary-fixed-variant font-label-md text-label-md hover:text-primary transition-colors" href="#">
+                    Forgot password?
+                </a>
+</div>
+</div>
+<!-- Footer Help/Info -->
+<footer class="mt-lg text-center">
+<p class="text-on-surface-variant font-body-md text-body-md">
+                Don't have an account? 
+                <a class="text-primary font-semibold hover:underline" href="#">Contact your HR Admin</a>
+</p>
+</footer>
+</main>
+<!-- Visual Decorative Element (Subtle) -->
+<div class="fixed bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-primary-container to-primary-fixed opacity-20"></div>
+<script>
+        // Micro-interaction for the sign-in button
+        const loginForm = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const originalContent = submitBtn.innerHTML;
+            
+            // Loading state simulation
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Authenticating...</span>
+            `;
+
+            // Reset after 1.5s for demo purposes
+            setTimeout(() => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalContent;
+                // Add a small success feedback
+                const email = document.getElementById('email').value;
+                if (email) {
+                   console.log('Login attempt for:', email);
+                }
+            }, 1500);
+        });
+
+        // Simple toggle for password visibility
+        const toggleBtn = document.querySelector('button[type="button"]');
+        const passwordInput = document.getElementById('password');
+        
+        toggleBtn.addEventListener('click', () => {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            toggleBtn.querySelector('span').innerText = isPassword ? 'visibility_off' : 'visibility';
+        });
+    </script>
+</body></html>

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GiftFlow Team Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffddb8",
+                        "surface-container-high": "#dce9ff",
+                        "inverse-surface": "#213145",
+                        "surface-tint": "#006c49",
+                        "on-secondary-fixed": "#111c2d",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-background": "#0b1c30",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#005236",
+                        "on-primary-container": "#00422b",
+                        "surface": "#f8f9ff",
+                        "secondary": "#545f73",
+                        "on-secondary-fixed-variant": "#3c475a",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "on-surface": "#0b1c30",
+                        "on-tertiary-container": "#523200",
+                        "surface-container": "#e5eeff",
+                        "on-primary-fixed": "#002113",
+                        "background": "#f8f9ff",
+                        "secondary-fixed-dim": "#bcc7de",
+                        "primary-fixed": "#6ffbbe",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#2a1700",
+                        "primary-fixed-dim": "#4edea3",
+                        "outline-variant": "#bbcabf",
+                        "on-secondary-container": "#586377",
+                        "surface-variant": "#d3e4fe",
+                        "surface-dim": "#cbdbf5",
+                        "secondary-container": "#d5e0f8",
+                        "on-surface-variant": "#3c4a42",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#e29100",
+                        "outline": "#6c7a71",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary-container": "#10b981",
+                        "tertiary": "#855300",
+                        "surface-bright": "#f8f9ff",
+                        "secondary-fixed": "#d8e3fb",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "inverse-primary": "#4edea3",
+                        "primary": "#006c49"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "base": "4px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "md": "16px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "mono-data": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar-active {
+            font-weight: 700;
+        }
+        /* Zebra striping for tables based on brand guidelines */
+        .giftflow-table tbody tr:nth-child(even) {
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex">
+<!-- SideNavBar (Authority: JSON & Design System) -->
+<aside class="flex flex-col h-screen py-gutter px-base w-60 bg-surface-container-lowest dark:bg-surface-container-low fixed left-0 top-0 border-r border-outline-variant shadow-sm dark:shadow-none z-50">
+<div class="px-4 mb-xl">
+<h1 class="text-title-md font-title-md font-bold text-primary dark:text-primary-fixed-dim">GiftFlow Admin</h1>
+<p class="font-label-md text-label-md text-secondary opacity-70">Corporate Logistics</p>
+</div>
+<nav class="flex-1 space-y-base overflow-y-auto">
+<a class="text-secondary dark:text-secondary-fixed-dim flex items-center gap-3 px-4 py-3 hover:bg-surface-container dark:hover:bg-surface-container-highest transition-colors opacity-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+<span class="font-label-md text-label-md">Campaigns</span>
+</a>
+<a class="text-secondary dark:text-secondary-fixed-dim flex items-center gap-3 px-4 py-3 hover:bg-surface-container dark:hover:bg-surface-container-highest transition-colors opacity-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Employees</span>
+</a>
+<a class="text-secondary dark:text-secondary-fixed-dim flex items-center gap-3 px-4 py-3 hover:bg-surface-container dark:hover:bg-surface-container-highest transition-colors opacity-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+<span class="font-label-md text-label-md">Audit Log</span>
+</a>
+<a class="text-secondary dark:text-secondary-fixed-dim flex items-center gap-3 px-4 py-3 hover:bg-surface-container dark:hover:bg-surface-container-highest transition-colors opacity-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+<a class="text-primary dark:text-primary-fixed-dim font-bold bg-secondary-container dark:bg-secondary-fixed-dim/20 rounded-lg flex items-center gap-3 px-4 py-3 hover:bg-surface-container dark:hover:bg-surface-container-highest transition-colors opacity-90 transition-all duration-200 sidebar-active" href="#">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+<span class="font-label-md text-label-md">Team</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-base">
+<a class="text-secondary dark:text-secondary-fixed-dim flex items-center gap-3 px-4 py-3 hover:bg-surface-container dark:hover:bg-surface-container-highest transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-label-md text-label-md">My Profile</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-60 flex-1 min-h-screen flex flex-col">
+<!-- TopAppBar Context -->
+<header class="flex justify-between items-center px-gutter w-full sticky top-0 z-40 h-16 bg-surface shadow-sm border-b border-outline-variant/30">
+<div class="flex items-center gap-md">
+<h2 class="font-title-md text-title-md font-bold text-on-surface">Team</h2>
+</div>
+<div class="flex items-center gap-md">
+<button class="bg-primary text-on-primary font-label-md text-label-md px-lg h-11 flex items-center gap-2 rounded-lg hover:opacity-90 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[18px]" data-icon="person_add">person_add</span>
+                    Invite Member
+                </button>
+</div>
+</header>
+<div class="p-gutter space-y-lg max-w-container-max mx-auto w-full">
+<!-- Admins Section -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+<div class="px-gutter py-md bg-surface-container-low border-b border-outline-variant">
+<h3 class="font-title-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="admin_panel_settings">admin_panel_settings</span>
+                        Admins
+                    </h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left giftflow-table">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-container">
+<th class="px-gutter py-md font-label-md text-label-md text-secondary">MEMBER</th>
+<th class="px-gutter py-md font-label-md text-label-md text-secondary">EMAIL</th>
+<th class="px-gutter py-md font-label-md text-label-md text-secondary">ROLE</th>
+<th class="px-gutter py-md font-label-md text-label-md text-secondary">LAST ACTIVE</th>
+<th class="px-gutter py-md font-label-md text-label-md text-secondary text-right">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr>
+<td class="px-gutter py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-variant border border-outline-variant">
+<img alt="Sarah Chen" class="w-full h-full object-cover" data-alt="A professional corporate headshot of a middle-aged woman with a confident expression, wearing business attire. The lighting is soft and natural, emphasizing a high-trust professional environment. The background is a clean, minimalist office setting with muted tones that match a corporate light-mode design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRwFU4LR1E6vyqMAEZEVhYvfm7u4Cx4Tha68CblAJU_1U-nySKdGOuTCRqFlXQrMSvC3F0ACwSUg-6UwSbqZ-YPFxBqoZsRS-AKLpBTgkDcYuqQHAOXNzBBq0h0ZmSXDfjBjLKFAqKGuBSTtq5pf4U6denzd-v7Mj6C09miL_C89XY004E8tAO6GdQ2AG_3mwk32eb8Fw4Pl8zHL7urx5ytyzrW0UwiHrquqJCugrYqjCYNqqNdsOut98SKvEVRkM-YPUjGk7MRf8"/>
+</div>
+<span class="font-body-md text-on-surface font-semibold">Sarah Chen</span>
+</div>
+</td>
+<td class="px-gutter py-md font-mono-data text-mono-data text-secondary">s.chen@giftflow.corp</td>
+<td class="px-gutter py-md">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-wider bg-purple-100 text-purple-700 uppercase border border-purple-200">System Admin</span>
+</td>
+<td class="px-gutter py-md font-body-md text-secondary">2 mins ago</td>
+<td class="px-gutter py-md text-right">
+<button class="text-error hover:bg-error/10 p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</td>
+</tr>
+<tr>
+<td class="px-gutter py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-variant border border-outline-variant">
+<img alt="Marcus Thompson" class="w-full h-full object-cover" data-alt="A professional portrait of a young man in business casual clothing, smiling warmly. The setting is a bright, modern corporate atrium with architectural glass elements. The visual style is crisp and modern, utilizing a clean palette of whites and soft blues to suggest professional reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8fKlwUtf3Gn4Ep4HNq4pUZH2RnVqsgB7DFvhnlqdME1nAJ3_160UH6tVAmVuvnJf0ocYAkaiIZlBajjwcml430uJ99n6w95Rs3fghZ9kj9VJzqwFH46IfYOOSfbMbC9RLxJe1k2KH-aMkq7ULEp4SDsvhtoxnnUfrSj2_ufPMNmX1F-yz0QvSb4X6K3Vlnn_V6WXhqQeccAmzRw0PyDSvwC1LGXYK3J9DZ_lQR4dPhmrxPghGjmzqJxsgPLhe_xhEv8ukRCfcbUw"/>
+</div>
+<span class="font-body-md text-on-surface font-semibold">Marcus Thompson</span>
+</div>
+</td>
+<td class="px-gutter py-md font-mono-data text-mono-data text-secondary">m.thompson@giftflow.corp</td>
+<td class="px-gutter py-md">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-wider bg-purple-100 text-purple-700 uppercase border border-purple-200">Logistics Admin</span>
+</td>
+<td class="px-gutter py-md font-body-md text-secondary">Yesterday, 4:15 PM</td>
+<td class="px-gutter py-md text-right">
+<button class="text-error hover:bg-error/10 p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Distributors Section -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+<div class="px-gutter py-md bg-surface-container-low border-b border-outline-variant">
+<h3 class="font-title-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="local_shipping">local_shipping</span>
+                        Distributors
+                    </h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left giftflow-table">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-container">
+<th class="px-gutter py-md font-label-md text-label-md text-secondary">MEMBER</th>
+<th class="px-gutter py-md font-label-md text-label-md text-secondary">ROLE</th>
+<th class="px-gutter py-md font-label-md text-label-md text-secondary">STATUS</th>
+<th class="px-gutter py-md font-label-md text-label-md text-secondary">SITE</th>
+<th class="px-gutter py-md font-label-md text-label-md text-secondary text-right">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr>
+<td class="px-gutter py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full flex items-center justify-center bg-primary-container text-on-primary-container font-bold">
+                                            RL
+                                        </div>
+<span class="font-body-md text-on-surface font-semibold">Robert Lopez</span>
+</div>
+</td>
+<td class="px-gutter py-md">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-wider bg-emerald-100 text-emerald-700 uppercase border border-emerald-200">Distributor</span>
+</td>
+<td class="px-gutter py-md">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-surface-container text-secondary border border-outline-variant">
+<span class="material-symbols-outlined text-[14px]" data-icon="qr_code_2">qr_code_2</span>
+                                        QR ONLY
+                                    </span>
+</td>
+<td class="px-gutter py-md font-body-md text-secondary">Warehouse A-4</td>
+<td class="px-gutter py-md text-right">
+<button class="text-secondary hover:text-on-surface p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr>
+<td class="px-gutter py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full flex items-center justify-center bg-primary-container text-on-primary-container font-bold">
+                                            JA
+                                        </div>
+<span class="font-body-md text-on-surface font-semibold">Jane Ahari</span>
+</div>
+</td>
+<td class="px-gutter py-md">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-wider bg-emerald-100 text-emerald-700 uppercase border border-emerald-200">Distributor</span>
+</td>
+<td class="px-gutter py-md">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-green-50 text-emerald-600 border border-emerald-100">
+<span class="material-symbols-outlined text-[14px]" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                        FULL ACCESS
+                                    </span>
+</td>
+<td class="px-gutter py-md font-body-md text-secondary">Regional Hub 2</td>
+<td class="px-gutter py-md text-right">
+<button class="text-secondary hover:text-on-surface p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+<tr>
+<td class="px-gutter py-md">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full flex items-center justify-center bg-primary-container text-on-primary-container font-bold">
+                                            TK
+                                        </div>
+<span class="font-body-md text-on-surface font-semibold">Tunde Kalu</span>
+</div>
+</td>
+<td class="px-gutter py-md">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-wider bg-emerald-100 text-emerald-700 uppercase border border-emerald-200">Distributor</span>
+</td>
+<td class="px-gutter py-md">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-surface-container text-secondary border border-outline-variant">
+<span class="material-symbols-outlined text-[14px]" data-icon="qr_code_2">qr_code_2</span>
+                                        QR ONLY
+                                    </span>
+</td>
+<td class="px-gutter py-md font-body-md text-secondary">Site Delta</td>
+<td class="px-gutter py-md text-right">
+<button class="text-secondary hover:text-on-surface p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="more_vert">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Pending Invitations Section -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant overflow-hidden shadow-sm">
+<div class="px-gutter py-md bg-surface-container-low border-b border-outline-variant">
+<h3 class="font-title-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary" data-icon="mail">mail</span>
+                        Pending Invitations
+                    </h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left giftflow-table">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-container">
+<th class="px-gutter py-md font-label-md text-label-md text-secondary">EMAIL</th>
+<th class="px-gutter py-md font-label-md text-label-md text-secondary">ROLE</th>
+<th class="px-gutter py-md font-label-md text-label-md text-secondary">SENT DATE</th>
+<th class="px-gutter py-md font-label-md text-label-md text-secondary text-right">ACTIONS</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30">
+<tr>
+<td class="px-gutter py-md font-mono-data text-mono-data text-on-surface">d.vance@external-logistics.com</td>
+<td class="px-gutter py-md">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-wider bg-slate-100 text-slate-600 uppercase border border-slate-200">Distributor</span>
+</td>
+<td class="px-gutter py-md font-body-md text-secondary">Oct 12, 2023</td>
+<td class="px-gutter py-md text-right space-x-md">
+<a class="text-primary font-label-md text-label-md hover:underline" href="#">Resend</a>
+<a class="text-error font-label-md text-label-md hover:underline" href="#">Cancel</a>
+</td>
+</tr>
+<tr>
+<td class="px-gutter py-md font-mono-data text-mono-data text-on-surface">admin-hr@company.org</td>
+<td class="px-gutter py-md">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold tracking-wider bg-slate-100 text-slate-600 uppercase border border-slate-200">Logistics Admin</span>
+</td>
+<td class="px-gutter py-md font-body-md text-secondary">Oct 14, 2023</td>
+<td class="px-gutter py-md text-right space-x-md">
+<a class="text-primary font-label-md text-label-md hover:underline" href="#">Resend</a>
+<a class="text-error font-label-md text-label-md hover:underline" href="#">Cancel</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Subtle hover effects for table rows
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('mouseenter', () => {
+                row.classList.add('transition-all', 'duration-150');
+                row.style.boxShadow = 'inset 4px 0 0 #006c49';
+            });
+            row.addEventListener('mouseleave', () => {
+                row.style.boxShadow = 'none';
+            });
+        });
+
+        // Search highlight placeholder interaction
+        console.log("Team management module initialized.");
+    </script>
+</body></html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&amp;family=JetBrains+Mono:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="tokens.css" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffddb8",
+                    "surface-container-high": "#dce9ff",
+                    "inverse-surface": "#213145",
+                    "surface-tint": "#006c49",
+                    "on-secondary-fixed": "#111c2d",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-background": "#0b1c30",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed-variant": "#005236",
+                    "on-primary-container": "#00422b",
+                    "surface": "#f8f9ff",
+                    "secondary": "#545f73",
+                    "on-secondary-fixed-variant": "#3c475a",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "on-surface": "#0b1c30",
+                    "on-tertiary-container": "#523200",
+                    "surface-container": "#e5eeff",
+                    "on-primary-fixed": "#002113",
+                    "background": "#f8f9ff",
+                    "secondary-fixed-dim": "#bcc7de",
+                    "primary-fixed": "#6ffbbe",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#2a1700",
+                    "primary-fixed-dim": "#4edea3",
+                    "outline-variant": "#bbcabf",
+                    "on-secondary-container": "#586377",
+                    "surface-variant": "#d3e4fe",
+                    "surface-dim": "#cbdbf5",
+                    "secondary-container": "#d5e0f8",
+                    "on-surface-variant": "#3c4a42",
+                    "on-error-container": "#93000a",
+                    "tertiary-container": "#e29100",
+                    "outline": "#6c7a71",
+                    "inverse-on-surface": "#eaf1ff",
+                    "primary-container": "#10b981",
+                    "tertiary": "#855300",
+                    "surface-bright": "#f8f9ff",
+                    "secondary-fixed": "#d8e3fb",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "inverse-primary": "#4edea3",
+                    "primary": "#006c49"
+            },
+            "borderRadius": {
+                    "DEFAULT": "2px",
+                    "lg": "4px",
+                    "xl": "8px",
+                    "full": "12px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "base": "4px",
+                    "xl": "40px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "md": "16px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "title-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "mono-data": ["JetBrains Mono"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex">
+<!-- SideNavBar (Admin Shell) -->
+<aside class="w-60 h-screen fixed left-0 top-0 border-r border-outline-variant bg-surface-container-lowest dark:bg-surface-container-low flex flex-col py-gutter px-base z-50">
+<div class="px-4 mb-xl">
+<h1 class="text-primary font-bold text-title-md font-title-md">GiftFlow Admin</h1>
+<p class="text-secondary text-label-md font-label-md">Corporate Logistics</p>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Active Tab: Campaigns -->
+<a class="text-primary font-bold bg-secondary-container rounded-lg flex items-center gap-3 px-4 py-3 transition-all duration-200 opacity-90" href="#">
+<span class="material-symbols-outlined">campaign</span>
+<span class="text-label-md font-label-md">Campaigns</span>
+</a>
+<a class="text-secondary hover:bg-surface-container transition-colors flex items-center gap-3 px-4 py-3" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-label-md font-label-md">Employees</span>
+</a>
+<a class="text-secondary hover:bg-surface-container transition-colors flex items-center gap-3 px-4 py-3" href="#">
+<span class="material-symbols-outlined">history_edu</span>
+<span class="text-label-md font-label-md">Audit Log</span>
+</a>
+<a class="text-secondary hover:bg-surface-container transition-colors flex items-center gap-3 px-4 py-3" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-label-md font-label-md">Settings</span>
+</a>
+<a class="text-secondary hover:bg-surface-container transition-colors flex items-center gap-3 px-4 py-3" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span class="text-label-md font-label-md">Team</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-outline-variant pt-4">
+<a class="text-secondary hover:bg-surface-container transition-colors flex items-center gap-3 px-4 py-3" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="text-label-md font-label-md">My Profile</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-60 flex-1 min-h-screen bg-surface">
+<!-- Header / Top Bar Area -->
+<header class="h-16 flex items-center justify-between px-gutter sticky top-0 bg-surface/80 backdrop-blur-md z-40">
+<div class="flex flex-col">
+<nav class="flex items-center gap-2 text-secondary text-label-md font-label-md mb-1">
+<span>Campaigns</span>
+<span class="material-symbols-outlined scale-75">chevron_right</span>
+<span class="text-on-surface">Summer Wellness Box</span>
+</nav>
+</div>
+<div class="flex items-center gap-3">
+<button type="button" class="h-11 px-6 border border-on-background/20 rounded-lg text-label-md font-label-md font-bold hover:bg-surface-container transition-all">
+                    Edit Campaign
+                </button>
+<button type="button" class="h-11 px-6 bg-primary-container text-on-primary-container rounded-lg text-label-md font-label-md font-bold hover:opacity-90 transition-all">
+                    Launch Campaign
+                </button>
+</div>
+</header>
+<div class="p-gutter max-w-container-max mx-auto space-y-lg">
+<!-- Page Title Section -->
+<section class="flex items-center gap-4">
+<h2 class="text-headline-lg font-headline-lg text-on-surface">Summer Wellness Box</h2>
+<span class="px-3 py-1 bg-surface-container-highest text-secondary rounded-full text-label-md font-label-md">Draft</span>
+</section>
+<!-- Info Banner -->
+<div class="bg-tertiary-fixed text-on-tertiary-fixed p-4 rounded-xl flex items-start gap-4 border border-tertiary-fixed-dim shadow-sm">
+<span class="material-symbols-outlined text-on-tertiary-fixed">info</span>
+<div>
+<p class="font-bold text-body-md font-body-md">This campaign is a draft.</p>
+<p class="text-body-md font-body-md opacity-90">Review all details and complete the checklist below to launch this gift distribution event.</p>
+</div>
+</div>
+<!-- Bento Grid Layout for Campaign Details -->
+<div class="grid grid-cols-12 gap-lg">
+<!-- Summary Card & Checklist (Main Focus) -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<div class="flex justify-between items-center mb-md">
+<h3 class="text-title-md font-title-md text-on-surface">Launch Requirements</h3>
+<span class="text-label-md font-label-md text-secondary">2 of 4 Completed</span>
+</div>
+<!-- Progress Bar Component -->
+<div class="w-full h-1.5 bg-surface-container rounded-full mb-lg overflow-hidden">
+<div class="h-full bg-primary-container transition-all duration-500" style="width: 50%;"></div>
+</div>
+<!-- Checklist Items -->
+<ul class="space-y-sm">
+<li class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-body-md font-body-md text-on-surface">Gift item selected</span>
+</div>
+<span class="text-primary text-label-md font-label-md font-bold">VIEW ITEM</span>
+</li>
+<li class="flex items-center justify-between p-4 border border-error/20 bg-error-container/10 rounded-lg">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-error">cancel</span>
+<span class="text-body-md font-body-md text-error font-semibold">Employee list uploaded</span>
+</div>
+<button type="button" class="bg-error text-on-error px-4 py-2 rounded text-label-md font-label-md hover:opacity-90">UPLOAD CSV</button>
+</li>
+<li class="flex items-center justify-between p-4 border border-error/20 bg-error-container/10 rounded-lg">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-error">cancel</span>
+<span class="text-body-md font-body-md text-error font-semibold">Distribution date set</span>
+</div>
+<button type="button" class="bg-error text-on-error px-4 py-2 rounded text-label-md font-label-md hover:opacity-90">SET DATE</button>
+</li>
+<li class="flex items-center justify-between p-4 bg-surface-container-low rounded-lg">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-body-md font-body-md text-on-surface">Pickup location set</span>
+</div>
+<span class="text-primary text-label-md font-label-md font-bold">EDIT</span>
+</li>
+</ul>
+<div class="mt-xl pt-lg border-t border-outline-variant flex justify-center">
+<button type="button" class="flex items-center gap-2 text-primary font-bold text-label-md font-label-md py-2 px-8 rounded-lg hover:bg-primary/5 transition-colors">
+                            Complete setup
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Secondary Data Cards (Asymmetric Side Column) -->
+<div class="col-span-12 lg:col-span-4 space-y-lg">
+<!-- Preview Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden group">
+<div class="relative h-48">
+<img alt="Wellness Box Preview" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhzczaiGfSGO3UA8bkFf2jcnyKYvmEuKB8AUIsqe8sB-5vZfarDJkQ2NzxTXJ7CmKaTjiYJ6RFOcFSkY7PTM4koeieF433C_WRNFdfX3c4nwYTLiiUL3VwCvm4Z0oTM6kOcfS6pVr71QtCELrZZ9AMb4imwf_mOxo40d0mrAm9mkfh0KdMjoWrdc5KpPHAtxnkdvkVMC8-GCZN0MpcQRSV1rQkJAkvCmETISRR3pq2UR6Sm9xIbBTW3-fKf7Yr3dHDL9-6DmcN6gE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+<p class="text-white text-label-md font-label-md font-bold uppercase tracking-widest">Wellness Essentials Kit</p>
+</div>
+</div>
+<div class="p-md space-y-2">
+<div class="flex justify-between">
+<span class="text-secondary text-label-md">Unit Cost</span>
+<span class="text-on-surface font-bold text-label-md">$42.50</span>
+</div>
+<div class="flex justify-between">
+<span class="text-secondary text-label-md">Stock Status</span>
+<span class="text-primary font-bold text-label-md">Reserved (500)</span>
+</div>
+</div>
+</div>
+<!-- Logistics Meta -->
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<h4 class="text-label-md font-label-md text-secondary uppercase mb-md tracking-wider">Logistics Context</h4>
+<div class="space-y-4">
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary">location_on</span>
+</div>
+<div>
+<p class="text-body-md font-body-md text-on-surface font-semibold">Central Warehouse A</p>
+<p class="text-label-md font-label-md text-secondary">Loading Dock 4</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary">local_shipping</span>
+</div>
+<div>
+<p class="text-body-md font-body-md text-on-surface font-semibold">Pending Assignment</p>
+<p class="text-label-md font-label-md text-secondary">Carrier required</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Detailed Stats Table (Hidden/Footer Style) -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="p-lg border-b border-outline-variant bg-surface-container-low/50">
+<h3 class="text-title-md font-title-md text-on-surface">Target Distribution</h3>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-lowest">
+<tr>
+<th class="px-lg py-4 text-label-md font-label-md text-secondary uppercase tracking-wider">Department</th>
+<th class="px-lg py-4 text-label-md font-label-md text-secondary uppercase tracking-wider">Recipient Count</th>
+<th class="px-lg py-4 text-label-md font-label-md text-secondary uppercase tracking-wider">Box Variant</th>
+<th class="px-lg py-4 text-label-md font-label-md text-secondary uppercase tracking-wider text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-lg py-4 text-body-md font-body-md text-on-surface font-semibold">Engineering</td>
+<td class="px-lg py-4 text-body-md font-body-md text-on-surface">142</td>
+<td class="px-lg py-4">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded text-[10px] font-bold">STANDARD</span>
+</td>
+<td class="px-lg py-4 text-right">
+<button type="button" class="text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+<tr class="bg-surface-container-low/20 hover:bg-surface-container transition-colors group">
+<td class="px-lg py-4 text-body-md font-body-md text-on-surface font-semibold">Sales &amp; Marketing</td>
+<td class="px-lg py-4 text-body-md font-body-md text-on-surface">88</td>
+<td class="px-lg py-4">
+<span class="px-2 py-0.5 bg-primary-container text-on-primary-container rounded text-[10px] font-bold">PREMIUM</span>
+</td>
+<td class="px-lg py-4 text-right">
+<button type="button" class="text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors group">
+<td class="px-lg py-4 text-body-md font-body-md text-on-surface font-semibold">Operations</td>
+<td class="px-lg py-4 text-body-md font-body-md text-on-surface">215</td>
+<td class="px-lg py-4">
+<span class="px-2 py-0.5 bg-secondary-container text-on-secondary-container rounded text-[10px] font-bold">STANDARD</span>
+</td>
+<td class="px-lg py-4 text-right">
+<button type="button" class="text-secondary opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+</main>
+<script>
+        // Simple micro-interaction for button press
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.classList.add('scale-95');
+            });
+            button.addEventListener('mouseup', () => {
+                button.classList.remove('scale-95');
+            });
+            button.addEventListener('mouseleave', () => {
+                button.classList.remove('scale-95');
+            });
+        });
+
+        // Simulating loading state for the checklist
+        setTimeout(() => {
+            console.log("Checklist requirements refreshed...");
+        }, 1500);
+    </script>
+
+<script>
+    (function initAnimations() {
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+            });
+        }, { threshold: 0.05 });
+        document.querySelectorAll('.enter, .enter-img').forEach(el => io.observe(el));
+    })();
+</script>
+</body></html>
