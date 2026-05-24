@@ -107,7 +107,7 @@
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
         .step-transition { transition: all 0.3s ease-in-out; }
-        .executive-shadow { box-shadow: 0px 4px 20px rgba(30, 41, 59, 0.05); }
+        .executive-shadow { box-shadow: var(--shadow-card); }
     </style>
 </head>
 <body class="bg-background text-on-surface font-body-md min-h-screen">
@@ -119,10 +119,10 @@
 <span class="text-label-md font-label-md text-on-surface-variant">Campaign Creation Flow</span>
 </div>
 <div class="flex items-center gap-md">
-<button class="flex items-center justify-center p-sm rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<button type="button" aria-label="Help" class="flex items-center justify-center p-sm rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
 <span class="material-symbols-outlined">help_outline</span>
 </button>
-<button class="flex items-center justify-center p-sm rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<button type="button" aria-label="Notifications" class="flex items-center justify-center p-sm rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
 <span class="material-symbols-outlined">notifications</span>
 </button>
 <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-label-md">
@@ -133,7 +133,7 @@
 <main class="max-w-container-max mx-auto px-gutter py-xl">
 <div class="grid grid-cols-12 gap-lg">
 <!-- Sidebar Progress (Steppers) -->
-<aside class="col-span-12 md:col-span-3 space-y-md">
+<aside class="col-span-12 md:col-span-3 space-y-md enter" data-delay="1">
 <div class="p-lg bg-surface border border-outline-variant rounded-lg executive-shadow">
 <h3 class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider mb-lg">Setup Progress</h3>
 <nav class="flex flex-col gap-md">
@@ -167,7 +167,7 @@
 <div class="flex-grow p-xl">
 <!-- Step 1: Campaign Details -->
 <section class="step-transition" id="step-1-content">
-<h1 class="text-headline-lg font-headline-lg text-on-surface mb-sm">Campaign Details</h1>
+<h1 class="text-headline-lg-mobile font-headline-lg md:text-headline-lg text-on-surface mb-sm">Campaign Details</h1>
 <p class="text-body-lg text-on-surface-variant mb-xl">Define the core identity and schedule for your corporate gift initiative.</p>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
 <div class="space-y-xs">
@@ -189,11 +189,11 @@
 </section>
 <!-- Step 2: Employee Selection (Hidden by default) -->
 <section class="hidden step-transition" id="step-2-content">
-<h1 class="text-headline-lg font-headline-lg text-on-surface mb-sm">Employee Selection</h1>
+<h1 class="text-headline-lg-mobile font-headline-lg md:text-headline-lg text-on-surface mb-sm">Employee Selection</h1>
 <p class="text-body-lg text-on-surface-variant mb-xl">Select which employees are eligible for this campaign.</p>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
 <!-- CSV Upload -->
-<div class="border-2 border-dashed border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer card-hover enter" data-delay="2">
 <div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center text-on-primary-container mb-md">
 <span class="material-symbols-outlined">upload_file</span>
 </div>
@@ -201,7 +201,7 @@
 <p class="text-body-md text-on-surface-variant text-center mt-xs">Drag and drop your employee list here</p>
 </div>
 <!-- Directory Select -->
-<div class="border border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="border border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer group card-hover enter" data-delay="3">
 <div class="w-12 h-12 bg-secondary-container rounded-full flex items-center justify-center text-on-secondary-container mb-md group-hover:bg-primary group-hover:text-on-primary transition-colors">
 <span class="material-symbols-outlined">group</span>
 </div>
@@ -218,7 +218,7 @@
 <section class="hidden step-transition" id="step-3-content">
 <div class="flex justify-between items-end mb-xl">
 <div>
-<h1 class="text-headline-lg font-headline-lg text-on-surface mb-sm">Gift Configuration</h1>
+<h1 class="text-headline-lg-mobile font-headline-lg md:text-headline-lg text-on-surface mb-sm">Gift Configuration</h1>
 <p class="text-body-lg text-on-surface-variant">Assign gift options and logistics partners.</p>
 </div>
 <button class="flex items-center gap-sm px-md py-sm bg-secondary text-on-secondary rounded-lg font-label-md hover:opacity-90 transition-opacity">
@@ -227,8 +227,8 @@
 </div>
 <div class="space-y-md">
 <!-- Gift Item 1 -->
-<div class="flex items-center gap-lg p-md border border-outline-variant rounded-lg bg-surface-container-lowest">
-<img alt="Spa Voucher" class="w-20 h-20 object-cover rounded" data-alt="A luxurious, high-end spa gift card resting on a bed of smooth white river stones with a single green orchid. The lighting is soft and clinical, reflecting a modern wellness brand aesthetic. The background is a clean, minimal white space that emphasizes professional corporate gifting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRPUj_pKKK4h6CZC4wzaviRDLYAUuUniD-miiGKy6kYisl3-8xTKMcmaCOIkA508yfodLVtvtATkgfN4Btv1hWxekwTAYjA5TGHty5XyLrovdbwhlFCrWnPSC4YnRiOha0jgTMrObURwH_61bEazsBPoiErxvbWdKQIJ7jTprpNjSGbn-tAwQS6PR6mUi1ym6ncZslS8oRIx96CC7I4LXTnbya33Qzo1mVHEeY7-T3bt2CpXxk3si04dqQ-Wk7GMAD3V-VX0bjMWE"/>
+<div class="flex items-center gap-lg p-md border border-outline-variant rounded-lg bg-surface-container-lowest card-hover">
+<img alt="Spa Voucher" class="w-20 h-20 object-cover rounded" loading="lazy" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRPUj_pKKK4h6CZC4wzaviRDLYAUuUniD-miiGKy6kYisl3-8xTKMcmaCOIkA508yfodLVtvtATkgfN4Btv1hWxekwTAYjA5TGHty5XyLrovdbwhlFCrWnPSC4YnRiOha0jgTMrObURwH_61bEazsBPoiErxvbWdKQIJ7jTprpNjSGbn-tAwQS6PR6mUi1ym6ncZslS8oRIx96CC7I4LXTnbya33Qzo1mVHEeY7-T3bt2CpXxk3si04dqQ-Wk7GMAD3V-VX0bjMWE"/>
 <div class="flex-grow grid grid-cols-2 gap-md">
 <div>
 <p class="text-label-md text-on-surface-variant uppercase">Gift Name</p>
@@ -247,8 +247,8 @@
 </button>
 </div>
 <!-- Gift Item 2 -->
-<div class="flex items-center gap-lg p-md border border-outline-variant rounded-lg bg-surface-container-lowest">
-<img alt="Gourmet Basket" class="w-20 h-20 object-cover rounded" data-alt="A sophisticated gourmet food basket packed with premium artisan crackers, olives, and dark chocolate, wrapped in a minimalist navy ribbon. The scene is lit with bright, even studio lighting to convey reliability and premium quality. The setting is a professional workspace, suggesting an executive-level gift." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3RVcOGP9IiV61sXpZ4hJqrJJjSUYcS0mLf7Z9o6jZWbGhvhEhWq_zaovVJlGKmI2ticqtHUx2t2SnfARKTGtjjWN1DOroSf_p7uBMwYmH_dAgUyXjxOeMAEfl02kF4s_gdc_2p6Hp9E_FhMpg9Li87bR8pnTcToXMt_MsNwvpZ6kpiVPBRR0gu0AxJrS4nAZJ-Em9FSz8ZXsTzlrV9Abbwd7cMCCt_VtCFTyinH60IdW0w0B8gab8lTx6f0Q3Ses0gUmnLnTs538"/>
+<div class="flex items-center gap-lg p-md border border-outline-variant rounded-lg bg-surface-container-lowest card-hover">
+<img alt="Gourmet Basket" class="w-20 h-20 object-cover rounded" loading="lazy" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3RVcOGP9IiV61sXpZ4hJqrJJjSUYcS0mLf7Z9o6jZWbGhvhEhWq_zaovVJlGKmI2ticqtHUx2t2SnfARKTGtjjWN1DOroSf_p7uBMwYmH_dAgUyXjxOeMAEfl02kF4s_gdc_2p6Hp9E_FhMpg9Li87bR8pnTcToXMt_MsNwvpZ6kpiVPBRR0gu0AxJrS4nAZJ-Em9FSz8ZXsTzlrV9Abbwd7cMCCt_VtCFTyinH60IdW0w0B8gab8lTx6f0Q3Ses0gUmnLnTs538"/>
 <div class="flex-grow grid grid-cols-2 gap-md">
 <div>
 <p class="text-label-md text-on-surface-variant uppercase">Gift Name</p>
@@ -271,13 +271,13 @@
 </div>
 <!-- Action Bar -->
 <div class="p-lg bg-surface-container-lowest border-t border-outline-variant flex justify-between items-center">
-<button class="hidden flex items-center gap-sm px-xl py-md text-on-surface-variant font-bold hover:bg-surface-container transition-colors rounded-lg" id="back-btn">
+<button type="button" class="hidden flex items-center gap-sm px-xl py-md text-on-surface-variant font-bold hover:bg-surface-container rounded-lg btn-micro" id="back-btn">
 <span class="material-symbols-outlined">arrow_back</span> Back
                         </button>
 <div class="flex-grow" id="spacer"></div>
 <div class="flex gap-md">
-<button class="px-xl py-md text-on-surface-variant font-bold hover:bg-surface-container transition-colors rounded-lg">Save Draft</button>
-<button class="flex items-center gap-sm px-xl py-md bg-primary-container text-on-primary-container font-bold hover:opacity-90 active:scale-95 transition-all rounded-lg executive-shadow" id="next-btn">
+<button type="button" class="px-xl py-md text-on-surface-variant font-bold hover:bg-surface-container rounded-lg btn-micro">Save Draft</button>
+<button type="button" class="flex items-center gap-sm px-xl py-md bg-primary-container text-on-primary-container font-bold hover:opacity-90 rounded-lg executive-shadow btn-micro" id="next-btn">
                                 Next <span class="material-symbols-outlined">arrow_forward</span>
 </button>
 </div>
@@ -358,4 +358,15 @@
             });
         });
     </script>
+
+<script>
+    (function initAnimations() {
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.enter, .enter-img').forEach(el => io.observe(el));
+    })();
+</script>
 </body></html>

@@ -73,4 +73,108 @@
   /* Elevation */
   --shadow-card: 0px 4px 20px rgba(30, 41, 59, 0.05);
   --shadow-overlay: 0 -8px 24px rgba(0, 0, 0, 0.10);
+  /* Scrim / glows */
+  --color-scrim: rgba(0, 0, 0, 0.5);
+  --color-primary-glow: rgba(78, 222, 163, 0.8);
 }
+
+/* ── Animation system ──────────────────────────────────────────── */
+
+/* Blur-slide-up entrance (used by .enter class) */
+@keyframes blurSlideUp {
+  from { opacity: 0; filter: blur(12px); transform: translateY(28px); }
+  to   { opacity: 1; filter: blur(0px); transform: translateY(0); }
+}
+
+/* Scale-in for images */
+@keyframes scaleIn {
+  from { opacity: 0; filter: blur(10px); transform: scale(0.92); }
+  to   { opacity: 1; filter: blur(0px);  transform: scale(1); }
+}
+
+/* Counter number animation handled by JS; this class marks targets */
+.count-up { font-variant-numeric: tabular-nums; }
+
+/* Scroll-triggered entrance — default hidden, .visible reveals */
+@media (prefers-reduced-motion: no-preference) {
+  .enter {
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(28px);
+    transition: opacity 0.7s cubic-bezier(0.25,0.46,0.45,0.94),
+                filter  0.7s cubic-bezier(0.25,0.46,0.45,0.94),
+                transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
+  }
+  .enter.visible {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+  /* Stagger delays */
+  .enter[data-delay="1"] { transition-delay: 0.09s; }
+  .enter[data-delay="2"] { transition-delay: 0.18s; }
+  .enter[data-delay="3"] { transition-delay: 0.27s; }
+  .enter[data-delay="4"] { transition-delay: 0.36s; }
+  .enter[data-delay="5"] { transition-delay: 0.45s; }
+
+  /* Image entrance variant */
+  .enter-img {
+    opacity: 0;
+    filter: blur(10px);
+    transform: scale(0.92);
+    transition: opacity 0.65s cubic-bezier(0.34,1.56,0.64,1),
+                filter  0.65s cubic-bezier(0.34,1.56,0.64,1),
+                transform 0.65s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .enter-img.visible { opacity: 1; filter: blur(0px); transform: scale(1); }
+
+  /* Line reveal (scaleX from left) */
+  .line-reveal {
+    transform-origin: left;
+    transform: scaleX(0);
+    transition: transform 0.9s cubic-bezier(0.76,0,0.24,1);
+  }
+  .line-reveal.visible { transform: scaleX(1); }
+
+  /* Word-by-word headline: each .word span staggered */
+  .word-split .word {
+    display: inline-block;
+    opacity: 0;
+    filter: blur(10px);
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, filter 0.7s ease, transform 0.7s ease;
+  }
+  .word-split.visible .word { opacity: 1; filter: blur(0px); transform: translateY(0); }
+
+  /* Card hover lift */
+  .card-hover {
+    transition: transform 0.25s cubic-bezier(0.34,1.56,0.64,1),
+                box-shadow 0.25s ease;
+  }
+  .card-hover:hover { transform: translateY(-7px) scale(1.018); }
+
+  /* Button micro-interaction */
+  .btn-micro {
+    transition: transform 0.15s cubic-bezier(0.34,1.56,0.64,1), opacity 0.15s ease;
+  }
+  .btn-micro:hover  { transform: scale(1.05); }
+  .btn-micro:active { transform: scale(0.97); }
+}
+
+/* Reduced-motion fallback: simple opacity fade only */
+@media (prefers-reduced-motion: reduce) {
+  .enter {
+    opacity: 0;
+    transition: opacity 0.7s ease;
+  }
+  .enter.visible { opacity: 1; }
+  .enter-img { opacity: 0; transition: opacity 0.65s ease; }
+  .enter-img.visible { opacity: 1; }
+  .line-reveal { transition: transform 0.9s ease; }
+  .word-split .word { opacity: 0; transition: opacity 0.7s ease; }
+  .word-split.visible .word { opacity: 1; filter: none; transform: none; }
+  .card-hover:hover, .btn-micro:hover, .btn-micro:active { transform: none; }
+}
+
+/* IntersectionObserver bootstrap — shared across all screens */
+/* (script inline in each page calls initAnimations()) */

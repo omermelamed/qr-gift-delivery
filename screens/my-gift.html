@@ -20,15 +20,6 @@
             to   { opacity: 1; filter: blur(0);   transform: translateY(0); }
         }
         .hero-entrance { animation: heroEntrance 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) both; }
-        .confetti-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
     </style>
 <script id="tailwind-config">
         tailwind.config = {
@@ -134,26 +125,26 @@
 <!-- Top Navigation Anchor -->
 <header class="flex md:hidden justify-between items-center w-full px-4 h-14 fixed top-0 z-50 bg-surface-container-highest">
 <div class="flex items-center gap-2">
-<span class="material-symbols-outlined text-on-surface" data-icon="redeem">redeem</span>
+<span class="material-symbols-outlined text-on-surface">redeem</span>
 <span class="text-title-md font-title-md font-bold text-on-surface">GiftFlow</span>
 </div>
 <div class="flex gap-4">
-<span class="material-symbols-outlined text-on-surface-variant" data-icon="history">history</span>
-<span class="material-symbols-outlined text-on-surface-variant" data-icon="flash_on">flash_on</span>
+<span class="material-symbols-outlined text-on-surface-variant">history</span>
+<span class="material-symbols-outlined text-on-surface-variant">flash_on</span>
 </div>
 </header>
 <!-- Main Content Canvas -->
-<main class="w-full max-w-md px-gutter pt-20 pb-24 flex-1 flex flex-col gap-6 relative z-10">
+<main class="w-full max-w-md px-gutter pt-20 pb-24 flex-1 flex flex-col gap-lg relative z-10">
 <!-- Welcome Hero Section -->
 <section class="text-center hero-entrance">
 <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-container mb-4 shadow-sm">
-<span class="material-symbols-outlined text-on-primary-container text-4xl" data-icon="celebration" style="font-variation-settings: 'FILL' 1;">celebration</span>
+<span class="material-symbols-outlined text-on-primary-container text-4xl" style="font-variation-settings: 'FILL' 1;">celebration</span>
 </div>
 <h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Hello, Michael!</h1>
 <p class="font-body-lg text-body-lg text-on-surface-variant">Your gift is ready for pickup.</p>
 </section>
 <!-- QR Code Interaction Area -->
-<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 flex flex-col items-center gap-6 shadow-sm">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 flex flex-col items-center gap-6 shadow-sm enter" data-delay="1">
 <!-- Status Badge -->
 <div class="bg-primary-container/10 border border-primary-container/20 px-4 py-2 rounded-full flex items-center gap-2">
 <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
@@ -163,7 +154,7 @@
 <div class="relative group cursor-pointer" onclick="this.classList.toggle('scale-105')">
 <div class="absolute -inset-4 qr-gradient opacity-10 blur-xl rounded-full transition-all duration-500"></div>
 <div class="relative bg-white p-4 rounded-lg border-2 border-primary/20 shadow-lg">
-<img alt="QR Code for Verification" class="w-48 h-48 sm:w-56 sm:h-56" data-alt="A clean, high-contrast QR code centered on a white square background with rounded corners. The QR code is framed by a subtle glowing emerald green aura, suggesting a high-trust digital transaction. The lighting is bright and even, consistent with a premium corporate mobile interface. The overall aesthetic is professional, minimalist, and secure." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-wJeLgsMYc-qRcXwTr5RiXy8kqZ6vFEHCJy5w89z7ZDD5XY-N-oU9iuZyiBbR6xbjj50d7cQthEnlQiQBiT7JNTxyp4moZDv8ErcMjsqPV69kOWyUdIdgJ1ug29Mjp8QsWycN3OBTMweIfRIQSijoNF6uRlQrwEYWSYY7Kj2mNMONpWRdO24tVHrYN4SnUsW4GgA_CxgnvxLtqWFOW4ub7jowU7CmcEyAMmzQ8BW0vwGHpbUdOOG71rOE6C8M42eBnxmrhRIH2L8"/>
+<img alt="QR Code for Verification" class="w-48 h-48 sm:w-56 sm:h-56 enter-img" loading="lazy" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-wJeLgsMYc-qRcXwTr5RiXy8kqZ6vFEHCJy5w89z7ZDD5XY-N-oU9iuZyiBbR6xbjj50d7cQthEnlQiQBiT7JNTxyp4moZDv8ErcMjsqPV69kOWyUdIdgJ1ug29Mjp8QsWycN3OBTMweIfRIQSijoNF6uRlQrwEYWSYY7Kj2mNMONpWRdO24tVHrYN4SnUsW4GgA_CxgnvxLtqWFOW4ub7jowU7CmcEyAMmzQ8BW0vwGHpbUdOOG71rOE6C8M42eBnxmrhRIH2L8"/>
 </div>
 <div class="mt-4 flex flex-col items-center">
 <span class="font-mono-data text-mono-data text-on-surface-variant opacity-60">REF: GIFT-2024-MXP-09</span>
@@ -171,11 +162,11 @@
 </div>
 </div>
 <!-- Gift & Location Bento Cards -->
-<div class="grid grid-cols-1 gap-4">
+<div class="grid grid-cols-1 gap-md">
 <!-- Gift Info -->
 <div class="bg-surface-container rounded-xl p-5 border border-outline-variant flex items-center gap-4">
 <div class="w-12 h-12 bg-on-primary rounded-lg flex items-center justify-center border border-outline-variant">
-<span class="material-symbols-outlined text-primary" data-icon="package_2">package_2</span>
+<span class="material-symbols-outlined text-primary">package_2</span>
 </div>
 <div>
 <span class="font-label-md text-label-md text-on-surface-variant block">ASSIGNED GIFT</span>
@@ -185,23 +176,23 @@
 <!-- Pickup Location -->
 <div class="bg-surface-container-high rounded-xl p-5 border border-outline-variant flex items-start gap-4">
 <div class="w-12 h-12 bg-on-primary rounded-lg flex items-center justify-center border border-outline-variant shrink-0">
-<span class="material-symbols-outlined text-primary" data-icon="location_on">location_on</span>
+<span class="material-symbols-outlined text-primary">location_on</span>
 </div>
 <div class="flex-1">
 <span class="font-label-md text-label-md text-on-surface-variant block">PICK UP AT</span>
 <span class="font-body-lg text-body-lg text-on-surface font-semibold">Building B Lobby</span>
 <div class="flex items-center gap-2 mt-1">
-<span class="material-symbols-outlined text-on-surface-variant text-sm" data-icon="schedule">schedule</span>
+<span class="material-symbols-outlined text-on-surface-variant text-sm">schedule</span>
 <span class="font-body-md text-body-md text-on-surface-variant">9:00 AM - 5:00 PM</span>
 </div>
 </div>
-<button class="bg-on-primary p-2 rounded-lg border border-outline-variant text-primary hover:bg-primary/5 transition-colors">
-<span class="material-symbols-outlined" data-icon="map">map</span>
+<button type="button" aria-label="View pickup location on map" class="bg-on-primary p-2 rounded-lg border border-outline-variant text-primary hover:bg-primary/5 btn-micro">
+<span class="material-symbols-outlined">map</span>
 </button>
 </div>
 </div>
 <!-- Progress/Stepping Indicator -->
-<div class="mt-4 px-2">
+<div class="mt-4 px-2 enter" data-delay="4">
 <div class="flex justify-between items-center mb-2">
 <span class="font-label-md text-label-md text-primary">Redemption Step 2 of 3</span>
 <span class="font-label-md text-label-md text-on-surface-variant">Scan Pending</span>
@@ -211,23 +202,23 @@
 </div>
 </div>
 <!-- Help Action -->
-<button class="flex items-center justify-center gap-2 py-4 text-on-surface-variant hover:text-primary transition-colors">
-<span class="material-symbols-outlined text-md" data-icon="help">help</span>
+<button type="button" aria-label="Get help with your gift" class="flex items-center justify-center gap-lg py-4 text-on-surface-variant hover:text-primary btn-micro">
+<span class="material-symbols-outlined text-md">help</span>
 <span class="font-label-md text-label-md">Need help with your gift?</span>
 </button>
 </main>
 <!-- Bottom Navigation Shell -->
 <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface border-t border-outline-variant shadow-lg rounded-t-xl">
 <a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
-<span class="material-symbols-outlined" data-icon="qr_code_scanner">qr_code_scanner</span>
+<span class="material-symbols-outlined">qr_code_scanner</span>
 <span class="font-label-md text-label-md">Scan</span>
 </a>
 <a class="flex flex-col items-center justify-center text-on-surface-variant" href="#">
-<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="material-symbols-outlined">receipt_long</span>
 <span class="font-label-md text-label-md">History</span>
 </a>
-<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1" href="#">
-<span class="material-symbols-outlined" data-icon="account_circle" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+<a aria-current="page" class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_circle</span>
 <span class="font-label-md text-label-md">Profile</span>
 </a>
 </nav>
@@ -255,4 +246,15 @@
             });
         });
     </script>
+
+<script>
+    (function initAnimations() {
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.enter, .enter-img').forEach(el => io.observe(el));
+    })();
+</script>
 </body></html>

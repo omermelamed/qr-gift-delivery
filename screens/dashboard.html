@@ -120,7 +120,7 @@
 </div>
 <nav class="flex-1 px-4 space-y-2">
 <!-- Campaigns (Active) -->
-<a class="flex items-center gap-3 px-4 py-3 text-primary font-bold border-r-4 border-primary hover:bg-surface-container transition-colors active:scale-95 duration-150" href="#">
+<a aria-current="page" class="flex items-center gap-3 px-4 py-3 text-primary font-bold border-r-4 border-primary hover:bg-surface-container transition-colors active:scale-95 duration-150" href="#">
 <span class="material-symbols-outlined">campaign</span>
 <span class="text-label-md font-label-md">Campaigns</span>
 </a>
@@ -136,7 +136,7 @@
 </a>
 </nav>
 <div class="p-4 mt-auto">
-<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<button type="button" class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md flex items-center justify-center gap-2 btn-micro">
 <span class="material-symbols-outlined text-[20px]">add</span>
                 New Campaign
             </button>
@@ -165,25 +165,25 @@
 <!-- Dashboard Content -->
 <div class="p-gutter max-w-container-max mx-auto space-y-gutter">
 <!-- Header & Primary Actions -->
-<section class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<section class="flex flex-col md:flex-row md:items-end justify-between gap-4 enter">
 <div>
 <div class="flex items-center gap-2 mb-2">
 <span class="bg-primary-container/20 text-on-primary-container px-2 py-0.5 rounded text-label-md font-label-md uppercase tracking-wider">Active Campaign</span>
 <span class="text-on-surface-variant opacity-60">•</span>
 <span class="text-label-md font-label-md text-on-surface-variant">Created Oct 12, 2024</span>
 </div>
-<h1 class="text-headline-lg font-headline-lg text-on-surface">Holiday Gift 2024</h1>
+<h1 class="text-headline-lg font-headline-lg text-on-surface word-split" id="main-headline"><span class="word">Holiday</span> <span class="word">Gift</span> <span class="word">2024</span></h1>
 </div>
 <div class="flex flex-wrap gap-3">
-<button class="bg-primary text-on-primary px-6 py-2.5 rounded font-label-md flex items-center gap-2 shadow-sm hover:opacity-95 active:scale-95 transition-all">
+<button type="button" class="bg-primary text-on-primary px-6 py-2.5 rounded font-label-md flex items-center gap-2 shadow-sm btn-micro">
 <span class="material-symbols-outlined text-[18px]">send</span>
                         Launch SMS Dispatch
                     </button>
-<button class="bg-surface border border-secondary text-secondary px-6 py-2.5 rounded font-label-md flex items-center gap-2 hover:bg-secondary-container/10 transition-colors">
+<button type="button" class="bg-surface border border-secondary text-secondary px-6 py-2.5 rounded font-label-md flex items-center gap-2 hover:bg-secondary-container/10 btn-micro">
 <span class="material-symbols-outlined text-[18px]">download</span>
                         Export Audit CSV
                     </button>
-<button class="text-error px-4 py-2.5 rounded font-label-md flex items-center gap-2 hover:bg-error-container/20 transition-colors">
+<button type="button" class="text-error px-4 py-2.5 rounded font-label-md flex items-center gap-2 hover:bg-error-container/20 transition-colors">
 <span class="material-symbols-outlined text-[18px]">cancel</span>
                         Close Campaign
                     </button>
@@ -192,11 +192,11 @@
 <!-- Stats & Progress Bento Grid -->
 <section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
 <!-- Progress Main Card -->
-<div class="lg:col-span-8 bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-[0px_4px_20px_rgba(30,41,59,0.05)]">
+<div class="lg:col-span-8 bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-[0px_4px_20px_rgba(30,41,59,0.05)] enter card-hover" data-delay="1">
 <div class="flex justify-between items-start mb-8">
 <div>
 <p class="text-label-md font-label-md text-on-surface-variant uppercase tracking-widest mb-1">Redemption Status</p>
-<h3 class="text-display-lg font-display-lg text-primary">67%</h3>
+<h3 class="text-display-lg font-display-lg text-primary count-up" id="redemption-stat" data-target="67">67%</h3>
 </div>
 <div class="text-right">
 <p class="text-body-md font-body-md text-on-surface-variant">Live Momentum</p>
@@ -204,7 +204,7 @@
 </div>
 </div>
 <!-- Large Progress Bar -->
-<div class="w-full h-4 bg-secondary-container/50 rounded-full overflow-hidden mb-4">
+<div class="w-full h-4 bg-secondary-container/50 rounded-full overflow-hidden mb-4" id="progress-track">
 <div class="h-full bg-primary-container w-[67%] relative transition-all duration-1000 ease-out">
 <div class="absolute inset-0 bg-gradient-to-r from-transparent to-white/20"></div>
 </div>
@@ -217,7 +217,7 @@
 </div>
 <!-- Snapshot Stats -->
 <div class="lg:col-span-4 grid grid-rows-2 gap-gutter">
-<div class="bg-surface-container-high/40 border border-outline-variant p-md rounded-xl flex items-center gap-4">
+<div class="bg-surface-container-high/40 border border-outline-variant p-md rounded-xl flex items-center gap-4 enter card-hover" data-delay="2">
 <div class="w-12 h-12 bg-primary-container/20 rounded-lg flex items-center justify-center text-primary">
 <span class="material-symbols-outlined">group</span>
 </div>
@@ -226,7 +226,7 @@
 <p class="text-title-md font-title-md text-on-surface">1,250</p>
 </div>
 </div>
-<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex items-center gap-4">
+<div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl flex items-center gap-4 enter card-hover" data-delay="3">
 <div class="w-12 h-12 bg-tertiary-container/20 rounded-lg flex items-center justify-center text-tertiary">
 <span class="material-symbols-outlined">pending_actions</span>
 </div>
@@ -238,7 +238,7 @@
 </div>
 </section>
 <!-- Employee Table Section -->
-<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(30,41,59,0.05)]">
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-[0px_4px_20px_rgba(30,41,59,0.05)] enter" data-delay="2">
 <div class="px-gutter py-4 border-b border-outline-variant bg-surface flex flex-col md:flex-row md:items-center justify-between gap-4">
 <h3 class="text-title-md font-title-md text-on-surface">Redemption Log</h3>
 <div class="flex items-center gap-3">
@@ -348,13 +348,13 @@
 <div class="px-gutter py-4 bg-surface border-t border-outline-variant flex items-center justify-between text-label-md font-label-md text-on-surface-variant">
 <span>Showing 1-10 of 1,250 employees</span>
 <div class="flex items-center gap-2">
-<button class="p-1 hover:bg-surface-container rounded-md material-symbols-outlined text-[20px]">chevron_left</button>
+<button type="button" aria-label="Previous page" class="p-1 hover:bg-surface-container rounded-md material-symbols-outlined text-[20px]">chevron_left</button>
 <span class="px-2 font-bold text-on-surface">1</span>
 <span class="px-2">2</span>
 <span class="px-2">3</span>
 <span class="px-2">...</span>
 <span class="px-2">125</span>
-<button class="p-1 hover:bg-surface-container rounded-md material-symbols-outlined text-[20px]">chevron_right</button>
+<button type="button" aria-label="Next page" class="p-1 hover:bg-surface-container rounded-md material-symbols-outlined text-[20px]">chevron_right</button>
 </div>
 </div>
 </section>
@@ -397,4 +397,63 @@
             });
         });
     </script>
+
+<script>
+    (function initAnimations() {
+        const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        // IntersectionObserver for .enter and .enter-img
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    io.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.enter, .enter-img, .line-reveal').forEach(el => io.observe(el));
+
+        // Word-split headline
+        const headline = document.getElementById('main-headline');
+        if (headline) {
+            io.observe(headline);
+            headline.addEventListener('transitionend', () => {}, { once: true });
+            const words = headline.querySelectorAll('.word');
+            words.forEach((w, i) => {
+                w.style.transitionDelay = (i * 0.1) + 's';
+            });
+            // Also trigger headline as an .enter equivalent via word-split
+            const wordIo = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) { e.target.classList.add('visible'); wordIo.unobserve(e.target); }
+                });
+            }, { threshold: 0.1 });
+            wordIo.observe(headline);
+        }
+
+        // Number counter for redemption stat
+        const stat = document.getElementById('redemption-stat');
+        if (stat && !prefersReduced) {
+            const target = parseInt(stat.dataset.target, 10);
+            stat.textContent = '0%';
+            const statIo = new IntersectionObserver((entries) => {
+                entries.forEach(e => {
+                    if (e.isIntersecting) {
+                        const start = performance.now();
+                        const duration = 1400;
+                        function tick(now) {
+                            const t = Math.min((now - start) / duration, 1);
+                            const ease = 1 - Math.pow(1 - t, 3);
+                            stat.textContent = Math.round(ease * target) + '%';
+                            if (t < 1) requestAnimationFrame(tick);
+                        }
+                        requestAnimationFrame(tick);
+                        statIo.unobserve(e.target);
+                    }
+                });
+            }, { threshold: 0.5 });
+            statIo.observe(stat);
+        }
+    })();
+</script>
 </body></html>
