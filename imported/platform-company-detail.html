@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#eff4ff",
+                    "primary-container": "#10b981",
+                    "on-background": "#0b1c30",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed-dim": "#bcc7de",
+                    "outline-variant": "#bbcabf",
+                    "secondary-fixed": "#d8e3fb",
+                    "on-tertiary-fixed": "#2a1700",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-primary-container": "#00422b",
+                    "on-error": "#ffffff",
+                    "primary-fixed-dim": "#4edea3",
+                    "surface": "#f8f9ff",
+                    "inverse-surface": "#213145",
+                    "surface-bright": "#f8f9ff",
+                    "on-tertiary-container": "#523200",
+                    "on-secondary-fixed-variant": "#3c475a",
+                    "on-secondary-fixed": "#111c2d",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#3c4a42",
+                    "surface-container-high": "#dce9ff",
+                    "surface-tint": "#006c49",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-secondary-container": "#586377",
+                    "tertiary-container": "#e29100",
+                    "surface-container": "#e5eeff",
+                    "primary-fixed": "#6ffbbe",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed": "#002113",
+                    "primary": "#006c49",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "secondary-container": "#d5e0f8",
+                    "error": "#ba1a1a",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#005236",
+                    "secondary": "#545f73",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#ffddb8",
+                    "inverse-primary": "#4edea3",
+                    "background": "#f8f9ff",
+                    "tertiary": "#855300",
+                    "on-surface": "#0b1c30",
+                    "outline": "#6c7a71"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-max": "1280px",
+                    "sm": "8px",
+                    "xl": "40px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "md": "16px",
+                    "gutter": "24px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "title-md": ["Inter"],
+                    "mono-data": ["JetBrains Mono"],
+                    "headline-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .zebra-table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+        body {
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-background">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-gutter w-full sticky top-0 z-50 h-16 bg-primary shadow-md">
+<div class="flex items-center gap-8">
+<span class="font-title-md text-title-md font-black text-on-primary">GiftFlow Platform</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-primary dark:text-on-primary-container border-b-2 border-on-primary font-bold pb-1 scale-95 transition-transform" href="#">Companies</a>
+<a class="text-on-primary/80 font-medium hover:text-on-primary transition-opacity" href="#">Activity</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="font-label-md text-label-md text-on-primary/90 hover:text-on-primary px-4 py-2 rounded transition-colors">Sign Out</button>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs">
+                JD
+            </div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-gutter py-xl">
+<!-- Breadcrumb & Header Section -->
+<div class="mb-lg">
+<nav class="flex items-center gap-2 mb-sm text-secondary">
+<span class="font-label-md text-label-md">Companies</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="font-label-md text-label-md text-primary font-bold">Acme Corp</span>
+</nav>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-lg">
+<div class="flex items-center gap-4">
+<h1 class="font-headline-lg text-headline-lg text-on-background">Acme Corp</h1>
+<div class="flex gap-2">
+<span class="px-3 py-1 rounded-full bg-tertiary-container/10 text-tertiary-container font-label-md text-[11px] uppercase tracking-wider font-bold border border-tertiary-container/20">Pro</span>
+<span class="px-3 py-1 rounded-full bg-primary-container/10 text-primary-container font-label-md text-[11px] uppercase tracking-wider font-bold border border-primary-container/20">Active</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<button class="h-11 px-6 border border-outline text-secondary font-label-md text-label-md rounded-lg hover:bg-surface-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined">switch_account</span>
+                        Impersonate Admin
+                    </button>
+<button class="h-11 px-6 border border-error text-error font-label-md text-label-md rounded-lg hover:bg-error/5 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined">block</span>
+                        Suspend Account
+                    </button>
+</div>
+</div>
+</div>
+<!-- Stat Cards Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md mb-xl">
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<p class="font-label-md text-label-md text-secondary mb-xs">Total Employees</p>
+<p class="font-headline-lg text-headline-lg text-on-background">850</p>
+<div class="mt-md h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[75%]"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<p class="font-label-md text-label-md text-secondary mb-xs">Active Campaigns</p>
+<p class="font-headline-lg text-headline-lg text-on-background">3</p>
+<div class="mt-md h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-tertiary-container w-[40%]"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<p class="font-label-md text-label-md text-secondary mb-xs">Redeemed Gifts</p>
+<p class="font-headline-lg text-headline-lg text-on-background">1,240</p>
+<div class="mt-md h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-[92%]"></div>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<p class="font-label-md text-label-md text-secondary mb-xs">Monthly Revenue</p>
+<p class="font-headline-lg text-headline-lg text-on-background">$299</p>
+<div class="mt-md h-1 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-[100%]"></div>
+</div>
+</div>
+</div>
+<!-- Two-Column Content Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<!-- Left Column: Info & Campaigns -->
+<div class="lg:col-span-2 space-y-lg">
+<!-- Company Info Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="p-lg border-b border-outline-variant flex items-center justify-between">
+<h2 class="font-title-md text-title-md">Company Details</h2>
+<button class="text-primary font-label-md text-label-md hover:underline">Edit Info</button>
+</div>
+<div class="p-lg grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div>
+<label class="font-label-md text-label-md text-secondary block mb-xs">Legal Entity Name</label>
+<p class="font-body-lg text-body-lg">Acme Corporation North America</p>
+</div>
+<div>
+<label class="font-label-md text-label-md text-secondary block mb-xs">Primary Contact</label>
+<p class="font-body-lg text-body-lg">Sarah Jenkins (Admin)</p>
+</div>
+<div>
+<label class="font-label-md text-label-md text-secondary block mb-xs">Billing Email</label>
+<p class="font-body-lg text-body-lg text-primary underline">billing@acmecorp.com</p>
+</div>
+<div>
+<label class="font-label-md text-label-md text-secondary block mb-xs">Subscription Tier</label>
+<p class="font-body-lg text-body-lg">Enterprise Yearly (Renewing Oct 2024)</p>
+</div>
+</div>
+</div>
+<!-- Campaigns Table -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="p-lg border-b border-outline-variant">
+<h2 class="font-title-md text-title-md">Active Campaigns</h2>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left zebra-table">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="px-lg py-md font-label-md text-label-md text-secondary">CAMPAIGN NAME</th>
+<th class="px-lg py-md font-label-md text-label-md text-secondary">STATUS</th>
+<th class="px-lg py-md font-label-md text-label-md text-secondary">BUDGET</th>
+<th class="px-lg py-md font-label-md text-label-md text-secondary text-right">ACTION</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md">
+<tr class="border-b border-outline-variant/30">
+<td class="px-lg py-md font-bold">Q3 Summer Employee Perks</td>
+<td class="px-lg py-md">
+<span class="px-2 py-0.5 rounded-full bg-primary-container/10 text-primary-container text-[11px] font-bold">ONGOING</span>
+</td>
+<td class="px-lg py-md font-mono-data">$12,000.00</td>
+<td class="px-lg py-md text-right">
+<button class="text-secondary hover:text-primary"><span class="material-symbols-outlined">visibility</span></button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/30">
+<td class="px-lg py-md font-bold">Annual Anniversary Gift</td>
+<td class="px-lg py-md">
+<span class="px-2 py-0.5 rounded-full bg-primary-container/10 text-primary-container text-[11px] font-bold">RECURRING</span>
+</td>
+<td class="px-lg py-md font-mono-data">$5,400.00</td>
+<td class="px-lg py-md text-right">
+<button class="text-secondary hover:text-primary"><span class="material-symbols-outlined">visibility</span></button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/30">
+<td class="px-lg py-md font-bold">New Hire Welcome Kit</td>
+<td class="px-lg py-md">
+<span class="px-2 py-0.5 rounded-full bg-primary-container/10 text-primary-container text-[11px] font-bold">ONGOING</span>
+</td>
+<td class="px-lg py-md font-mono-data">$2,250.00</td>
+<td class="px-lg py-md text-right">
+<button class="text-secondary hover:text-primary"><span class="material-symbols-outlined">visibility</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-md text-center bg-surface-container-low/50">
+<button class="text-primary font-label-md text-label-md hover:underline font-bold">View All 14 Campaigns</button>
+</div>
+</div>
+</div>
+<!-- Right Column: Audit & Danger Zone -->
+<div class="space-y-lg">
+<!-- Audit Log Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+<div class="p-lg border-b border-outline-variant">
+<h2 class="font-title-md text-title-md">Recent Audit Events</h2>
+</div>
+<div class="divide-y divide-outline-variant/30">
+<div class="p-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-start gap-3">
+<div class="p-2 bg-surface-container-highest rounded-lg">
+<span class="material-symbols-outlined text-secondary">history_edu</span>
+</div>
+<div>
+<p class="font-body-md text-on-background font-medium">Subscription upgraded to Pro</p>
+<p class="font-label-md text-secondary mt-0.5">By platform_admin_04 • 2h ago</p>
+</div>
+</div>
+</div>
+<div class="p-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-start gap-3">
+<div class="p-2 bg-surface-container-highest rounded-lg">
+<span class="material-symbols-outlined text-secondary">group</span>
+</div>
+<div>
+<p class="font-body-md text-on-background font-medium">Bulk import: 42 new employees</p>
+<p class="font-label-md text-secondary mt-0.5">By s.jenkins@acmecorp.com • 1d ago</p>
+</div>
+</div>
+</div>
+<div class="p-lg hover:bg-surface-container-low transition-colors">
+<div class="flex items-start gap-3">
+<div class="p-2 bg-surface-container-highest rounded-lg">
+<span class="material-symbols-outlined text-secondary">campaign</span>
+</div>
+<div>
+<p class="font-body-md text-on-background font-medium">Campaign 'Q3 Summer' activated</p>
+<p class="font-label-md text-secondary mt-0.5">By system_automation • 3d ago</p>
+</div>
+</div>
+</div>
+</div>
+<div class="p-md text-center bg-surface-container-low/50">
+<button class="text-primary font-label-md text-label-md hover:underline font-bold">View Full Audit History</button>
+</div>
+</div>
+<!-- Danger Zone Card -->
+<div class="bg-error-container/10 rounded-xl border border-error/20 shadow-sm overflow-hidden">
+<div class="p-lg border-b border-error/20 bg-error/5">
+<h2 class="font-title-md text-title-md text-error flex items-center gap-2">
+<span class="material-symbols-outlined">report_problem</span>
+                            Danger Zone
+                        </h2>
+</div>
+<div class="p-lg">
+<p class="font-body-md text-on-surface-variant mb-lg">
+                            Once you delete a company, there is no going back. Please be certain of this action as it will purge all employee records and active campaigns.
+                        </p>
+<button class="w-full bg-error text-on-error h-11 rounded-lg font-bold font-label-md hover:brightness-110 transition-all shadow-md shadow-error/20 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">delete_forever</span>
+                            Delete Company
+                        </button>
+</div>
+</div>
+<!-- Atmospheric Visual Component -->
+<div class="rounded-xl overflow-hidden relative group cursor-pointer border border-outline-variant">
+<img alt="Logistics background" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A sophisticated macro photograph of high-tech logistic machinery in a clean, modern warehouse. The lighting is bright and industrial with soft emerald green highlights reflecting off metallic surfaces, echoing the primary brand color. The mood is efficient, high-trust, and technologically advanced, with a shallow depth of field that keeps the focus on precision components. Pristine white and cool slate navy tones dominate the palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCLaTveXgX3J1qqKU9ijwLr4Oak-ysIYhnU5WJaanlrgqu_sFpaislX3T89hjZhIDSLLP9bn4aRP2gWI4HwVLlzl_Gx_ZDGKRSeZP41N0YsOL50zWmKWPEN05ThWUtb_C8G0B_V4rD4UhugAL71495-ER4de1S0l-mstTgdaDEurGV4zXJe5hzqhojcR44RPAhmDjRyi9uVKF3GKaP8Qdt8C2y-SCmKdZ3qj_leMcbnxY7tUOUwzepHxbKRdo0A-dWEYvBSwmJ3h7Q"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/80 to-transparent flex flex-col justify-end p-lg">
+<p class="text-on-primary font-bold">Logistics Network</p>
+<p class="text-on-primary/80 text-xs">Local distribution centers status: Optimal</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interaction for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.style.transform = 'scale(0.98)';
+            });
+            btn.addEventListener('mouseup', () => {
+                btn.style.transform = 'scale(1)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+
+        // Simple mock for "Impersonate Admin" interaction
+        const impersonateBtn = document.querySelector('button:contains("Impersonate Admin")');
+        if(impersonateBtn) {
+            impersonateBtn.addEventListener('click', () => {
+                alert('Initializing secure administrative impersonation session...');
+            });
+        }
+    </script>
+</body></html>

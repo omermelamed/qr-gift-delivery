@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GiftFlow - QR Code Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="tokens.css" rel="stylesheet"/>
+
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#eff4ff",
+                    "primary-container": "#10b981",
+                    "on-background": "#0b1c30",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed-dim": "#bcc7de",
+                    "outline-variant": "#bbcabf",
+                    "secondary-fixed": "#d8e3fb",
+                    "on-tertiary-fixed": "#2a1700",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-primary-container": "#00422b",
+                    "on-error": "#ffffff",
+                    "primary-fixed-dim": "#4edea3",
+                    "surface": "#f8f9ff",
+                    "inverse-surface": "#213145",
+                    "surface-bright": "#f8f9ff",
+                    "on-tertiary-container": "#523200",
+                    "on-secondary-fixed-variant": "#3c475a",
+                    "on-secondary-fixed": "#111c2d",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#3c4a42",
+                    "surface-container-high": "#dce9ff",
+                    "surface-tint": "#006c49",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-secondary-container": "#586377",
+                    "tertiary-container": "#e29100",
+                    "surface-container": "#e5eeff",
+                    "primary-fixed": "#6ffbbe",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed": "#002113",
+                    "primary": "#006c49",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "secondary-container": "#d5e0f8",
+                    "error": "#ba1a1a",
+                    "surface-variant": "#d3e4fe",
+                    "surface-dim": "#cbdbf5",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed-variant": "#005236",
+                    "secondary": "#545f73",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#ffddb8",
+                    "inverse-primary": "#4edea3",
+                    "background": "#f8f9ff",
+                    "tertiary": "#855300",
+                    "on-surface": "#0b1c30",
+                    "outline": "#6c7a71"
+            },
+            "borderRadius": {
+                    "DEFAULT": "2px",
+                    "lg": "4px",
+                    "xl": "8px",
+                    "full": "12px"
+            },
+            "spacing": {
+                    "container-max": "1280px",
+                    "sm": "8px",
+                    "xl": "40px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "md": "16px",
+                    "gutter": "24px",
+                    "base": "4px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "title-md": ["Inter"],
+                    "mono-data": ["JetBrains Mono"],
+                    "headline-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .zebra-row:nth-child(even) { background-color: rgba(248, 250, 252, 0.5); }
+        .qr-card { transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease-in-out; }
+        .qr-card:hover { transform: translateY(-2px); box-shadow: 0px 4px 20px rgba(30, 41, 59, 0.05); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- SideNavBar -->
+<aside class="h-screen w-64 fixed left-0 top-0 flex flex-col py-md px-sm bg-surface-container-low border-r border-outline-variant z-50">
+<div class="px-md py-lg mb-lg">
+<span class="font-headline-lg text-headline-lg font-bold text-primary">GiftFlow</span>
+<p class="text-on-surface-variant font-label-md">Admin Console</p>
+</div>
+<nav class="flex-1 space-y-xs">
+<a class="flex items-center px-md py-sm gap-md bg-secondary-container text-on-secondary-container font-bold rounded-lg transition-all duration-150 opacity-90" href="#">
+<span class="material-symbols-outlined">featured_seasonal_and_gifts</span>
+<span>Campaigns</span>
+</a>
+<a class="flex items-center px-md py-sm gap-md text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">groups</span>
+<span>Employees</span>
+</a>
+<a class="flex items-center px-md py-sm gap-md text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span>Audit Log</span>
+</a>
+<a class="flex items-center px-md py-sm gap-md text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span>Settings</span>
+</a>
+<a class="flex items-center px-md py-sm gap-md text-on-surface-variant hover:bg-surface-container-high transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">badge</span>
+<span>Team</span>
+</a>
+</nav>
+<div class="px-md mt-auto pt-lg">
+<button type="button" class="w-full bg-primary text-on-primary py-sm rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all">
+                New Campaign
+            </button>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="flex justify-between items-center h-16 ml-64 px-lg w-[calc(100%-16rem)] sticky top-0 bg-surface border-b border-outline-variant z-40">
+<div class="flex items-center gap-lg">
+<div class="relative">
+<span class="absolute inset-y-0 left-3 flex items-center text-on-surface-variant">
+<span class="material-symbols-outlined">search</span>
+</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all w-64 text-body-md" placeholder="Search QR codes..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button type="button" class="p-sm text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button type="button" class="p-sm text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="w-px h-8 bg-outline-variant mx-xs"></div>
+<div class="flex items-center gap-sm">
+<img alt="Admin User Profile" class="w-8 h-8 rounded-full bg-surface-container-highest" src="https://lh3.googleusercontent.com/aida-public/AB6AXuASYjmFbiQZ30rKvgWwUc-Miw7QJD-6iyNHDx4GFCV89yOYoGKthLgsx-BxsREfdIex_fn8bbfNbQvCM_H57UjDqmktI7NXNcLmykd3VMmpH5RjexnlXinElYHUDNDMBXwjrOPy7Xc43Qo2f1yc6DpIx3941Lx5NrAYial6Wae86ax2jqKZ_3_ju7KPBqE83Nu4z7yRcFhTDeKVoIch0RXN46Vn_ij4n7CctuWBf8ieJhtKtq0FzOS-PMBkPf5-WRLK551ZYQeqC0Q"/>
+<span class="font-title-md text-title-md text-primary">Admin</span>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="ml-64 p-lg min-h-screen">
+<!-- Breadcrumb & Title -->
+<div class="mb-lg">
+<nav class="flex text-on-surface-variant font-label-md mb-xs gap-xs">
+<span>Campaigns</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Holiday Gift 2024</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-primary font-bold">QR Codes</span>
+</nav>
+<div class="flex justify-between items-end">
+<h1 class="font-headline-lg text-headline-lg text-on-background">QR Codes</h1>
+<div class="flex gap-md">
+<button type="button" class="flex items-center gap-sm px-lg h-11 border border-primary text-primary rounded-lg font-bold hover:bg-primary-container/10 transition-colors">
+<span class="material-symbols-outlined">print</span>
+                        Print Sheet
+                    </button>
+<button type="button" class="flex items-center gap-sm px-lg h-11 bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined">download</span>
+                        Download All
+                    </button>
+</div>
+</div>
+</div>
+<!-- Filter Tabs -->
+<div class="flex border-b border-outline-variant mb-lg overflow-x-auto">
+<button type="button" class="px-lg py-md border-b-2 border-primary text-primary font-bold transition-all">All</button>
+<button type="button" class="px-lg py-md text-on-surface-variant hover:text-primary transition-all">Redeemed</button>
+<button type="button" class="px-lg py-md text-on-surface-variant hover:text-primary transition-all">Pending</button>
+</div>
+<!-- Grid Container -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-lg mb-xl">
+<!-- Cards: 7 Redeemed, 3 Pending -->
+<!-- Redeemed Card 1 -->
+<div class="qr-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-md flex items-center justify-center p-sm">
+<div class="absolute inset-0 flex items-center justify-center bg-primary/80 text-on-primary rounded-lg z-10">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<img class="w-full h-full opacity-30 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6TLca7RmAiVOTGYoxRAE6xsERecRXHQMor93pwTm96qjflG5X7pL2tt_eb5UCleerZ75K_iSOSRsfPnOGeXVR4eKLR1Xz1Yf4s1eO-0e-dp2GTvEm6TsGS3rZbd58mfi81T1QX4OB10u3tK6rSXk5m66k2J7WEOpUmEFnFOxRmmq9dWbp1wBunHWAL94Asldvkrst2R2iAB-osEqpyOZMmzAAPjAREJQR57K2dONUSY7-Vq4UoRVXFWfdB7NfZpLHQ8a2yjsU-4s"/>
+</div>
+<div class="w-full">
+<div class="flex justify-between items-start mb-xs">
+<h3 class="font-bold text-on-background">Michael Chen</h3>
+<button type="button" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<span class="inline-block px-sm py-xs bg-primary/10 text-primary font-label-md rounded-full">Redeemed</span>
+</div>
+</div>
+<!-- Redeemed Card 2 -->
+<div class="qr-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-md flex items-center justify-center p-sm">
+<div class="absolute inset-0 flex items-center justify-center bg-primary/80 text-on-primary rounded-lg z-10">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<img class="w-full h-full opacity-30 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDljNWRprAoCZr0ZsctI_ju4LFR3Fb1hzhchP8EzkfQSAWJYjdFJ--TDqDSxeocb-OYZ81DDhaVp8hgr3nZNmKG9aGgOgTZloek3rjC997bmlOLrnkplMS9cqoalbbJmhEpX-MuDwfpUkBb5nQkJ2Xuh88jBRVpSPwaO95YD95ClgnEjMCCcoBWQbSQ1t6jZQtvgFoOPsS7_Nr5IORHeTxBXaw66jJb_U1lAicUZcWoKglGVQ_pW6k-SWhz_CSHxUhh-1rWUzpcTKc"/>
+</div>
+<div class="w-full">
+<div class="flex justify-between items-start mb-xs">
+<h3 class="font-bold text-on-background">Sarah Jenkins</h3>
+<button type="button" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<span class="inline-block px-sm py-xs bg-primary/10 text-primary font-label-md rounded-full">Redeemed</span>
+</div>
+</div>
+<!-- Pending Card 1 -->
+<div class="qr-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-md flex items-center justify-center p-sm">
+<img class="w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoX4qVuiVl5LawUd8UrzgPabeLU8Gwc1yBlRePpa9-rr7WrIjlX8Y1TRAQ9u8P8l2w5YRYv_vZsrcA7CeSnM_pQrlX-0vfT5IekMVT0_66jjToFu7uSiL6P9Z-pSTO1WqzzpEyxnib8Cc2I5mv0olyn47o4oZfFjib1DIpcTNx1flBMwG149Xs0op11zoVDwvL3sfyvfpBUyIuGsXoxIWat2y9O4mma_d-Vx_E_0HgRgfD6lilxPC2Zx68Wrj-5MGTZ85PBuqd0rM"/>
+</div>
+<div class="w-full">
+<div class="flex justify-between items-start mb-xs">
+<h3 class="font-bold text-on-background">David Miller</h3>
+<button type="button" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<span class="inline-block px-sm py-xs bg-surface-container-high text-on-surface-variant font-label-md rounded-full">Pending</span>
+</div>
+</div>
+<!-- Redeemed Card 3 -->
+<div class="qr-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-md flex items-center justify-center p-sm">
+<div class="absolute inset-0 flex items-center justify-center bg-primary/80 text-on-primary rounded-lg z-10">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<img class="w-full h-full opacity-30 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCj1bXrXMoKCuyxoNHeK-gqY5H6Yqz7DUEMktOuLf7XknGtPzwwgJv7CkZdmHLs2mahlA-XKBIPLxTMr8LNkzMIFnFlx5SW0rRlRBT_Q8sx_ezEXnXwBgRT8rZosyyIjw-SIZVIxs3_qIRxQh_uzhCeVm1P-f1Da-E0nKGtWby0K8weIlFid05TaBhA_7LJc4HWcPCyRxilgo3sCH2rUkpm2xHMuQhkJWei08vOL1qabYbY1WHdfF3SeuMj_b3cZDK_tMbyyJs6nPw"/>
+</div>
+<div class="w-full">
+<div class="flex justify-between items-start mb-xs">
+<h3 class="font-bold text-on-background">Elena Rodriguez</h3>
+<button type="button" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<span class="inline-block px-sm py-xs bg-primary/10 text-primary font-label-md rounded-full">Redeemed</span>
+</div>
+</div>
+<!-- Redeemed Card 4 -->
+<div class="qr-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-md flex items-center justify-center p-sm">
+<div class="absolute inset-0 flex items-center justify-center bg-primary/80 text-on-primary rounded-lg z-10">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<img class="w-full h-full opacity-30 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBizBRuwYrG4HR5Yi6n22wSf1NsxQkSJLhpTuxntQ4hbyi2uaYjnPM5gaCUsJtwT5wgJgPwOkcoHjBc0RsI_hH-SEZLdooSh4QLSeJhmUOlAsfDkz4IWG3BqHnbcHBDaHu-b6n8qkL3BW5BMfFtfTxPbQ-a9-VclBf9h6AxtfyYRRkuYkXMvoQdN4qunBR4o8hQgbIuuDFhytLpXDi-GM9hAsSUnT32B8ituhGTzAalVwK0wOchLfu2ptJgZITcl621SHbxl14x3qM"/>
+</div>
+<div class="w-full">
+<div class="flex justify-between items-start mb-xs">
+<h3 class="font-bold text-on-background">Marcus Thorne</h3>
+<button type="button" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<span class="inline-block px-sm py-xs bg-primary/10 text-primary font-label-md rounded-full">Redeemed</span>
+</div>
+</div>
+<!-- Pending Card 2 -->
+<div class="qr-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-md flex items-center justify-center p-sm">
+<img class="w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgd46PHFjBsbRSDF_ATFUKjQ1WwU06N3Il5eA1MwHKDZvXjbPXN1d4LoWlkT3E3hlJNyAyJhA8Cfs2PWDubmuc30rJ8SI-AltDRdsGGhTwEzQ0lmfMn8xJTQZ9EbE-1mZ1O0lXhVMw6e6VuSRqy3FEvA_eRMXK3Ye-gqwwL1fy4Idb1TaqpG5fTHgAJhmYXn1rBtH35ZG4Dk4KZQqhpKuPnzLwxFEn6X4wh6LzDW6pyQysaa6qxhvlpRc6P1q1HOrf4qmjI68rmZk"/>
+</div>
+<div class="w-full">
+<div class="flex justify-between items-start mb-xs">
+<h3 class="font-bold text-on-background">Jessica Wu</h3>
+<button type="button" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<span class="inline-block px-sm py-xs bg-surface-container-high text-on-surface-variant font-label-md rounded-full">Pending</span>
+</div>
+</div>
+<!-- Redeemed Card 5 -->
+<div class="qr-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-md flex items-center justify-center p-sm">
+<div class="absolute inset-0 flex items-center justify-center bg-primary/80 text-on-primary rounded-lg z-10">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<img class="w-full h-full opacity-30 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOVTrH-PlCsENBPIBwbnWTg4-4QQ8aRfKCJMcjtHPWfRuQuK5y7VBp1InFOYnZu65P4jYGSYfgTerGqpVtnK-8OyLhsPRiatcLyA4dQIf9j2Zstdb5ktl3FinEmK7ND1iCDJk9kOCs5ug3IfOmsT0nwlqBQxQM_PZi3pkH56dnxAvbWQAcF7MGKzI1CgH4fC9xauO59uRo5F8ZY8nhitgVjsAMllBBm4tiiQICQymva9AOYNuacds0iDhSm3Z8G5tRrpm4fj1UvO0"/>
+</div>
+<div class="w-full">
+<div class="flex justify-between items-start mb-xs">
+<h3 class="font-bold text-on-background">Liam O'Connor</h3>
+<button type="button" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<span class="inline-block px-sm py-xs bg-primary/10 text-primary font-label-md rounded-full">Redeemed</span>
+</div>
+</div>
+<!-- Redeemed Card 6 -->
+<div class="qr-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-md flex items-center justify-center p-sm">
+<div class="absolute inset-0 flex items-center justify-center bg-primary/80 text-on-primary rounded-lg z-10">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<img class="w-full h-full opacity-30 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHlpUqelMZhyP29fB15SckDVzKn5lPLBh2Lfe3Mv7BdWCtzHHSOhyWLw9Zogrg5BXaXYuh-dLBeD1TrUFNWRhosGC3mXf4fAaaiKeOL2y0uaPFkrlOOt-UApKXCGPKtfkos_ROztS5ZgfnsW8mpd4s_K65SXElom9V73T0u6cg2T4Yp9Y5Qw9E2OndLYe5s7uaOoWz9Pz7FivnJK484HVdANuTe-umnFjZlJiUwM_RaF9y7S7vsN7X6gYjBxTaBFRMu9SiF9sLVJQ"/>
+</div>
+<div class="w-full">
+<div class="flex justify-between items-start mb-xs">
+<h3 class="font-bold text-on-background">Sophia Garcia</h3>
+<button type="button" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<span class="inline-block px-sm py-xs bg-primary/10 text-primary font-label-md rounded-full">Redeemed</span>
+</div>
+</div>
+<!-- Pending Card 3 -->
+<div class="qr-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-md flex items-center justify-center p-sm">
+<img class="w-full h-full" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD891gwG8DJazKUX_rQsMamfvk2omrT5dWiKPZpFnMxrpoqb82P8nOV1Re03xUVWF2eUIP4_ZA7E4AW1MTBZxi4y_fAI0EK6mSm8fniVFv23mcpWaK9BuHexAZ5HzIPHGlx_feS8C8q0rOLINKbPfsqC6RcToHNKuvgQeDmZXiebw851t1VJoZQPl1spYpBqUABpcGhmcXbmFieHWn1r6mYAiGMPqsgMwoSa_ebWKEoQeiSpy0eOvcb8dy9FTskgEYm7jVyo_BcYME"/>
+</div>
+<div class="w-full">
+<div class="flex justify-between items-start mb-xs">
+<h3 class="font-bold text-on-background">Tyler Brown</h3>
+<button type="button" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<span class="inline-block px-sm py-xs bg-surface-container-high text-on-surface-variant font-label-md rounded-full">Pending</span>
+</div>
+</div>
+<!-- Redeemed Card 7 -->
+<div class="qr-card bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex flex-col items-center">
+<div class="relative w-full aspect-square bg-surface-container-low rounded-lg mb-md flex items-center justify-center p-sm">
+<div class="absolute inset-0 flex items-center justify-center bg-primary/80 text-on-primary rounded-lg z-10">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<img class="w-full h-full opacity-30 grayscale" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTzsv6krhzhI3J2NtcUjBks57HtcViOjhkIBUuAlUuPPM-REPadhy2zcAsZRHHL3U3tPcf-l_ysYmAtJVBb4neyLWVSgvh4PZ_clfVL5N65nICxrsWuzo_WwfCny325js3VVFxaYmatwhv_siMICgKBoUa4P44EUpqT99sNdYtqckzdBElSA0roX_LGDlDrFBBJaXGY7xv59sDPDDoNXgRJh0lkBgGG_dmiG94t10zwjlqkf8rkSuA0Obke_X23kPlfVN4mQozxz4"/>
+</div>
+<div class="w-full">
+<div class="flex justify-between items-start mb-xs">
+<h3 class="font-bold text-on-background">Amara Kalu</h3>
+<button type="button" class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">download</span>
+</button>
+</div>
+<span class="inline-block px-sm py-xs bg-primary/10 text-primary font-label-md rounded-full">Redeemed</span>
+</div>
+</div>
+</div>
+<!-- Pagination -->
+<div class="flex justify-between items-center py-lg border-t border-outline-variant">
+<span class="text-on-surface-variant font-label-md">Showing 10 of 150</span>
+<div class="flex items-center gap-md">
+<button type="button" class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded-lg hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<div class="flex items-center gap-xs">
+<button type="button" class="w-10 h-10 bg-primary text-on-primary font-bold rounded-lg transition-all">1</button>
+<button type="button" class="w-10 h-10 hover:bg-surface-container-high text-on-surface-variant rounded-lg transition-all">2</button>
+<button type="button" class="w-10 h-10 hover:bg-surface-container-high text-on-surface-variant rounded-lg transition-all">3</button>
+<span class="px-xs">...</span>
+<button type="button" class="w-10 h-10 hover:bg-surface-container-high text-on-surface-variant rounded-lg transition-all">15</button>
+</div>
+<button type="button" class="w-10 h-10 flex items-center justify-center border border-outline-variant rounded-lg hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+<script>
+        // Micro-interactions
+        document.querySelectorAll('.qr-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                // Potential ripple or hover effect
+            });
+        });
+
+        // Tabs Toggle Logic (Simple Visual Mock)
+        const tabs = document.querySelectorAll('.flex.border-b.border-outline-variant button');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => {
+                    t.classList.remove('border-b-2', 'border-primary', 'text-primary', 'font-bold');
+                    t.classList.add('text-on-surface-variant');
+                });
+                tab.classList.add('border-b-2', 'border-primary', 'text-primary', 'font-bold');
+                tab.classList.remove('text-on-surface-variant');
+            });
+        });
+    </script>
+
+<script>
+    (function initAnimations() {
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+            });
+        }, { threshold: 0.05 });
+        document.querySelectorAll('.enter, .enter-img').forEach(el => io.observe(el));
+    })();
+</script>
+</body></html>
