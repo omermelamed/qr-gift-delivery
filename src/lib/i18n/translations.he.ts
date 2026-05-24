@@ -348,7 +348,9 @@ export const he: Record<string, string> = {
   'employees redeemed': 'עובדים מומשו',
 
   // CampaignPopulator / ResendModal dynamic
+  'employee': 'עובד',
   'employees': 'עובדים',
+  'employees imported': 'עובדים יובאו',
   "who haven't claimed their gift yet.": "שטרם קיבלו את מתנתם.",
   'Will resend to': 'ישלח מחדש ל-',
   'in': 'ב',
@@ -368,4 +370,28 @@ export const he: Record<string, string> = {
   // QR-only (no phone) employees
   'QR only': 'QR בלבד',
   'All directory employees are already in this campaign.': 'כל העובדים בספרייה כבר נמצאים בקמפיין זה.',
+
+  // SettingsForm
+  'Logo': 'לוגו',
+  'Brand color': 'צבע מותג',
+  'SMS template': 'תבנית SMS',
+  'Use': 'השתמש ב-',
+  'for the employee\'s name and': 'לשם העובד וב-',
+  'for their QR code link (required).': 'לקישור קוד ה-QR שלהם (חובה).',
+  'chars': 'תווים',
+  'will send as multiple SMS segments': 'יישלח כמספר הודעות SMS',
+
+  // Audit Log
+  'Last 50 actions in your company': '50 הפעולות האחרונות בחברה שלך',
+  'No activity yet.': 'אין פעילות עדיין.',
+  'Time': 'זמן',
+  'Who': 'מי',
+  'Action': 'פעולה',
+  'Created campaign': 'יצר קמפיין',
+  'Launched campaign': 'השיק קמפיין',
+  'Closed campaign': 'סגר קמפיין',
+  'Deleted campaign': 'מחק קמפיין',
+  'Duplicated campaign': 'שכפל קמפיין',
+  'Sent reminder': 'שלח תזכורת',
+  'Redeemed gift': 'מימש מתנה',
 }

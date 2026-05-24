@@ -75,7 +75,7 @@ function EmployeeQrModal({
         />
 
         {target.phone_number && (
-          <p className="text-sm text-zinc-400 font-mono">
+          <p className="text-sm text-zinc-400 font-mono" dir="ltr">
             {maskPhone(target.phone_number)}
           </p>
         )}
@@ -284,7 +284,7 @@ export function EmployeeTable({
                         className={`border-b border-zinc-50 transition-colors duration-500 ${row.redeemed ? 'bg-green-50' : 'hover:bg-zinc-50'}`}
                       >
                         <td className="px-3 py-2.5 font-medium text-zinc-800">{row.employee_name}</td>
-                        <td className="px-3 py-2.5 font-mono text-xs text-zinc-500">{row.phone_number ? maskPhone(row.phone_number) : <span className="text-zinc-300">—</span>}</td>
+                        <td className="px-3 py-2.5 font-mono text-xs text-zinc-500" dir="ltr">{row.phone_number ? maskPhone(row.phone_number) : <span className="text-zinc-300">—</span>}</td>
                         <td className="px-3 py-2.5 text-zinc-500">{row.department ?? <span className="text-zinc-300">—</span>}</td>
                         {showGiftCol && (
                           <td className="px-3 py-2.5">

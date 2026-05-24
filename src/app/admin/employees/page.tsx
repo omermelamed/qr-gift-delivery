@@ -85,7 +85,7 @@ export default function EmployeesPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900">{t('Employee Directory')}</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">{employees.length} employee{employees.length !== 1 ? 's' : ''}</p>
+          <p className="text-sm text-zinc-500 mt-0.5">{employees.length} {employees.length !== 1 ? t('employees') : t('employee')}</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setShowImport(true)} className="border border-zinc-200 rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors">
@@ -152,7 +152,7 @@ export default function EmployeesPage() {
                   ) : (
                     <>
                       <td className="px-5 py-3 font-medium text-zinc-900">{e.employee_name}</td>
-                      <td className="px-5 py-3 font-mono text-xs text-zinc-500">
+                      <td className="px-5 py-3 font-mono text-xs text-zinc-500" dir="ltr">
                         {e.phone
                           ? maskPhone(e.phone)
                           : <button onClick={() => startEdit(e)} className="text-xs text-amber-500 hover:text-amber-600 font-medium">{t('+ Add phone')}</button>
@@ -207,7 +207,7 @@ export default function EmployeesPage() {
         <ImportDirectoryModal
           onClose={() => setShowImport(false)}
           onImported={(count) => {
-            showToast(`${count} employees imported`)
+            showToast(`${count} ${t('employees imported')}`)
             fetch('/api/employees').then((r) => r.json()).then((d) => setEmployees(d.employees ?? []))
           }}
         />

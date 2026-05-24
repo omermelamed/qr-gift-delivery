@@ -84,13 +84,13 @@ export function SettingsForm({ companyId, initialName, initialLogoUrl, initialTe
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-zinc-700">Logo</label>
+          <label className="text-sm font-medium text-zinc-700">{t('Logo')}</label>
           <LogoUploader companyId={companyId} currentUrl={logoUrl} onUploaded={(url) => { setLogoUrl(url); router.refresh() }} />
         </div>
 
         {/* Brand color */}
         <div className="flex flex-col gap-3">
-          <label className="text-sm font-medium text-zinc-700">Brand color</label>
+          <label className="text-sm font-medium text-zinc-700">{t('Brand color')}</label>
           <div className="flex items-center gap-2 flex-wrap">
             {PRESETS.map((p) => (
               <button
@@ -121,10 +121,9 @@ export function SettingsForm({ companyId, initialName, initialLogoUrl, initialTe
 
       {/* SMS template */}
       <div className="p-6 flex flex-col gap-3">
-        <h2 className="font-semibold text-zinc-900">SMS template</h2>
+        <h2 className="font-semibold text-zinc-900">{t('SMS template')}</h2>
         <p className="text-sm text-zinc-500">
-          Use <code className="font-mono bg-zinc-100 px-1 rounded text-xs">{'{name}'}</code> for the employee&apos;s name
-          and <code className="font-mono bg-zinc-100 px-1 rounded text-xs">{'{link}'}</code> for their QR code link (required).
+          {t('Use')} <code className="font-mono bg-zinc-100 px-1 rounded text-xs">{'{name}'}</code> {t('for the employee\'s name and')} <code className="font-mono bg-zinc-100 px-1 rounded text-xs">{'{link}'}</code> {t('for their QR code link (required).')}
         </p>
         <textarea
           value={template}
@@ -141,8 +140,8 @@ export function SettingsForm({ companyId, initialName, initialLogoUrl, initialTe
             <span />
           )}
           <p className={`text-xs ${template.length > MAX_SMS_CHARS ? 'text-amber-600' : 'text-zinc-400'}`}>
-            {template.length} / {MAX_SMS_CHARS} chars
-            {template.length > MAX_SMS_CHARS && ' — will send as multiple SMS segments'}
+            {template.length} / {MAX_SMS_CHARS} {t('chars')}
+            {template.length > MAX_SMS_CHARS && ` — ${t('will send as multiple SMS segments')}`}
           </p>
         </div>
       </div>
