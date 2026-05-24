@@ -119,7 +119,7 @@ export default async function CampaignDetailPage({
           <>
             {/* Draft: Populator (2 cols) + Distributor + GiftOptions (1 col) */}
             <div className="lg:col-span-2">
-              <CampaignPopulator campaignId={campaign.id} />
+              <CampaignPopulator campaignId={campaign.id} existingTokens={allTokens.map((t) => ({ employee_name: t.employee_name, phone_number: t.phone_number }))} />
             </div>
             <div className="flex flex-col gap-4">
               <DistributorAssignment campaignId={campaign.id} />

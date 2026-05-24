@@ -4,13 +4,15 @@ import { useState, useEffect } from 'react'
 import { useT } from '@/lib/i18n/useT'
 
 type Employee = { id: string; employee_name: string; phone: string | null; department: string | null; user_id?: string | null }
+type ExistingToken = { employee_name: string; phone_number: string | null }
 
 type Props = {
   campaignId: string
+  existingTokens?: ExistingToken[]
   onAdded: () => void
 }
 
-export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
+export function DirectoryEmployeePicker({ campaignId, existingTokens = [], onAdded }: Props) {
   const t = useT()
   const [employees, setEmployees] = useState<Employee[]>([])
   const [selected, setSelected] = useState<Set<string>>(new Set())
@@ -23,9 +25,12 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
     fetch('/api/employees').then((r) => r.json()).then((d) => setEmployees(d.employees ?? []))
   }, [])
 
-  const departments = [...new Set(employees.map((e) => e.department).filter(Boolean) as string[])].sort()
+  const existingSet = new Set(existingTokens.map((t) => `${t.employee_name}|${t.phone_number ?? ''}`))
+  const notYetAdded = employees.filter((e) => !existingSet.has(`${e.employee_name}|${e.phone ?? ''}`))
 
-  const filtered = employees.filter((e) => {
+  const departments = [...new Set(notYetAdded.map((e) => e.department).filter(Boolean) as string[])].sort()
+
+  const filtered = notYetAdded.filter((e) => {
     const matchSearch = !search || e.employee_name.toLowerCase().includes(search.toLowerCase())
     const matchDept = !deptFilter || e.department === deptFilter
     return matchSearch && matchDept
@@ -82,6 +87,14 @@ export function DirectoryEmployeePicker({ campaignId, onAdded }: Props) {
       <div className="text-center py-8 text-zinc-400 text-sm">
         {t('Your directory is empty.')}{' '}
         <a href="/admin/employees" className="text-indigo-600 hover:underline">{t('Add employees')}</a> first.
+      </div>
+    )
+  }
+
+  if (notYetAdded.length === 0) {
+    return (
+      <div className="text-center py-8 text-zinc-400 text-sm">
+        {t('All directory employees are already in this campaign.')}
       </div>
     )
   }

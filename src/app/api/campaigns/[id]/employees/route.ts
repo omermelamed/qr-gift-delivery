@@ -59,3 +59,49 @@ export async function POST(
 
   return NextResponse.json({ id: data.id }, { status: 201 })
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id: campaignId } = await params
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const appMeta = user.app_metadata as JwtAppMetadata
+  if (!appMeta?.company_id || !appMeta?.role_id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const permissions = await fetchPermissions(appMeta.role_id)
+  if (!hasPermission(permissions, 'campaigns:create')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  const service = createServiceClient()
+
+  const { data: campaign } = await service
+    .from('campaigns')
+    .select('id, sent_at')
+    .eq('id', campaignId)
+    .eq('company_id', appMeta.company_id)
+    .single()
+
+  if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
+  if (campaign.sent_at) return NextResponse.json({ error: 'Campaign already sent' }, { status: 409 })
+
+  const body = await request.json().catch(() => ({}))
+  const tokenId = String(body.tokenId ?? '').trim()
+  if (!tokenId) return NextResponse.json({ error: 'tokenId required' }, { status: 400 })
+
+  const { error } = await service
+    .from('gift_tokens')
+    .delete()
+    .eq('id', tokenId)
+    .eq('campaign_id', campaignId)
+
+  if (error) return NextResponse.json({ error: 'Failed to remove employee' }, { status: 500 })
+
+  return NextResponse.json({ ok: true })
+}

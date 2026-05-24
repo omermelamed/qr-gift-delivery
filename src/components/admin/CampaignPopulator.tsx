@@ -11,6 +11,7 @@ type Tab = 'upload' | 'directory' | 'clone'
 type ParsedRow = { name: string; phone_number: string; department?: string }
 type ValidatedRow = ParsedRow & { _status: 'valid' | 'invalid'; _reason?: string }
 type CampaignOption = { id: string; name: string; campaign_date: string | null }
+type ExistingToken = { employee_name: string; phone_number: string | null }
 
 function validateRows(raw: ParsedRow[]): ValidatedRow[] {
   return raw.map((row) => {
@@ -20,7 +21,7 @@ function validateRows(raw: ParsedRow[]): ValidatedRow[] {
   })
 }
 
-export function CampaignPopulator({ campaignId }: { campaignId: string }) {
+export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaignId: string; existingTokens?: ExistingToken[] }) {
   const [tab, setTab] = useState<Tab>('upload')
   const [rows, setRows] = useState<ValidatedRow[]>([])
   const [isDragging, setIsDragging] = useState(false)
@@ -174,7 +175,7 @@ export function CampaignPopulator({ campaignId }: { campaignId: string }) {
 
       {/* Directory tab */}
       {tab === 'directory' && (
-        <DirectoryEmployeePicker campaignId={campaignId} onAdded={() => {
+        <DirectoryEmployeePicker campaignId={campaignId} existingTokens={existingTokens} onAdded={() => {
           router.refresh()
           setMessage({ text: t('Employees added from directory'), type: 'success' })
         }} />

@@ -148,6 +148,15 @@ export function EmployeeTable({
     a.click()
   }
 
+  async function handleRemove(tokenId: string) {
+    const res = await fetch(`/api/campaigns/${campaignId}/employees`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tokenId }),
+    })
+    if (res.ok) setRows((prev) => prev.filter((r) => r.id !== tokenId))
+  }
+
   const hasDepts = rows.some((r) => r.department != null)
 
   // Fetch assigned distributors once on mount
@@ -257,7 +266,7 @@ export function EmployeeTable({
                 <th className="px-3 py-2 font-medium">{t('Claimed')}</th>
                 <th className="px-3 py-2 font-medium">{t('Claimed At')}</th>
                 <th className="px-3 py-2 font-medium">{t('Distributor')}</th>
-                {!isDraft && <th className="px-3 py-2 font-medium w-8" />}
+                <th className="px-3 py-2 font-medium w-8" />
               </tr>
             </thead>
             <tbody>
@@ -265,7 +274,7 @@ export function EmployeeTable({
                 ? buildGroupedRows().map((row) =>
                     '_type' in row ? (
                       <tr key={`header-${row.department}`} className="bg-zinc-50">
-                        <td colSpan={showGiftCol ? (isDraft ? 8 : 9) : (isDraft ? 7 : 8)} className="px-3 py-1.5 text-xs font-semibold text-zinc-500">
+                        <td colSpan={showGiftCol ? 9 : 8} className="px-3 py-1.5 text-xs font-semibold text-zinc-500">
                           {row.department} · {row.claimed}/{row.total} claimed
                         </td>
                       </tr>
@@ -311,24 +320,30 @@ export function EmployeeTable({
                             ? distributorNames[row.redeemed_by] ?? row.redeemed_by
                             : <span className="text-zinc-300">—</span>}
                         </td>
-                        {!isDraft && (
-                          <td className="px-3 py-2.5">
+                        <td className="px-3 py-2.5">
+                          {isDraft ? (
+                            <button
+                              onClick={() => handleRemove(row.id)}
+                              className="p-1 rounded text-zinc-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                              aria-label={`Remove ${row.employee_name}`}
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          ) : (
                             <button
                               onClick={() => row.qr_image_url && setEnlarged(row as TokenRow & { qr_image_url: string })}
                               disabled={!row.qr_image_url}
-                              className={`p-1 rounded transition-colors ${
-                                row.qr_image_url
-                                  ? 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100'
-                                  : 'text-zinc-200 cursor-not-allowed'
-                              }`}
+                              className={`p-1 rounded transition-colors ${row.qr_image_url ? 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100' : 'text-zinc-200 cursor-not-allowed'}`}
                               aria-label={row.qr_image_url ? `View QR for ${row.employee_name}` : 'QR generating'}
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                               </svg>
                             </button>
-                          </td>
-                        )}
+                          )}
+                        </td>
                       </tr>
                     )
                   )
@@ -374,29 +389,35 @@ export function EmployeeTable({
                           ? distributorNames[r.redeemed_by] ?? r.redeemed_by
                           : <span className="text-zinc-300">—</span>}
                       </td>
-                      {!isDraft && (
-                        <td className="px-3 py-2.5">
+                      <td className="px-3 py-2.5">
+                        {isDraft ? (
+                          <button
+                            onClick={() => handleRemove(r.id)}
+                            className="p-1 rounded text-zinc-300 hover:text-red-500 hover:bg-red-50 transition-colors"
+                            aria-label={`Remove ${r.employee_name}`}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        ) : (
                           <button
                             onClick={() => r.qr_image_url && setEnlarged(r as TokenRow & { qr_image_url: string })}
                             disabled={!r.qr_image_url}
-                            className={`p-1 rounded transition-colors ${
-                              r.qr_image_url
-                                ? 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100'
-                                : 'text-zinc-200 cursor-not-allowed'
-                            }`}
+                            className={`p-1 rounded transition-colors ${r.qr_image_url ? 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100' : 'text-zinc-200 cursor-not-allowed'}`}
                             aria-label={r.qr_image_url ? `View QR for ${r.employee_name}` : 'QR generating'}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
                             </svg>
                           </button>
-                        </td>
-                      )}
+                        )}
+                      </td>
                     </tr>
                   ))}
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={showGiftCol ? (isDraft ? 8 : 9) : (isDraft ? 7 : 8)} className="px-3 py-12 text-center text-zinc-400 text-sm">
+                  <td colSpan={showGiftCol ? 9 : 8} className="px-3 py-12 text-center text-zinc-400 text-sm">
                     {t('No employees yet. Upload a CSV or add one manually.')}
                   </td>
                 </tr>

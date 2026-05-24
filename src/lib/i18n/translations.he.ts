@@ -367,4 +367,5 @@ export const he: Record<string, string> = {
 
   // QR-only (no phone) employees
   'QR only': 'QR בלבד',
+  'All directory employees are already in this campaign.': 'כל העובדים בספרייה כבר נמצאים בקמפיין זה.',
 }
