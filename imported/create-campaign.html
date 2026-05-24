@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GiftFlow - Campaign Creation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=JetBrains+Mono&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface-variant": "#3c4a42",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed-dim": "#bcc7de",
+                    "surface-container-lowest": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "on-secondary-container": "#586377",
+                    "inverse-surface": "#213145",
+                    "inverse-primary": "#4edea3",
+                    "on-background": "#0b1c30",
+                    "surface-container-high": "#dce9ff",
+                    "surface-container": "#e5eeff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "tertiary-fixed": "#ffddb8",
+                    "secondary": "#545f73",
+                    "surface-container-highest": "#d3e4fe",
+                    "outline-variant": "#bbcabf",
+                    "outline": "#6c7a71",
+                    "secondary-fixed": "#d8e3fb",
+                    "surface": "#f8f9ff",
+                    "on-surface": "#0b1c30",
+                    "on-primary-fixed": "#002113",
+                    "tertiary": "#855300",
+                    "primary-fixed-dim": "#4edea3",
+                    "on-secondary-fixed": "#111c2d",
+                    "on-primary-container": "#00422b",
+                    "secondary-container": "#d5e0f8",
+                    "on-tertiary-fixed": "#2a1700",
+                    "background": "#f8f9ff",
+                    "surface-tint": "#006c49",
+                    "on-secondary-fixed-variant": "#3c475a",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#523200",
+                    "primary-fixed": "#6ffbbe",
+                    "primary-container": "#10b981",
+                    "tertiary-container": "#e29100",
+                    "surface-bright": "#f8f9ff",
+                    "on-tertiary": "#ffffff",
+                    "surface-variant": "#d3e4fe",
+                    "primary": "#006c49",
+                    "surface-dim": "#cbdbf5",
+                    "error": "#ba1a1a",
+                    "surface-container-low": "#eff4ff",
+                    "on-error": "#ffffff",
+                    "on-primary-fixed-variant": "#005236"
+            },
+            "borderRadius": {
+                    "DEFAULT": "2px",
+                    "lg": "4px",
+                    "xl": "8px",
+                    "full": "12px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "gutter": "24px",
+                    "lg": "24px",
+                    "base": "4px",
+                    "container-max": "1280px",
+                    "xl": "40px",
+                    "md": "16px",
+                    "xs": "4px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "title-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "mono-data": ["JetBrains Mono"],
+                    "label-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "mono-data": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .step-transition { transition: all 0.3s ease-in-out; }
+        .executive-shadow { box-shadow: 0px 4px 20px rgba(30, 41, 59, 0.05); }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen">
+<!-- Top Navigation Anchor -->
+<header class="flex justify-between items-center w-full px-gutter h-16 sticky top-0 z-40 bg-surface-bright border-b border-outline-variant">
+<div class="flex items-center gap-md">
+<span class="text-title-md font-title-md font-extrabold text-primary">GiftFlow</span>
+<div class="h-6 w-[1px] bg-outline-variant mx-sm"></div>
+<span class="text-label-md font-label-md text-on-surface-variant">Campaign Creation Flow</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="flex items-center justify-center p-sm rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<button class="flex items-center justify-center p-sm rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-bold text-label-md">
+                JD
+            </div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-gutter py-xl">
+<div class="grid grid-cols-12 gap-lg">
+<!-- Sidebar Progress (Steppers) -->
+<aside class="col-span-12 md:col-span-3 space-y-md">
+<div class="p-lg bg-surface border border-outline-variant rounded-lg executive-shadow">
+<h3 class="text-label-md font-label-md text-on-surface-variant uppercase tracking-wider mb-lg">Setup Progress</h3>
+<nav class="flex flex-col gap-md">
+<!-- Step 1 Indicator -->
+<div class="flex items-center gap-md text-primary font-bold" id="step-nav-1">
+<div class="w-8 h-8 rounded-full border-2 border-primary flex items-center justify-center text-label-md">1</div>
+<span class="text-body-md font-title-md">Campaign Details</span>
+</div>
+<div class="ml-4 h-6 border-l-2 border-outline-variant"></div>
+<!-- Step 2 Indicator -->
+<div class="flex items-center gap-md text-on-surface-variant" id="step-nav-2">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant flex items-center justify-center text-label-md">2</div>
+<span class="text-body-md">Employee Selection</span>
+</div>
+<div class="ml-4 h-6 border-l-2 border-outline-variant"></div>
+<!-- Step 3 Indicator -->
+<div class="flex items-center gap-md text-on-surface-variant" id="step-nav-3">
+<div class="w-8 h-8 rounded-full border-2 border-outline-variant flex items-center justify-center text-label-md">3</div>
+<span class="text-body-md">Gift Configuration</span>
+</div>
+</nav>
+</div>
+<div class="p-lg bg-surface-container-low border border-outline-variant rounded-lg">
+<p class="text-label-md text-on-surface-variant">Draft saved at 10:42 AM</p>
+</div>
+</aside>
+<!-- Main Form Canvas -->
+<div class="col-span-12 md:col-span-9">
+<div class="bg-surface border border-outline-variant rounded-lg executive-shadow overflow-hidden min-h-[600px] flex flex-col">
+<!-- Form Content Area -->
+<div class="flex-grow p-xl">
+<!-- Step 1: Campaign Details -->
+<section class="step-transition" id="step-1-content">
+<h1 class="text-headline-lg font-headline-lg text-on-surface mb-sm">Campaign Details</h1>
+<p class="text-body-lg text-on-surface-variant mb-xl">Define the core identity and schedule for your corporate gift initiative.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="space-y-xs">
+<label class="text-label-md font-label-md text-on-surface">Campaign Name</label>
+<input class="w-full h-11 px-md border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" type="text" value="Winter Wellness 2024"/>
+</div>
+<div class="space-y-xs">
+<label class="text-label-md font-label-md text-on-surface">Distribution Date</label>
+<div class="relative">
+<input class="w-full h-11 px-md pr-xl border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" type="text" value="Dec 15, 2024"/>
+<span class="material-symbols-outlined absolute right-md top-1/2 -translate-y-1/2 text-on-surface-variant">calendar_today</span>
+</div>
+</div>
+<div class="col-span-full space-y-xs">
+<label class="text-label-md font-label-md text-on-surface">Description (Internal)</label>
+<textarea class="w-full p-md border border-outline rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="Enter campaign objectives or internal notes..." rows="4"></textarea>
+</div>
+</div>
+</section>
+<!-- Step 2: Employee Selection (Hidden by default) -->
+<section class="hidden step-transition" id="step-2-content">
+<h1 class="text-headline-lg font-headline-lg text-on-surface mb-sm">Employee Selection</h1>
+<p class="text-body-lg text-on-surface-variant mb-xl">Select which employees are eligible for this campaign.</p>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- CSV Upload -->
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center text-on-primary-container mb-md">
+<span class="material-symbols-outlined">upload_file</span>
+</div>
+<h3 class="text-title-md font-title-md text-on-surface">Upload CSV</h3>
+<p class="text-body-md text-on-surface-variant text-center mt-xs">Drag and drop your employee list here</p>
+</div>
+<!-- Directory Select -->
+<div class="border border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center bg-surface-container-lowest hover:bg-surface-container-low transition-colors cursor-pointer group">
+<div class="w-12 h-12 bg-secondary-container rounded-full flex items-center justify-center text-on-secondary-container mb-md group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined">group</span>
+</div>
+<h3 class="text-title-md font-title-md text-on-surface">Select from Directory</h3>
+<p class="text-body-md text-on-surface-variant text-center mt-xs">Browse the existing company database</p>
+</div>
+</div>
+<div class="mt-xl p-md bg-surface-container-high rounded-lg flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="text-body-md text-on-surface">You can select multiple departments or filter by seniority once selected.</p>
+</div>
+</section>
+<!-- Step 3: Gift Configuration (Hidden by default) -->
+<section class="hidden step-transition" id="step-3-content">
+<div class="flex justify-between items-end mb-xl">
+<div>
+<h1 class="text-headline-lg font-headline-lg text-on-surface mb-sm">Gift Configuration</h1>
+<p class="text-body-lg text-on-surface-variant">Assign gift options and logistics partners.</p>
+</div>
+<button class="flex items-center gap-sm px-md py-sm bg-secondary text-on-secondary rounded-lg font-label-md hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-[18px]">add</span> Add Option
+                                </button>
+</div>
+<div class="space-y-md">
+<!-- Gift Item 1 -->
+<div class="flex items-center gap-lg p-md border border-outline-variant rounded-lg bg-surface-container-lowest">
+<img alt="Spa Voucher" class="w-20 h-20 object-cover rounded" data-alt="A luxurious, high-end spa gift card resting on a bed of smooth white river stones with a single green orchid. The lighting is soft and clinical, reflecting a modern wellness brand aesthetic. The background is a clean, minimal white space that emphasizes professional corporate gifting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRPUj_pKKK4h6CZC4wzaviRDLYAUuUniD-miiGKy6kYisl3-8xTKMcmaCOIkA508yfodLVtvtATkgfN4Btv1hWxekwTAYjA5TGHty5XyLrovdbwhlFCrWnPSC4YnRiOha0jgTMrObURwH_61bEazsBPoiErxvbWdKQIJ7jTprpNjSGbn-tAwQS6PR6mUi1ym6ncZslS8oRIx96CC7I4LXTnbya33Qzo1mVHEeY7-T3bt2CpXxk3si04dqQ-Wk7GMAD3V-VX0bjMWE"/>
+<div class="flex-grow grid grid-cols-2 gap-md">
+<div>
+<p class="text-label-md text-on-surface-variant uppercase">Gift Name</p>
+<p class="text-title-md text-on-surface font-bold">Spa Voucher</p>
+</div>
+<div>
+<p class="text-label-md text-on-surface-variant uppercase">Distributor</p>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">local_shipping</span>
+<p class="text-body-md">Global Rewards Inc.</p>
+</div>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+<!-- Gift Item 2 -->
+<div class="flex items-center gap-lg p-md border border-outline-variant rounded-lg bg-surface-container-lowest">
+<img alt="Gourmet Basket" class="w-20 h-20 object-cover rounded" data-alt="A sophisticated gourmet food basket packed with premium artisan crackers, olives, and dark chocolate, wrapped in a minimalist navy ribbon. The scene is lit with bright, even studio lighting to convey reliability and premium quality. The setting is a professional workspace, suggesting an executive-level gift." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3RVcOGP9IiV61sXpZ4hJqrJJjSUYcS0mLf7Z9o6jZWbGhvhEhWq_zaovVJlGKmI2ticqtHUx2t2SnfARKTGtjjWN1DOroSf_p7uBMwYmH_dAgUyXjxOeMAEfl02kF4s_gdc_2p6Hp9E_FhMpg9Li87bR8pnTcToXMt_MsNwvpZ6kpiVPBRR0gu0AxJrS4nAZJ-Em9FSz8ZXsTzlrV9Abbwd7cMCCt_VtCFTyinH60IdW0w0B8gab8lTx6f0Q3Ses0gUmnLnTs538"/>
+<div class="flex-grow grid grid-cols-2 gap-md">
+<div>
+<p class="text-label-md text-on-surface-variant uppercase">Gift Name</p>
+<p class="text-title-md text-on-surface font-bold">Gourmet Basket</p>
+</div>
+<div>
+<p class="text-label-md text-on-surface-variant uppercase">Distributor</p>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary text-[18px]">local_shipping</span>
+<p class="text-body-md">Artisan Logistics Ltd.</p>
+</div>
+</div>
+</div>
+<button class="text-on-surface-variant hover:text-error transition-colors">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+<!-- Action Bar -->
+<div class="p-lg bg-surface-container-lowest border-t border-outline-variant flex justify-between items-center">
+<button class="hidden flex items-center gap-sm px-xl py-md text-on-surface-variant font-bold hover:bg-surface-container transition-colors rounded-lg" id="back-btn">
+<span class="material-symbols-outlined">arrow_back</span> Back
+                        </button>
+<div class="flex-grow" id="spacer"></div>
+<div class="flex gap-md">
+<button class="px-xl py-md text-on-surface-variant font-bold hover:bg-surface-container transition-colors rounded-lg">Save Draft</button>
+<button class="flex items-center gap-sm px-xl py-md bg-primary-container text-on-primary-container font-bold hover:opacity-90 active:scale-95 transition-all rounded-lg executive-shadow" id="next-btn">
+                                Next <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        const nextBtn = document.getElementById('next-btn');
+        const backBtn = document.getElementById('back-btn');
+        const spacer = document.getElementById('spacer');
+
+        function updateUI() {
+            // Hide all content
+            for (let i = 1; i <= totalSteps; i++) {
+                document.getElementById(`step-${i}-content`).classList.add('hidden');
+                const nav = document.getElementById(`step-nav-${i}`);
+                nav.classList.remove('text-primary', 'font-bold');
+                nav.classList.add('text-on-surface-variant');
+                nav.querySelector('div').classList.remove('border-primary');
+                nav.querySelector('div').classList.add('border-outline-variant');
+            }
+
+            // Show current step
+            document.getElementById(`step-${currentStep}-content`).classList.remove('hidden');
+            
+            // Highlight current nav
+            const activeNav = document.getElementById(`step-nav-${currentStep}`);
+            activeNav.classList.add('text-primary', 'font-bold');
+            activeNav.classList.remove('text-on-surface-variant');
+            activeNav.querySelector('div').classList.add('border-primary');
+            activeNav.querySelector('div').classList.remove('border-outline-variant');
+
+            // Manage buttons
+            if (currentStep === 1) {
+                backBtn.classList.add('hidden');
+                spacer.classList.remove('hidden');
+            } else {
+                backBtn.classList.remove('hidden');
+                spacer.classList.add('hidden');
+            }
+
+            if (currentStep === totalSteps) {
+                nextBtn.innerHTML = 'Launch Campaign <span class="material-symbols-outlined">rocket_launch</span>';
+                nextBtn.classList.remove('bg-primary-container');
+                nextBtn.classList.add('bg-primary', 'text-on-primary');
+            } else {
+                nextBtn.innerHTML = 'Next <span class="material-symbols-outlined">arrow_forward</span>';
+                nextBtn.classList.add('bg-primary-container');
+                nextBtn.classList.remove('bg-primary', 'text-on-primary');
+            }
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateUI();
+            } else {
+                alert('Campaign "Winter Wellness 2024" has been successfully launched!');
+            }
+        });
+
+        backBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+            }
+        });
+
+        // Add subtle animation for content switching
+        document.querySelectorAll('section').forEach(section => {
+            section.addEventListener('transitionend', () => {
+                section.classList.remove('opacity-0');
+            });
+        });
+    </script>
+</body></html>
