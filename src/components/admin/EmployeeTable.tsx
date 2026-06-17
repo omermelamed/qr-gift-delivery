@@ -107,6 +107,7 @@ export function EmployeeTable({
   const [rows, setRows] = useState(initialRows)
   // Sync rows when the server re-renders via router.refresh() (e.g. after populate)
   useEffect(() => { setRows(initialRows) }, [initialRows])
+  const [search, setSearch] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
   const [enlarged, setEnlarged] = useState<(TokenRow & { qr_image_url: string }) | null>(null)
   const closeQr = useCallback(() => setEnlarged(null), [])
@@ -200,12 +201,23 @@ export function EmployeeTable({
     if (!hasDepts) setGroupByDept(false)
   }, [hasDepts])
 
+  const filteredRows = search.trim()
+    ? rows.filter((r) => {
+        const q = search.toLowerCase()
+        return (
+          r.employee_name.toLowerCase().includes(q) ||
+          (r.phone_number && r.phone_number.includes(q)) ||
+          (r.department && r.department.toLowerCase().includes(q))
+        )
+      })
+    : rows
+
   type GroupHeader = { _type: 'header'; department: string; claimed: number; total: number }
   type TableRow = TokenRow | GroupHeader
 
   function buildGroupedRows(): TableRow[] {
     const groups = new Map<string, TokenRow[]>()
-    for (const row of rows) {
+    for (const row of filteredRows) {
       const key = row.department ?? 'No department'
       if (!groups.has(key)) groups.set(key, [])
       groups.get(key)!.push(row)
@@ -233,6 +245,13 @@ export function EmployeeTable({
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 className="font-semibold text-zinc-900">{t('Employees')} <span className="text-zinc-400 font-normal">({rows.length})</span></h2>
           <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder={t('Search employees…')}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
             <button
               onClick={handleExport}
               className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
@@ -347,7 +366,7 @@ export function EmployeeTable({
                       </tr>
                     )
                   )
-                : rows.map((r) => (
+                : filteredRows.map((r) => (
                     <tr
                       key={r.id}
                       className={`border-b border-zinc-50 transition-colors duration-500 ${r.redeemed ? 'bg-green-50' : 'hover:bg-zinc-50'}`}
@@ -415,10 +434,12 @@ export function EmployeeTable({
                       </td>
                     </tr>
                   ))}
-              {rows.length === 0 && (
+              {filteredRows.length === 0 && (
                 <tr>
                   <td colSpan={showGiftCol ? 9 : 8} className="px-3 py-12 text-center text-zinc-400 text-sm">
-                    {t('No employees yet. Upload a CSV or add one manually.')}
+                    {search.trim()
+                      ? t('No employees match your search.')
+                      : t('No employees yet. Upload a CSV or add one manually.')}
                   </td>
                 </tr>
               )}
