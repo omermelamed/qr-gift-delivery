@@ -45,6 +45,40 @@ export async function PATCH(
 
   if (error || !data) return NextResponse.json({ error: 'Employee not found' }, { status: 404 })
 
+  const { data: emp } = await service
+    .from('employees')
+    .select('employee_name, phone, company_id')
+    .eq('id', id)
+    .single()
+
+  if (emp) {
+    const tokenUpdates: Record<string, string | null> = {}
+    if (updates.employee_name) tokenUpdates.employee_name = updates.employee_name
+    if (updates.phone !== undefined) tokenUpdates.phone_number = updates.phone
+    if (updates.department !== undefined) tokenUpdates.department = updates.department
+
+    if (Object.keys(tokenUpdates).length > 0) {
+      const { data: campaignIds } = await service
+        .from('campaigns')
+        .select('id')
+        .eq('company_id', emp.company_id)
+
+      if (campaignIds && campaignIds.length > 0) {
+        let query = service
+          .from('gift_tokens')
+          .update(tokenUpdates)
+          .in('campaign_id', campaignIds.map((c) => c.id))
+          .eq('employee_name', emp.employee_name)
+
+        if (emp.phone) {
+          query = query.eq('phone_number', emp.phone)
+        }
+
+        await query
+      }
+    }
+  }
+
   return NextResponse.json({ id: data.id })
 }
 
