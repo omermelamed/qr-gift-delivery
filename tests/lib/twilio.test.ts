@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 const mockFetch = vi.fn()
 vi.stubGlobal('fetch', mockFetch)
 
-describe('sendGiftMMS', () => {
+describe('sendGiftSMS', () => {
   beforeEach(() => {
     vi.stubEnv('TWILIO_ACCOUNT_SID', 'ACtest')
     vi.stubEnv('TWILIO_AUTH_TOKEN', 'auth_token')
@@ -20,12 +20,12 @@ describe('sendGiftMMS', () => {
   })
 
   it('calls Twilio API and returns sid', async () => {
-    const { sendGiftMMS } = await import('@/lib/twilio')
-    const result = await sendGiftMMS({
+    const { sendGiftSMS } = await import('@/lib/twilio')
+    const result = await sendGiftSMS({
       to: '+972501234567',
       employeeName: 'Omer',
       holidayName: 'Passover',
-      qrImageUrl: 'https://example.com/qr.png',
+      giftLink: 'https://example.com/gift/abc-123',
     })
     expect(result.sid).toBe('SM_real_123')
     expect(mockFetch).toHaveBeenCalledWith(
@@ -36,12 +36,12 @@ describe('sendGiftMMS', () => {
 
   it('returns mock sid when TWILIO_MOCK is true', async () => {
     vi.stubEnv('TWILIO_MOCK', 'true')
-    const { sendGiftMMS } = await import('@/lib/twilio')
-    const result = await sendGiftMMS({
+    const { sendGiftSMS } = await import('@/lib/twilio')
+    const result = await sendGiftSMS({
       to: '+972501234567',
       employeeName: 'Omer',
       holidayName: 'Passover',
-      qrImageUrl: 'https://example.com/qr.png',
+      giftLink: 'https://example.com/gift/abc-123',
     })
     expect(result.sid).toBe('mock')
     expect(mockFetch).not.toHaveBeenCalled()

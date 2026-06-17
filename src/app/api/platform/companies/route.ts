@@ -6,6 +6,29 @@ function toSlug(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 }
 
+async function assertPlatformAdmin() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+  const meta = user.app_metadata as JwtAppMetadata | undefined
+  if (meta?.role_name !== 'platform_admin') return null
+  return user
+}
+
+export async function GET() {
+  const user = await assertPlatformAdmin()
+  if (!user) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+  const service = createServiceClient()
+  const { data, error } = await service
+    .from('companies')
+    .select('id, name, slug, active, created_at')
+    .order('created_at', { ascending: false })
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json(data)
+}
+
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

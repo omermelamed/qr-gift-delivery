@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
-import { sendGiftMMS } from '@/lib/twilio'
+import { sendGiftSMS } from '@/lib/twilio'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 
@@ -40,7 +40,7 @@ export async function POST(
 
   let query = service
     .from('gift_tokens')
-    .select('id, employee_name, phone_number, qr_image_url')
+    .select('id, token, employee_name, phone_number, qr_image_url')
     .eq('campaign_id', campaignId)
     .eq('redeemed', false)
 
@@ -62,11 +62,11 @@ export async function POST(
     const results = await Promise.allSettled(
       batch.map(async (token) => {
         if (process.env.TWILIO_MOCK !== 'true' && token.phone_number) {
-          await sendGiftMMS({
+          await sendGiftSMS({
             to: token.phone_number,
             employeeName: token.employee_name,
             holidayName: campaign.name,
-            qrImageUrl: token.qr_image_url ?? '',
+            giftLink: `${process.env.NEXT_PUBLIC_APP_URL}/gift/${token.token}`,
           })
         }
         const { error: sentError } = await service

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
-import { sendGiftMMS, isTwilioConfigured } from '@/lib/twilio'
+import { sendGiftSMS, isTwilioConfigured } from '@/lib/twilio'
 import { generateQrBuffer } from '@/lib/qr'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
@@ -100,16 +100,18 @@ export async function POST(
             .eq('id', token.id)
         }
 
+        const giftLink = `${process.env.NEXT_PUBLIC_APP_URL}/gift/${token.token}`
+
         if (smsSending && token.phone_number) {
-          await sendGiftMMS({
+          await sendGiftSMS({
             to: token.phone_number,
             employeeName: token.employee_name,
             holidayName: campaign.name,
-            qrImageUrl,
+            giftLink,
             body: smsTemplate
               ? smsTemplate
                   .replace('{name}', token.employee_name)
-                  .replace('{link}', `${process.env.NEXT_PUBLIC_APP_URL}/verify/${token.token}`)
+                  .replace('{link}', giftLink)
               : undefined,
           })
         }

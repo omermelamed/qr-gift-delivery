@@ -1,12 +1,12 @@
-interface SendGiftMMSOptions {
+interface SendGiftSMSOptions {
   to: string
   employeeName: string
   holidayName: string
-  qrImageUrl: string
+  giftLink: string
   body?: string
 }
 
-interface SendGiftMMSResult {
+interface SendGiftSMSResult {
   sid: string
 }
 
@@ -19,7 +19,7 @@ export function isTwilioConfigured(): boolean {
   )
 }
 
-export async function sendGiftMMS(options: SendGiftMMSOptions): Promise<SendGiftMMSResult> {
+export async function sendGiftSMS(options: SendGiftSMSOptions): Promise<SendGiftSMSResult> {
   if (process.env.TWILIO_MOCK === 'true') {
     return { sid: 'mock' }
   }
@@ -45,8 +45,7 @@ export async function sendGiftMMS(options: SendGiftMMSOptions): Promise<SendGift
       body: new URLSearchParams({
         From: fromNumber,
         To: options.to,
-        MediaUrl: options.qrImageUrl,
-        Body: options.body ?? `Hi ${options.employeeName}! Here's your ${options.holidayName} gift QR code above. Scan it to redeem!`,
+        Body: options.body ?? `Hi ${options.employeeName}! You have a ${options.holidayName} gift waiting for you. Open the link to get your QR code: ${options.giftLink}`,
       }).toString(),
     }
   )
