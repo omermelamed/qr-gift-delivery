@@ -28,6 +28,12 @@ export default async function TeamPage() {
     return companyUserIds.has(u.id) || meta?.company_id === appMeta.company_id
   })
 
+  const userIds = companyUsers.map((u) => u.id)
+  const { data: employeeRows } = userIds.length > 0
+    ? await service.from('employees').select('user_id, phone').in('user_id', userIds).eq('company_id', appMeta.company_id)
+    : { data: [] }
+  const phoneByUserId = new Map((employeeRows ?? []).map((e) => [e.user_id, e.phone]))
+
   const members: Member[] = companyUsers.map((u) => {
     const ucrRow = (ucr ?? []).find((r) => r.user_id === u.id)
     const roleRow = ucrRow?.roles as unknown as { name: string } | null
@@ -39,6 +45,7 @@ export default async function TeamPage() {
       id: u.id,
       email: u.email ?? '',
       name: u.user_metadata?.full_name ?? u.email?.split('@')[0] ?? '—',
+      phone: phoneByUserId.get(u.id) ?? '',
       role_name: roleRow?.name ?? meta?.role_name ?? '—',
       isPending: !u.last_sign_in_at,
       isReinvited,

@@ -9,6 +9,7 @@ export type Member = {
   id: string
   email: string
   name: string
+  phone: string
   role_name: string
   isPending: boolean
   isReinvited: boolean
@@ -50,6 +51,7 @@ export function TeamPageUI({ members }: Props) {
             <thead>
               <tr className="text-start text-xs text-zinc-400 border-b border-zinc-100">
                 <th className="px-5 py-3 font-medium text-start">{t('Member')}</th>
+                <th className="px-5 py-3 font-medium text-start">{t('Phone')}</th>
                 <th className="px-5 py-3 font-medium text-start">{t('Role')}</th>
                 <th className="px-5 py-3 font-medium text-start">{t('Status')}</th>
                 <th className="px-5 py-3 font-medium w-10" />
@@ -61,6 +63,9 @@ export function TeamPageUI({ members }: Props) {
                   <td className="px-5 py-3">
                     <p className="font-medium text-zinc-900">{m.name}</p>
                     <p className="text-xs text-zinc-400">{m.email}</p>
+                  </td>
+                  <td className="px-5 py-3 text-zinc-500 font-mono text-xs" dir="ltr">
+                    {m.phone || <span className="text-zinc-300">—</span>}
                   </td>
                   <td className="px-5 py-3 text-zinc-600">{ROLE_LABELS[m.role_name] ?? m.role_name}</td>
                   <td className="px-5 py-3">
@@ -77,7 +82,8 @@ export function TeamPageUI({ members }: Props) {
                     <div className="flex items-center justify-end gap-2">
                       <EditMemberButton
                         userId={m.id} name={m.name} email={m.email}
-                        roleName={m.role_name} isActive={!m.isDeactivated}
+                        phone={m.phone} roleName={m.role_name}
+                        isActive={!m.isDeactivated}
                         isPending={m.isPending} isSelf={m.isSelf}
                       />
                       {!m.isSelf && <RemoveMemberButton userId={m.id} name={m.name} />}

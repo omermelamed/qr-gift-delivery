@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
+import { normalizePhone } from '@/lib/phone'
 import type { JwtAppMetadata } from '@/types'
 
 const ALLOWED_ROLES = ['company_admin', 'campaign_manager', 'scanner'] as const
@@ -91,6 +92,19 @@ export async function PATCH(
     await service.auth.admin.updateUserById(userId, {
       app_metadata: { company_id: appMeta.company_id, role_id: roleRow.id, role_name: roleName },
     })
+  }
+
+  // Phone — update linked employee record
+  if (typeof body.phone === 'string') {
+    const phone = body.phone.trim() ? normalizePhone(body.phone) : null
+    if (body.phone.trim() && !phone) {
+      return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
+    }
+    await service
+      .from('employees')
+      .update({ phone })
+      .eq('user_id', userId)
+      .eq('company_id', appMeta.company_id)
   }
 
   return NextResponse.json({ success: true })

@@ -14,13 +14,14 @@ type Props = {
   userId: string
   name: string
   email: string
+  phone: string
   roleName: string
   isActive: boolean
   isPending: boolean
   isSelf: boolean
 }
 
-export function EditMemberButton({ userId, name, email, roleName, isActive, isPending, isSelf }: Props) {
+export function EditMemberButton({ userId, name, email, phone, roleName, isActive, isPending, isSelf }: Props) {
   const t = useT()
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -28,13 +29,13 @@ export function EditMemberButton({ userId, name, email, roleName, isActive, isPe
   const [emailAction, setEmailAction] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
   const [error, setError] = useState<string | null>(null)
 
-  const [form, setForm] = useState({ name, email, role_name: roleName, active: isActive })
+  const [form, setForm] = useState({ name, email, phone, role_name: roleName, active: isActive })
 
   function resetAndClose() {
     setOpen(false)
     setError(null)
     setEmailAction('idle')
-    setForm({ name, email, role_name: roleName, active: isActive })
+    setForm({ name, email, phone, role_name: roleName, active: isActive })
   }
 
   async function handleSave() {
@@ -113,6 +114,19 @@ export function EditMemberButton({ userId, name, email, roleName, isActive, isPe
                   value={form.email}
                   onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
                   className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[--brand]"
+                />
+              </div>
+
+              {/* Phone */}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-zinc-700">{t('Phone')}</label>
+                <input
+                  type="tel"
+                  dir="ltr"
+                  placeholder="+972..."
+                  value={form.phone}
+                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                  className="border border-zinc-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[--brand]"
                 />
               </div>
 
