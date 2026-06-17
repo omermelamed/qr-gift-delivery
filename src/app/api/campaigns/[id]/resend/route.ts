@@ -35,6 +35,14 @@ export async function POST(
 
   if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
 
+  const { data: company } = await service
+    .from('companies')
+    .select('sms_template')
+    .eq('id', appMeta.company_id)
+    .single()
+
+  const smsTemplate = company?.sms_template ?? null
+
   const body = await _request.json().catch(() => ({}))
   const tokenIds: string[] | undefined = Array.isArray(body.tokenIds) ? body.tokenIds : undefined
 
@@ -62,11 +70,17 @@ export async function POST(
     const results = await Promise.allSettled(
       batch.map(async (token) => {
         if (process.env.TWILIO_MOCK !== 'true' && token.phone_number) {
+          const giftLink = `${process.env.NEXT_PUBLIC_APP_URL}/gift/${token.token}`
           await sendGiftSMS({
             to: token.phone_number,
             employeeName: token.employee_name,
             holidayName: campaign.name,
-            giftLink: `${process.env.NEXT_PUBLIC_APP_URL}/gift/${token.token}`,
+            giftLink,
+            body: smsTemplate
+              ? smsTemplate
+                  .replace('{name}', token.employee_name)
+                  .replace('{link}', giftLink)
+              : undefined,
           })
         }
         const { error: sentError } = await service
