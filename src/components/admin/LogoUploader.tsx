@@ -1,16 +1,15 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { createClient } from '@/lib/supabase/browser'
 import { useT } from '@/lib/i18n/useT'
 
 type Props = {
-  companyId: string
+  companyId?: string
   currentUrl: string | null
   onUploaded: (url: string) => void
 }
 
-export function LogoUploader({ companyId, currentUrl, onUploaded }: Props) {
+export function LogoUploader({ currentUrl, onUploaded }: Props) {
   const t = useT()
   const [preview, setPreview] = useState<string | null>(currentUrl)
   const [uploading, setUploading] = useState(false)
@@ -24,17 +23,13 @@ export function LogoUploader({ companyId, currentUrl, onUploaded }: Props) {
     setError(null)
     setUploading(true)
     try {
-      const nameParts = file.name.split('.')
-      const ext = nameParts.length > 1 ? nameParts.pop()! : 'png'
-      const path = `${companyId}/logo.${ext}`
-      const supabase = createClient()
-      const { error: uploadError } = await supabase.storage
-        .from('logos')
-        .upload(path, file, { upsert: true, contentType: file.type })
-      if (uploadError) { setError(uploadError.message); return }
-      const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(path)
-      setPreview(publicUrl)
-      onUploaded(publicUrl)
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await fetch('/api/settings/logo', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error ?? 'Upload failed'); return }
+      setPreview(data.url)
+      onUploaded(data.url)
     } finally {
       setUploading(false)
     }
