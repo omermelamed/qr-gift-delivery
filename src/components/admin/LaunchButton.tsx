@@ -20,7 +20,7 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance, schedul
   const router = useRouter()
   const t = useT()
 
-  const isScheduled = !!(scheduledAt && new Date(scheduledAt) > new Date())
+  const hasSchedule = !!scheduledAt
   const isConfirmed = !!scheduledConfirmedAt
   const insufficientCredits = creditBalance < employeeCount
 
@@ -72,30 +72,33 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance, schedul
     </p>
   )
 
-  // State 1: Scheduled + confirmed → show badge + cancel button
-  if (isScheduled && isConfirmed) {
+  // State 1: Confirmed schedule → show badge + cancel (whether time is future or past/sending)
+  if (hasSchedule && isConfirmed) {
     const scheduledDate = new Date(scheduledAt!)
+    const isPast = scheduledDate <= new Date()
     return (
       <>
         {errorBanner}
         <div className="flex items-center gap-2">
-          <span className="bg-amber-50 text-amber-700 border border-amber-200 rounded-lg px-4 py-2.5 text-sm font-medium">
-            {t('Scheduled:')} {scheduledDate.toLocaleString(undefined, { hour12: false })}
+          <span className={`rounded-lg px-4 py-2.5 text-sm font-medium border ${isPast ? 'bg-green-50 text-green-700 border-green-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
+            {isPast ? t('Sending soon…') : `${t('Scheduled:')} ${scheduledDate.toLocaleString(undefined, { hour12: false })}`}
           </span>
-          <button
-            onClick={() => patchCampaign({ cancelConfirmation: true })}
-            disabled={loading}
-            className="border border-zinc-200 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
-          >
-            {loading ? '…' : t('Cancel schedule')}
-          </button>
+          {!isPast && (
+            <button
+              onClick={() => patchCampaign({ cancelConfirmation: true })}
+              disabled={loading}
+              className="border border-zinc-200 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+            >
+              {loading ? '…' : t('Cancel schedule')}
+            </button>
+          )}
         </div>
       </>
     )
   }
 
-  // State 2: Scheduled but not confirmed → show confirm button + cancel
-  if (isScheduled && !isConfirmed) {
+  // State 2: Has schedule but not confirmed → show confirm button + cancel
+  if (hasSchedule && !isConfirmed) {
     const scheduledDate = new Date(scheduledAt!)
     return (
       <>

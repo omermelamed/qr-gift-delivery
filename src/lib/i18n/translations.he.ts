@@ -143,6 +143,7 @@ export const he: Record<string, string> = {
   'Scheduled': 'מתוזמן',
   'Scheduled:': 'מתוזמן:',
   'Confirm Schedule': 'אשר תזמון',
+  'Sending soon…': 'נשלח בקרוב…',
   'Cancel schedule': 'בטל תזמון',
   'Failed to clear schedule': 'ביטול התזמון נכשל',
   'View QR Codes': 'צפה בקודי QR',
