@@ -95,7 +95,9 @@ export default async function CampaignDetailPage({
 
   const gifts = giftsData ?? []
   const claimedCount = allTokens.filter((t) => t.redeemed).length
-  const isDraft = !campaign.sent_at
+  const isConfirmedSchedule = !!campaign.scheduled_confirmed_at && !campaign.sent_at
+  const isDraft = !campaign.sent_at && !isConfirmedSchedule
+  const showActiveLayout = !!campaign.sent_at || isConfirmedSchedule
   const canLaunch = isDraft && allTokens.length > 0
   const canClose = !!campaign.sent_at && !campaign.closed_at
   const unredeemedCount = allTokens.filter((t) => !t.redeemed).length
@@ -120,7 +122,7 @@ export default async function CampaignDetailPage({
             sourceName={campaign.name}
             sourceDate={campaign.campaign_date}
           />
-          {campaign.sent_at && (
+          {showActiveLayout && (
             <Link
               href={`/admin/campaigns/${campaign.id}/qr`}
               className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
@@ -128,7 +130,7 @@ export default async function CampaignDetailPage({
               View QR Codes
             </Link>
           )}
-          {campaign.sent_at && (
+          {showActiveLayout && (
             <a
               href={`/api/campaigns/${campaign.id}/export`}
               download
@@ -141,7 +143,7 @@ export default async function CampaignDetailPage({
             <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} />
           )}
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
-          {canLaunch && (
+          {(canLaunch || isConfirmedSchedule) && (
             <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} creditBalance={creditBalance} scheduledAt={campaign.scheduled_at} scheduledConfirmedAt={campaign.scheduled_confirmed_at} />
           )}
         </div>
@@ -160,7 +162,7 @@ export default async function CampaignDetailPage({
       {/* ── Bento grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
 
-        {isDraft ? (
+        {!showActiveLayout ? (
           <>
             {/* Draft: Populator (2 cols) + Distributor + GiftOptions (1 col) */}
             <div className="lg:col-span-2">
