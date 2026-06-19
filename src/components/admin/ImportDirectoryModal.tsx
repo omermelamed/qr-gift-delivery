@@ -124,9 +124,9 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
               <table className="text-xs w-full border-collapse">
                 <thead>
                   <tr className="bg-zinc-50 text-zinc-500">
-                    <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">{t('Name')}</th>
-                    <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">{t('Phone')}</th>
-                    <th className="border-b border-zinc-100 px-3 py-2 text-left font-medium">{t('Department')}</th>
+                    <th className="border-b border-zinc-100 px-3 py-2 text-start font-medium">{t('Name')}</th>
+                    <th className="border-b border-zinc-100 px-3 py-2 text-start font-medium">{t('Phone')}</th>
+                    <th className="border-b border-zinc-100 px-3 py-2 text-start font-medium">{t('Department')}</th>
                   </tr>
                 </thead>
                 <tbody>

@@ -103,7 +103,7 @@ export function DistributorAssignment({ campaignId }: { campaignId: string }) {
                 <button
                   key={s.id}
                   onClick={() => handleAdd(s)}
-                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-zinc-50 transition-colors"
+                  className="w-full text-start px-3 py-2 rounded-lg hover:bg-zinc-50 transition-colors"
                 >
                   <p className="text-sm font-medium text-zinc-800">{s.name}</p>
                   <p className="text-xs text-zinc-400">{s.email}</p>

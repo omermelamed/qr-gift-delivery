@@ -83,10 +83,10 @@ export default async function CompanyDetailPage({
           ) : (
             <table className="w-full text-sm border-collapse">
               <thead>
-                <tr className="text-left text-xs text-zinc-400 border-b border-zinc-100">
-                  <th className="px-5 py-3 font-medium">Member</th>
-                  <th className="px-5 py-3 font-medium">Role</th>
-                  <th className="px-5 py-3 font-medium">Status</th>
+                <tr className="text-xs text-zinc-400 border-b border-zinc-100">
+                  <th className="px-5 py-3 font-medium text-start">Member</th>
+                  <th className="px-5 py-3 font-medium text-start">Role</th>
+                  <th className="px-5 py-3 font-medium text-start">Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -143,10 +143,10 @@ export default async function CompanyDetailPage({
           ) : (
             <table className="w-full text-sm border-collapse">
               <thead>
-                <tr className="text-left text-xs text-zinc-400 border-b border-zinc-100">
-                  <th className="px-5 py-3 font-medium">Campaign</th>
-                  <th className="px-5 py-3 font-medium">Date</th>
-                  <th className="px-5 py-3 font-medium">Status</th>
+                <tr className="text-xs text-zinc-400 border-b border-zinc-100">
+                  <th className="px-5 py-3 font-medium text-start">Campaign</th>
+                  <th className="px-5 py-3 font-medium text-start">Date</th>
+                  <th className="px-5 py-3 font-medium text-start">Status</th>
                 </tr>
               </thead>
               <tbody>

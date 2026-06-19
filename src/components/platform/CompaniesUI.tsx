@@ -63,12 +63,12 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
         <table className="w-full text-sm table-fixed">
           <thead>
             <tr className="border-b border-zinc-100 bg-zinc-50">
-              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[16%]">Company</th>
-              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[18%]">Admin Email</th>
-              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[8%]">Slug</th>
-              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[10%]">Created</th>
-              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[8%]">Status</th>
-              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[14%]">Credits</th>
+              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[16%]">Company</th>
+              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[18%]">Admin Email</th>
+              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[8%]">Slug</th>
+              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[10%]">Created</th>
+              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[8%]">Status</th>
+              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[14%]">Credits</th>
               <th className="px-5 py-3 w-[26%]" />
             </tr>
           </thead>
@@ -105,7 +105,7 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
                     </button>
                   </div>
                 </td>
-                <td className="px-5 py-4 text-right">
+                <td className="px-5 py-4 text-end">
                   <div className="flex items-center justify-end gap-2">
                     <button
                       onClick={() => handleLogin(company.id)}

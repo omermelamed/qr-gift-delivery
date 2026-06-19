@@ -48,10 +48,10 @@ export function AuditLogPage({ events }: { events: AuditEvent[] }) {
         ) : (
           <table className="w-full text-sm border-collapse">
       <thead>
-        <tr className="text-left text-xs text-zinc-400 border-b border-zinc-100">
-          <th className="px-5 py-3 font-medium">{t('Time')}</th>
-          <th className="px-5 py-3 font-medium">{t('Who')}</th>
-          <th className="px-5 py-3 font-medium">{t('Action')}</th>
+        <tr className="text-xs text-zinc-400 border-b border-zinc-100">
+          <th className="px-5 py-3 font-medium text-start">{t('Time')}</th>
+          <th className="px-5 py-3 font-medium text-start">{t('Who')}</th>
+          <th className="px-5 py-3 font-medium text-start">{t('Action')}</th>
         </tr>
       </thead>
       <tbody>

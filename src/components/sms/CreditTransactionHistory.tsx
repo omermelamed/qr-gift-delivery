@@ -38,10 +38,10 @@ export function CreditTransactionHistory({ transactions }: Props) {
       <table className="w-full">
         <thead>
           <tr className="border-b border-zinc-100">
-            <th className="text-left text-xs font-medium text-zinc-400 uppercase tracking-wide px-5 py-3">{t('Date')}</th>
-            <th className="text-left text-xs font-medium text-zinc-400 uppercase tracking-wide px-5 py-3">{t('Type')}</th>
-            <th className="text-left text-xs font-medium text-zinc-400 uppercase tracking-wide px-5 py-3">{t('Description')}</th>
-            <th className="text-right text-xs font-medium text-zinc-400 uppercase tracking-wide px-5 py-3">{t('Amount')}</th>
+            <th className="text-start text-xs font-medium text-zinc-400 uppercase tracking-wide px-5 py-3">{t('Date')}</th>
+            <th className="text-start text-xs font-medium text-zinc-400 uppercase tracking-wide px-5 py-3">{t('Type')}</th>
+            <th className="text-start text-xs font-medium text-zinc-400 uppercase tracking-wide px-5 py-3">{t('Description')}</th>
+            <th className="text-end text-xs font-medium text-zinc-400 uppercase tracking-wide px-5 py-3">{t('Amount')}</th>
           </tr>
         </thead>
         <tbody>
@@ -67,7 +67,7 @@ export function CreditTransactionHistory({ transactions }: Props) {
                 <td className="px-5 py-3 text-sm text-zinc-600">
                   {tx.description ?? '—'}
                 </td>
-                <td className="px-5 py-3 text-sm font-semibold text-right">
+                <td className="px-5 py-3 text-sm font-semibold text-end">
                   <span className={tx.type === 'use' ? 'text-zinc-600' : tx.type === 'grant' ? 'text-violet-600' : 'text-emerald-600'}>
                     {style.sign}{tx.amount.toLocaleString()}
                   </span>

@@ -276,15 +276,15 @@ export function EmployeeTable({
         <div className="overflow-x-auto">
           <table className="text-sm w-full border-collapse">
             <thead>
-              <tr className="text-left text-xs text-zinc-400 border-b border-zinc-100">
-                <th className="px-3 py-2 font-medium">{t('Name')}</th>
-                <th className="px-3 py-2 font-medium">{t('Phone')}</th>
-                <th className="px-3 py-2 font-medium">{t('Department')}</th>
-                {showGiftCol && <th className="px-3 py-2 font-medium">{t('Gift')}</th>}
-                <th className="px-3 py-2 font-medium">SMS</th>
-                <th className="px-3 py-2 font-medium">{t('Claimed')}</th>
-                <th className="px-3 py-2 font-medium">{t('Claimed At')}</th>
-                <th className="px-3 py-2 font-medium">{t('Distributor')}</th>
+              <tr className="text-xs text-zinc-400 border-b border-zinc-100">
+                <th className="px-3 py-2 font-medium text-start">{t('Name')}</th>
+                <th className="px-3 py-2 font-medium text-start">{t('Phone')}</th>
+                <th className="px-3 py-2 font-medium text-start">{t('Department')}</th>
+                {showGiftCol && <th className="px-3 py-2 font-medium text-start">{t('Gift')}</th>}
+                <th className="px-3 py-2 font-medium text-start">SMS</th>
+                <th className="px-3 py-2 font-medium text-start">{t('Claimed')}</th>
+                <th className="px-3 py-2 font-medium text-start">{t('Claimed At')}</th>
+                <th className="px-3 py-2 font-medium text-start">{t('Distributor')}</th>
                 <th className="px-3 py-2 font-medium w-8" />
               </tr>
             </thead>

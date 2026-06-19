@@ -63,7 +63,7 @@ export function RemoveMemberButton({ userId, name }: Props) {
               <button
                 onClick={() => handleRemove(true)}
                 disabled={loading}
-                className="w-full text-left px-4 py-3 rounded-xl border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+                className="w-full text-start px-4 py-3 rounded-xl border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors disabled:opacity-50"
               >
                 <p className="text-sm font-medium text-zinc-800">{t('Remove from team only')}</p>
                 <p className="text-xs text-zinc-400 mt-0.5">{t('Keep in employee directory (phone, department stay intact)')}</p>
@@ -71,7 +71,7 @@ export function RemoveMemberButton({ userId, name }: Props) {
               <button
                 onClick={() => handleRemove(false)}
                 disabled={loading}
-                className="w-full text-left px-4 py-3 rounded-xl border border-red-100 hover:border-red-200 hover:bg-red-50 transition-colors disabled:opacity-50"
+                className="w-full text-start px-4 py-3 rounded-xl border border-red-100 hover:border-red-200 hover:bg-red-50 transition-colors disabled:opacity-50"
               >
                 <p className="text-sm font-medium text-red-600">{t('Remove completely')}</p>
                 <p className="text-xs text-zinc-400 mt-0.5">{t('Remove from team and delete from employee directory')}</p>

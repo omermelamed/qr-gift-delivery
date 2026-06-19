@@ -117,10 +117,10 @@ export default function EmployeesPage() {
         ) : (
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="text-start text-xs text-zinc-400 border-b border-zinc-100">
-                <th className="px-5 py-3 font-medium">{t('Name')}</th>
-                <th className="px-5 py-3 font-medium">{t('Phone')}</th>
-                <th className="px-5 py-3 font-medium">{t('Department')}</th>
+              <tr className="text-xs text-zinc-400 border-b border-zinc-100">
+                <th className="px-5 py-3 font-medium text-start">{t('Name')}</th>
+                <th className="px-5 py-3 font-medium text-start">{t('Phone')}</th>
+                <th className="px-5 py-3 font-medium text-start">{t('Department')}</th>
                 <th className="px-5 py-3 font-medium w-24" />
               </tr>
             </thead>
