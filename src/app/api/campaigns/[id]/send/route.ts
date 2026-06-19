@@ -42,7 +42,7 @@ export async function POST(
 
   const { data: campaign, error: campaignError } = await service
     .from('campaigns')
-    .select('id, name, company_id, sent_at')
+    .select('id, name, company_id, sent_at, scheduled_at')
     .eq('id', campaignId)
     .eq('company_id', companyId)
     .single()
@@ -53,6 +53,13 @@ export async function POST(
 
   if (campaign.sent_at) {
     return NextResponse.json({ error: 'Campaign already dispatched' }, { status: 409 })
+  }
+
+  if (!isCronCall && campaign.scheduled_at && new Date(campaign.scheduled_at) > new Date()) {
+    return NextResponse.json(
+      { error: `Campaign is scheduled for ${campaign.scheduled_at}. Remove the schedule to launch immediately.` },
+      { status: 409 }
+    )
   }
 
   const { data: company } = await service

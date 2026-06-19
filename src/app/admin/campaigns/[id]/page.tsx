@@ -142,7 +142,7 @@ export default async function CampaignDetailPage({
           )}
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
           {canLaunch && (
-            <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} creditBalance={creditBalance} />
+            <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} creditBalance={creditBalance} scheduledAt={campaign.scheduled_at} />
           )}
         </div>
       </div>

@@ -141,6 +141,8 @@ export const he: Record<string, string> = {
 
   // Admin campaign detail
   'Scheduled:': 'מתוזמן:',
+  'Cancel schedule': 'בטל תזמון',
+  'Failed to clear schedule': 'ביטול התזמון נכשל',
   'View QR Codes': 'צפה בקודי QR',
   'Export CSV': 'ייצא CSV',
 

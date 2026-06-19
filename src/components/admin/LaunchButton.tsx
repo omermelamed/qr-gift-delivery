@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useT } from '@/lib/i18n/useT'
 
-export function LaunchButton({ campaignId, employeeCount, creditBalance }: { campaignId: string; employeeCount: number; creditBalance: number }) {
+export function LaunchButton({ campaignId, employeeCount, creditBalance, scheduledAt }: { campaignId: string; employeeCount: number; creditBalance: number; scheduledAt?: string | null }) {
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const t = useT()
+
+  const isScheduled = !!(scheduledAt && new Date(scheduledAt) > new Date())
 
   async function handleConfirm() {
     setLoading(true)
@@ -30,6 +32,53 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance }: { cam
       setLoading(false)
       setShowModal(false)
     }
+  }
+
+  async function handleClearSchedule() {
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await fetch(`/api/campaigns/${campaignId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scheduledAt: null }),
+      })
+      if (!res.ok) {
+        const data = await res.json()
+        setError(data.error ?? t('Failed to clear schedule'))
+        return
+      }
+      router.refresh()
+    } catch {
+      setError(t('Network error — please try again'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (isScheduled) {
+    const scheduledDate = new Date(scheduledAt!)
+    return (
+      <>
+        {error && (
+          <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-2">
+            {error}
+          </p>
+        )}
+        <div className="flex items-center gap-2">
+          <span className="bg-amber-50 text-amber-700 border border-amber-200 rounded-lg px-4 py-2.5 text-sm font-medium">
+            {t('Scheduled:')} {scheduledDate.toLocaleString(undefined, { hour12: false })}
+          </span>
+          <button
+            onClick={handleClearSchedule}
+            disabled={loading}
+            className="border border-zinc-200 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+          >
+            {loading ? '…' : t('Cancel schedule')}
+          </button>
+        </div>
+      </>
+    )
   }
 
   return (

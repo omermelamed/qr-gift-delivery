@@ -16,8 +16,13 @@ export async function POST(request: NextRequest) {
 
   if (inputRows.length === 0) return NextResponse.json({ error: 'No rows to import' }, { status: 400 })
 
+  const rejected: string[] = []
   const rows = inputRows
-    .filter((r) => r.employee_name?.trim() && normalizePhone(r.phone ?? ''))
+    .filter((r) => {
+      if (!r.employee_name?.trim()) { rejected.push(`"${r.phone ?? ''}" — missing name`); return false }
+      if (!normalizePhone(r.phone ?? '')) { rejected.push(`"${r.employee_name}" — invalid phone "${r.phone ?? ''}"`); return false }
+      return true
+    })
     .map((r) => ({
       company_id: appMeta.company_id,
       employee_name: r.employee_name.trim(),
@@ -25,7 +30,10 @@ export async function POST(request: NextRequest) {
       department: r.department?.trim() || null,
     }))
 
-  if (rows.length === 0) return NextResponse.json({ error: 'No valid rows to import' }, { status: 400 })
+  if (rows.length === 0) {
+    const detail = rejected.length > 0 ? `: ${rejected.slice(0, 5).join('; ')}` : ''
+    return NextResponse.json({ error: `No valid rows to import${detail}` }, { status: 400 })
+  }
 
   const service = createServiceClient()
   const { data, error } = await service
