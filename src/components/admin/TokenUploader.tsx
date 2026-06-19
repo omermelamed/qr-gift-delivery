@@ -4,6 +4,7 @@ import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { read, utils } from 'xlsx'
 import { normalizePhone } from '@/lib/phone'
+import { normalizeCSVRow } from '@/lib/csv'
 import { useT } from '@/lib/i18n/useT'
 
 type ParsedRow = { name: string; phone_number: string; department?: string }
@@ -31,7 +32,8 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
     const buf = await file.arrayBuffer()
     const wb = read(buf)
     const sheet = wb.Sheets[wb.SheetNames[0]]
-    const parsed: ParsedRow[] = utils.sheet_to_json(sheet, { defval: '' })
+    const raw: Record<string, string>[] = utils.sheet_to_json(sheet, { defval: '' })
+    const parsed: ParsedRow[] = raw.map(normalizeCSVRow)
     setRows(validateRows(parsed))
   }
 
@@ -79,9 +81,9 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
     <div className="bg-white rounded-xl border border-zinc-200 p-5">
       <h2 className="font-semibold text-zinc-900 mb-1">{t('Upload employees')}</h2>
       <p className="text-xs text-zinc-400 mb-4">
-        {t('Accepts .csv or .xlsx — columns:')} <code className="font-mono bg-zinc-100 px-1 rounded">name</code>,{' '}
-        <code className="font-mono bg-zinc-100 px-1 rounded">phone_number</code>,{' '}
-        <code className="font-mono bg-zinc-100 px-1 rounded">department</code> ({t('optional')})
+        {t('Accepts .csv or .xlsx — columns:')} <code className="font-mono bg-zinc-100 px-1 rounded">name</code> / <code className="font-mono bg-zinc-100 px-1 rounded">שם</code>,{' '}
+        <code className="font-mono bg-zinc-100 px-1 rounded">phone_number</code> / <code className="font-mono bg-zinc-100 px-1 rounded">טלפון</code>,{' '}
+        <code className="font-mono bg-zinc-100 px-1 rounded">department</code> / <code className="font-mono bg-zinc-100 px-1 rounded">מחלקה</code> ({t('optional')})
       </p>
 
       {/* Drop zone */}

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { read, utils } from 'xlsx'
 import { normalizePhone } from '@/lib/phone'
+import { normalizeCSVRow } from '@/lib/csv'
 import { DirectoryEmployeePicker } from '@/components/admin/DirectoryEmployeePicker'
 import { useT } from '@/lib/i18n/useT'
 
@@ -49,7 +50,8 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
     const buf = await file.arrayBuffer()
     const wb = read(buf)
     const sheet = wb.Sheets[wb.SheetNames[0]]
-    const parsed: ParsedRow[] = utils.sheet_to_json(sheet, { defval: '' })
+    const raw: Record<string, string>[] = utils.sheet_to_json(sheet, { defval: '' })
+    const parsed: ParsedRow[] = raw.map(normalizeCSVRow)
     setRows(validateRows(parsed))
   }
 
@@ -131,9 +133,9 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
       {tab === 'upload' && (
         <>
           <p className="text-xs text-zinc-400 mb-3">
-            {t('Columns:')} <code className="bg-zinc-100 px-1 rounded font-mono">name</code>,{' '}
-            <code className="bg-zinc-100 px-1 rounded font-mono">phone_number</code>,{' '}
-            <code className="bg-zinc-100 px-1 rounded font-mono">department</code> ({t('optional')})
+            {t('Columns:')} <code className="bg-zinc-100 px-1 rounded font-mono">name</code> / <code className="bg-zinc-100 px-1 rounded font-mono">שם</code>,{' '}
+            <code className="bg-zinc-100 px-1 rounded font-mono">phone_number</code> / <code className="bg-zinc-100 px-1 rounded font-mono">טלפון</code>,{' '}
+            <code className="bg-zinc-100 px-1 rounded font-mono">department</code> / <code className="bg-zinc-100 px-1 rounded font-mono">מחלקה</code> ({t('optional')})
           </p>
           <div
             role="button" tabIndex={0}

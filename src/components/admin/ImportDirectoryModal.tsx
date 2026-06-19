@@ -2,13 +2,16 @@
 
 import { useState, useRef } from 'react'
 import { read, utils } from 'xlsx'
+import { normalizeCSVRow } from '@/lib/csv'
 import { useT } from '@/lib/i18n/useT'
+import { useLocale } from '@/lib/i18n/LanguageContext'
 
 type Props = { onClose: () => void; onImported: (count: number) => void }
 type ParsedRow = { employee_name: string; phone: string; department?: string }
 
 export function ImportDirectoryModal({ onClose, onImported }: Props) {
   const t = useT()
+  const { locale } = useLocale()
   const [rows, setRows] = useState<ParsedRow[]>([])
   const [isDragging, setIsDragging] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -21,11 +24,14 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
     const sheet = wb.Sheets[wb.SheetNames[0]]
     const raw: Record<string, string>[] = utils.sheet_to_json(sheet, { defval: '' })
     const parsed: ParsedRow[] = raw
-      .map((r) => ({
-        employee_name: (r.name ?? r.employee_name ?? '').trim(),
-        phone: (r.phone_number ?? r.phone ?? '').trim(),
-        department: (r.department ?? '').trim() || undefined,
-      }))
+      .map((r) => {
+        const normalized = normalizeCSVRow(r)
+        return {
+          employee_name: normalized.name,
+          phone: normalized.phone_number,
+          department: normalized.department,
+        }
+      })
       .filter((r) => r.employee_name && r.phone)
     setRows(parsed)
   }
@@ -64,14 +70,16 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
           className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors mb-4 ${isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-zinc-200 hover:border-indigo-300 hover:bg-zinc-50'}`}
         >
           <p className="text-sm text-zinc-500"><span className="font-medium text-indigo-600">{t('Click to browse')}</span> {t('or drag and drop')}</p>
-          <p className="text-xs text-zinc-400 mt-1">.csv or .xlsx · columns: name, phone_number, department</p>
+          <p className="text-xs text-zinc-400 mt-1">.csv {t('or')} .xlsx · {t('Columns:')} name/שם, phone_number/טלפון, department/מחלקה</p>
           <input ref={inputRef} type="file" accept=".csv,.xlsx,.xls" onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f) }} className="hidden" />
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation()
-              const csv = 'name,phone_number,department\nJane Smith,+1234567890,Engineering\nJohn Doe,+0987654321,Marketing'
-              const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }))
+              const csv = locale === 'he'
+                ? '﻿שם,טלפון,מחלקה\nישראל ישראלי,+972501234567,הנדסה\nדנה כהן,+972509876543,שיווק'
+                : 'name,phone_number,department\nJane Smith,+1234567890,Engineering\nJohn Doe,+0987654321,Marketing'
+              const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
               const a = document.createElement('a')
               a.href = url
               a.download = 'employees_template.csv'
