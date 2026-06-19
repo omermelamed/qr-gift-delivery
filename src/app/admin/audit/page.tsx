@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { AuditLogPage } from './AuditLogTable'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId, isPlatformAdmin } from '@/lib/platform-auth'
 
 export default async function AuditPage() {
   const supabase = await createClient()
@@ -9,14 +10,17 @@ export default async function AuditPage() {
   if (!user) redirect('/login')
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (appMeta.role_name !== 'company_admin') redirect('/admin')
+  if (appMeta.role_name !== 'company_admin' && !isPlatformAdmin(appMeta)) redirect('/admin')
+
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) redirect('/admin')
 
   const service = createServiceClient()
 
   const { data: events } = await service
     .from('audit_events')
     .select('id, action, resource_type, metadata, created_at, actor_id')
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .order('created_at', { ascending: false })
     .limit(50)
 

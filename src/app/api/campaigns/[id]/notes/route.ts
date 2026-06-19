@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 async function getAuthorizedUser(campaignId: string, companyId: string) {
   const service = createServiceClient()
@@ -24,7 +25,9 @@ export async function GET(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  const campaign = await getAuthorizedUser(campaignId, appMeta.company_id)
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const campaign = await getAuthorizedUser(campaignId, companyId)
   if (!campaign) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const service = createServiceClient()
@@ -48,7 +51,9 @@ export async function POST(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  const campaign = await getAuthorizedUser(campaignId, appMeta.company_id)
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const campaign = await getAuthorizedUser(campaignId, companyId)
   if (!campaign) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const body = await request.json().catch(() => ({}))

@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 export async function POST(
   _request: NextRequest,
@@ -15,6 +16,8 @@ export async function POST(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'campaigns:launch')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -26,7 +29,7 @@ export async function POST(
     .from('campaigns')
     .select('id, name, sent_at, closed_at')
     .eq('id', campaignId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
@@ -37,14 +40,14 @@ export async function POST(
     .from('campaigns')
     .update({ closed_at: new Date().toISOString() })
     .eq('id', campaignId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
 
   if (closeError) {
     return NextResponse.json({ error: 'Failed to close campaign' }, { status: 500 })
   }
 
   logAuditEvent({
-    companyId: appMeta.company_id,
+    companyId: companyId,
     actorId: user.id,
     action: 'campaign.closed',
     resourceType: 'campaign',

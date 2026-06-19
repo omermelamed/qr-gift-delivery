@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 export async function PATCH(
   request: NextRequest,
@@ -13,6 +14,8 @@ export async function PATCH(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const service = createServiceClient()
 
   const { data: note } = await service
@@ -24,7 +27,7 @@ export async function PATCH(
   if (!note) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const campaign = note.campaigns as unknown as { company_id: string } | null
-  if (campaign?.company_id !== appMeta.company_id) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (campaign?.company_id !== companyId) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   if (note.author_id !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   if (note.campaign_id !== campaignId) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
@@ -55,6 +58,8 @@ export async function DELETE(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const service = createServiceClient()
 
   const { data: note } = await service
@@ -66,7 +71,7 @@ export async function DELETE(
   if (!note) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const campaign = note.campaigns as unknown as { company_id: string } | null
-  if (campaign?.company_id !== appMeta.company_id) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  if (campaign?.company_id !== companyId) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   if (note.author_id !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   if (note.campaign_id !== campaignId) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 

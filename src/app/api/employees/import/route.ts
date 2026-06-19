@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { normalizePhone } from '@/lib/phone'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient()
@@ -9,7 +10,8 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json().catch(() => ({}))
   const inputRows: Array<{ employee_name: string; phone: string; department?: string }> = Array.isArray(body.rows) ? body.rows : []
@@ -24,7 +26,7 @@ export async function POST(request: NextRequest) {
       return true
     })
     .map((r) => ({
-      company_id: appMeta.company_id,
+      company_id: companyId,
       employee_name: r.employee_name.trim(),
       phone: normalizePhone(r.phone)!,
       department: r.department?.trim() || null,

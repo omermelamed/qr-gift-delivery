@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId, isPlatformAdmin } from '@/lib/platform-auth'
 import { SettingsForm } from '@/components/admin/SettingsForm'
 import { SettingsPageHeader } from '@/components/admin/SettingsPageHeader'
 
@@ -9,7 +10,10 @@ export default async function SettingsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
   const meta = user.app_metadata as JwtAppMetadata
-  if (meta.role_name !== 'company_admin') redirect('/admin')
+  if (meta.role_name !== 'company_admin' && !isPlatformAdmin(meta)) redirect('/admin')
+
+  const companyId = await resolveCompanyId(meta)
+  if (!companyId) redirect('/admin')
 
   const service = createServiceClient()
   let company: { id: string; name: string; logo_url: string | null; sms_template: string | null; theme_color: string | null } | null = null
@@ -17,7 +21,7 @@ export default async function SettingsPage() {
     const { data } = await service
       .from('companies')
       .select('id, name, logo_url, sms_template, theme_color')
-      .eq('id', meta.company_id)
+      .eq('id', companyId)
       .single()
     company = data
   } catch {

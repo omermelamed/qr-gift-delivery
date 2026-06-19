@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { normalizePhone } from '@/lib/phone'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 type InputRow = { name: string; phone_number: string; department?: string }
 type InsertRow = { campaign_id: string; employee_name: string; phone_number: string | null; department: string | null; employee_id?: string }
@@ -19,6 +20,8 @@ export async function POST(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'campaigns:create')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -30,7 +33,7 @@ export async function POST(
     .from('campaigns')
     .select('id, sent_at')
     .eq('id', campaignId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
@@ -50,7 +53,7 @@ export async function POST(
       .from('employees')
       .select('id, employee_name, phone, department')
       .in('id', employeeIds)
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
 
     insertRows = (employees ?? []).map((e) => ({
       campaign_id: campaignId,
@@ -67,7 +70,7 @@ export async function POST(
       .from('campaigns')
       .select('id')
       .eq('id', sourceCampaignId)
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
       .single()
 
     if (!sourceCampaign) return NextResponse.json({ error: 'Source campaign not found' }, { status: 404 })
@@ -94,7 +97,7 @@ export async function POST(
     }
 
     const { data: matchedEmps } = phones.length > 0
-      ? await service.from('employees').select('id, phone').in('phone', phones).eq('company_id', appMeta.company_id)
+      ? await service.from('employees').select('id, phone').in('phone', phones).eq('company_id', companyId)
       : { data: [] }
     const empByPhone = new Map((matchedEmps ?? []).map((e) => [e.phone, e.id]))
 

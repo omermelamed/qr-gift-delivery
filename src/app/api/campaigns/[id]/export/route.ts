@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 export async function GET(
   _request: NextRequest,
@@ -14,6 +15,8 @@ export async function GET(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'reports:export')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -25,7 +28,7 @@ export async function GET(
     .from('campaigns')
     .select('id')
     .eq('id', campaignId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
@@ -39,7 +42,7 @@ export async function GET(
     service
       .from('employees')
       .select('employee_name, phone, department')
-      .eq('company_id', appMeta.company_id),
+      .eq('company_id', companyId),
   ])
 
   if (!tokensResult.data) return NextResponse.json({ error: 'Failed to fetch tokens' }, { status: 500 })

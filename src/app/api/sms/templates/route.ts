@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 export async function GET() {
   const supabase = await createClient()
@@ -10,7 +11,8 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'templates:read')) {
@@ -21,7 +23,7 @@ export async function GET() {
   const { data } = await service
     .from('message_templates')
     .select('id, name, body_template, variables, created_at, updated_at')
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .order('updated_at', { ascending: false })
 
   return NextResponse.json({ templates: data ?? [] })
@@ -39,6 +41,8 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'templates:manage')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -60,7 +64,7 @@ export async function POST(request: NextRequest) {
   const { data, error } = await service
     .from('message_templates')
     .insert({
-      company_id: appMeta.company_id,
+      company_id: companyId,
       name: name.trim(),
       body_template: bodyTemplate.trim(),
       variables,
@@ -73,7 +77,7 @@ export async function POST(request: NextRequest) {
   }
 
   logAuditEvent({
-    companyId: appMeta.company_id,
+    companyId: companyId,
     actorId: user.id,
     action: 'template.created',
     resourceType: 'template',

@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 export async function GET() {
   const supabase = await createClient()
@@ -10,13 +11,14 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const service = createServiceClient()
   const { data } = await service
     .from('campaigns')
     .select('id, name, campaign_date, sent_at')
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .order('created_at', { ascending: false })
 
   return NextResponse.json({ campaigns: data ?? [] })
@@ -28,12 +30,14 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'campaigns:create')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  if (!appMeta?.company_id) {
+  if (!companyId) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -57,7 +61,7 @@ export async function POST(request: NextRequest) {
     .insert({
       name: name.trim(),
       campaign_date: campaignDate,
-      company_id: appMeta.company_id,
+      company_id: companyId,
       created_by: user.id,
     })
     .select('id')
@@ -68,7 +72,7 @@ export async function POST(request: NextRequest) {
   }
 
   logAuditEvent({
-    companyId: appMeta.company_id,
+    companyId: companyId,
     actorId: user.id,
     action: 'campaign.created',
     resourceType: 'campaign',

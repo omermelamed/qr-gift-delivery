@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId, isPlatformAdmin } from '@/lib/platform-auth'
 import { TeamPageUI, type Member } from '@/components/admin/TeamPageUI'
 
 export default async function TeamPage() {
@@ -9,14 +10,17 @@ export default async function TeamPage() {
   if (!user) redirect('/login')
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (appMeta.role_name !== 'company_admin') redirect('/admin')
+  if (appMeta.role_name !== 'company_admin' && !isPlatformAdmin(appMeta)) redirect('/admin')
+
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) redirect('/admin')
 
   const service = createServiceClient()
 
   const { data: ucr } = await service
     .from('user_company_roles')
     .select('user_id, role_id, roles(name)')
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
 
   const companyUserIds = new Set((ucr ?? []).map((r) => r.user_id))
 
@@ -25,12 +29,12 @@ export default async function TeamPage() {
 
   const companyUsers = allUsers.filter((u) => {
     const meta = u.app_metadata as JwtAppMetadata | undefined
-    return companyUserIds.has(u.id) || meta?.company_id === appMeta.company_id
+    return companyUserIds.has(u.id) || meta?.company_id === companyId
   })
 
   const userIds = companyUsers.map((u) => u.id)
   const { data: employeeRows } = userIds.length > 0
-    ? await service.from('employees').select('user_id, employee_name, phone').in('user_id', userIds).eq('company_id', appMeta.company_id)
+    ? await service.from('employees').select('user_id, employee_name, phone').in('user_id', userIds).eq('company_id', companyId)
     : { data: [] }
   const employeeByUserId = new Map((employeeRows ?? []).map((e) => [e.user_id, e]))
 

@@ -9,11 +9,13 @@ type Company = {
   slug: string
   active: boolean
   created_at: string
+  admin_email: string | null
 }
 
 export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] }) {
   const [companies, setCompanies] = useState<Company[]>(initialCompanies)
   const [showCreate, setShowCreate] = useState(false)
+  const [loginLoading, setLoginLoading] = useState<string | null>(null)
   const router = useRouter()
 
   async function handleToggle(company: Company) {
@@ -27,8 +29,21 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
     }
   }
 
+  async function handleLogin(companyId: string) {
+    setLoginLoading(companyId)
+    const res = await fetch('/api/platform/impersonate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ companyId }),
+    })
+    if (res.ok) {
+      router.push('/admin')
+    }
+    setLoginLoading(null)
+  }
+
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="p-8 max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900">Companies</h1>
@@ -43,26 +58,28 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
       </div>
 
       <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm table-fixed">
           <thead>
             <tr className="border-b border-zinc-100 bg-zinc-50">
-              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide">Company</th>
-              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide">Slug</th>
-              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide">Created</th>
-              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide">Status</th>
-              <th className="px-5 py-3" />
+              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[20%]">Company</th>
+              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[22%]">Admin Email</th>
+              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[10%]">Slug</th>
+              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[12%]">Created</th>
+              <th className="text-left px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[10%]">Status</th>
+              <th className="px-5 py-3 w-[26%]" />
             </tr>
           </thead>
           <tbody>
             {companies.length === 0 && (
               <tr>
-                <td colSpan={5} className="text-center py-16 text-zinc-400">No companies yet. Create one to get started.</td>
+                <td colSpan={6} className="text-center py-16 text-zinc-400">No companies yet. Create one to get started.</td>
               </tr>
             )}
             {companies.map(company => (
               <tr key={company.id} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50 transition-colors">
-                <td className="px-5 py-4 font-medium text-zinc-900">{company.name}</td>
-                <td className="px-5 py-4 text-zinc-500 font-mono text-xs">{company.slug}</td>
+                <td className="px-5 py-4 font-medium text-zinc-900 truncate">{company.name}</td>
+                <td className="px-5 py-4 text-zinc-500 text-xs truncate">{company.admin_email ?? <span className="text-zinc-300">—</span>}</td>
+                <td className="px-5 py-4 text-zinc-500 font-mono text-xs truncate">{company.slug}</td>
                 <td className="px-5 py-4 text-zinc-500">{new Date(company.created_at).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' })}</td>
                 <td className="px-5 py-4">
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
@@ -75,16 +92,25 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
                   </span>
                 </td>
                 <td className="px-5 py-4 text-right">
-                  <button
-                    onClick={() => handleToggle(company)}
-                    className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
-                      company.active
-                        ? 'border-red-200 text-red-600 hover:bg-red-50'
-                        : 'border-green-200 text-green-700 hover:bg-green-50'
-                    }`}
-                  >
-                    {company.active ? 'Deactivate' : 'Activate'}
-                  </button>
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      onClick={() => handleLogin(company.id)}
+                      disabled={loginLoading === company.id}
+                      className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-50"
+                    >
+                      {loginLoading === company.id ? 'Loading…' : 'Login'}
+                    </button>
+                    <button
+                      onClick={() => handleToggle(company)}
+                      className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
+                        company.active
+                          ? 'border-red-200 text-red-600 hover:bg-red-50'
+                          : 'border-green-200 text-green-700 hover:bg-green-50'
+                      }`}
+                    >
+                      {company.active ? 'Deactivate' : 'Activate'}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -142,6 +168,7 @@ function CreateCompanyModal({
         slug: toSlug(name.trim()),
         active: true,
         created_at: new Date().toISOString(),
+        admin_email: adminEmail.trim() || null,
       })
     } finally {
       setLoading(false)

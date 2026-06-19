@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { normalizePhone } from '@/lib/phone'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 async function syncTeamMembers(companyId: string, service: ReturnType<typeof import('@/lib/supabase/server').createServiceClient>) {
   try {
@@ -64,17 +65,18 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const service = createServiceClient()
 
   // Sync any team members not yet in the directory
-  await syncTeamMembers(appMeta.company_id, service)
+  await syncTeamMembers(companyId, service)
 
   const { data } = await service
     .from('employees')
     .select('id, employee_name, phone, department, user_id')
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .order('employee_name')
 
   return NextResponse.json({ employees: data ?? [] })
@@ -86,7 +88,8 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json().catch(() => ({}))
   const { employee_name, phone: rawPhone, department } = body
@@ -98,7 +101,7 @@ export async function POST(request: NextRequest) {
   const service = createServiceClient()
   const { data, error } = await service
     .from('employees')
-    .insert({ company_id: appMeta.company_id, employee_name: employee_name.trim(), phone, department: department?.trim() || null })
+    .insert({ company_id: companyId, employee_name: employee_name.trim(), phone, department: department?.trim() || null })
     .select('id')
     .single()
 

@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 type RouteContext = { params: Promise<{ id: string }> }
 
@@ -19,6 +20,8 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'templates:manage')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -42,7 +45,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     .from('message_templates')
     .select('id')
     .eq('id', id)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!existing) {
@@ -53,14 +56,14 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     .from('message_templates')
     .update(updates)
     .eq('id', id)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
 
   if (error) {
     return NextResponse.json({ error: 'Failed to update template' }, { status: 500 })
   }
 
   logAuditEvent({
-    companyId: appMeta.company_id,
+    companyId: companyId,
     actorId: user.id,
     action: 'template.updated',
     resourceType: 'template',
@@ -78,6 +81,8 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'templates:manage')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -89,7 +94,7 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
     .from('message_templates')
     .select('id, name')
     .eq('id', id)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!existing) {
@@ -100,14 +105,14 @@ export async function DELETE(_request: NextRequest, context: RouteContext) {
     .from('message_templates')
     .delete()
     .eq('id', id)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
 
   if (error) {
     return NextResponse.json({ error: 'Failed to delete template' }, { status: 500 })
   }
 
   logAuditEvent({
-    companyId: appMeta.company_id,
+    companyId: companyId,
     actorId: user.id,
     action: 'template.deleted',
     resourceType: 'template',

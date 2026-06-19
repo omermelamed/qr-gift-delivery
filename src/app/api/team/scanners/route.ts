@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 export async function GET() {
   const supabase = await createClient()
@@ -8,13 +9,14 @@ export async function GET() {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const service = createServiceClient()
 
   // Get all users who belong to this company — via UCR or app_metadata
   const [{ data: ucr }, listResult] = await Promise.all([
-    service.from('user_company_roles').select('user_id').eq('company_id', appMeta.company_id),
+    service.from('user_company_roles').select('user_id').eq('company_id', companyId),
     service.auth.admin.listUsers({ perPage: 1000 }),
   ])
 
@@ -23,7 +25,7 @@ export async function GET() {
 
   const companyUsers = allUsers.filter((u) => {
     const meta = u.app_metadata as JwtAppMetadata | undefined
-    return ucrIds.has(u.id) || meta?.company_id === appMeta.company_id
+    return ucrIds.has(u.id) || meta?.company_id === companyId
   })
 
   const scanners = companyUsers.map((u) => ({

@@ -1,7 +1,9 @@
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
 import { Sidebar } from '@/components/admin/Sidebar'
+import { IMPERSONATE_COOKIE } from '@/app/api/platform/impersonate/route'
 
 const ADMIN_ROLES: JwtAppMetadata['role_name'][] = ['company_admin', 'campaign_manager']
 const DEFAULT_BRAND = '#6366f1'
@@ -11,7 +13,19 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
   const meta = user.app_metadata as JwtAppMetadata | undefined
-  if (!meta?.role_name || !ADMIN_ROLES.includes(meta.role_name)) redirect('/unauthorized')
+
+  let companyId: string | undefined
+  const isPlatformAdmin = meta?.role_name === 'platform_admin'
+
+  if (isPlatformAdmin) {
+    const jar = await cookies()
+    companyId = jar.get(IMPERSONATE_COOKIE)?.value
+    if (!companyId) redirect('/platform')
+  } else if (meta?.role_name && ADMIN_ROLES.includes(meta.role_name)) {
+    companyId = meta.company_id
+  } else {
+    redirect('/unauthorized')
+  }
 
   const service = createServiceClient()
   let company: { logo_url?: string | null; theme_color?: string | null } | null = null
@@ -19,7 +33,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     const { data } = await service
       .from('companies')
       .select('logo_url, theme_color')
-      .eq('id', meta.company_id)
+      .eq('id', companyId)
       .single()
     company = data
   } catch {

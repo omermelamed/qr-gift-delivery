@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 import { PrintButton } from './PrintButton'
 import { QrGrid } from './QrGrid'
 
@@ -18,13 +19,16 @@ export default async function CampaignQrPage({
   if (!user) redirect('/login')
   const appMeta = user.app_metadata as JwtAppMetadata
 
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) redirect('/login')
+
   const service = createServiceClient()
 
   const { data: campaign } = await service
     .from('campaigns')
     .select('id, name, sent_at')
     .eq('id', campaignId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!campaign) notFound()
@@ -39,7 +43,7 @@ export default async function CampaignQrPage({
     service
       .from('employees')
       .select('id, employee_name, phone, department')
-      .eq('company_id', appMeta.company_id),
+      .eq('company_id', companyId),
   ])
 
   const employees = employeesResult.data ?? []

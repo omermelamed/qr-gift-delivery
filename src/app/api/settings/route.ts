@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 export async function PATCH(request: NextRequest) {
   const supabase = await createClient()
@@ -9,7 +10,8 @@ export async function PATCH(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id || !appMeta?.role_id) {
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId || !appMeta?.role_id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -41,7 +43,7 @@ export async function PATCH(request: NextRequest) {
   const { error } = await service
     .from('companies')
     .update({ name, logo_url: logoUrl, sms_template: smsTemplate, theme_color: themeColor })
-    .eq('id', appMeta.company_id)
+    .eq('id', companyId)
 
   if (error) return NextResponse.json({ error: 'Failed to save settings' }, { status: 500 })
 

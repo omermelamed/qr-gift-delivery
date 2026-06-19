@@ -4,6 +4,7 @@ import { createClient as createAnonClient } from '@supabase/supabase-js'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { normalizePhone } from '@/lib/phone'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 const ALLOWED_ROLES = ['company_admin', 'campaign_manager', 'scanner'] as const
 type AllowedRole = (typeof ALLOWED_ROLES)[number]
@@ -16,7 +17,8 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id || !appMeta?.role_id) {
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId || !appMeta?.role_id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -95,7 +97,7 @@ export async function POST(request: NextRequest) {
 
   const { error: metaError } = await service.auth.admin.updateUserById(targetUserId, {
     app_metadata: {
-      company_id: appMeta.company_id,
+      company_id: companyId,
       role_id: role.id,
       role_name: roleName,
       ...(isReInvite ? { reinvited_at: new Date().toISOString() } : {}),
@@ -104,7 +106,7 @@ export async function POST(request: NextRequest) {
   if (metaError) return NextResponse.json({ error: 'Failed to set user metadata' }, { status: 500 })
 
   const { error: ucrError } = await service.from('user_company_roles').upsert(
-    { user_id: targetUserId, company_id: appMeta.company_id, role_id: role.id },
+    { user_id: targetUserId, company_id: companyId, role_id: role.id },
     { onConflict: 'user_id,company_id' }
   )
   if (ucrError) return NextResponse.json({ error: 'Failed to assign company role' }, { status: 500 })
@@ -114,7 +116,7 @@ export async function POST(request: NextRequest) {
     const { data: existingEmployee } = await service
       .from('employees')
       .select('id')
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
       .eq('user_id', targetUserId)
       .maybeSingle()
 
@@ -123,7 +125,7 @@ export async function POST(request: NextRequest) {
     } else {
       await service.from('employees').insert({
         user_id: targetUserId,
-        company_id: appMeta.company_id,
+        company_id: companyId,
         employee_name: employeeName,
         phone,
       })

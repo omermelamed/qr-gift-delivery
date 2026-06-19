@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 import { TemplateEditor } from '@/components/sms/TemplateEditor'
 
 type Props = { params: Promise<{ id: string }> }
@@ -12,12 +13,15 @@ export default async function EditTemplatePage({ params }: Props) {
   if (!user) redirect('/login')
   const appMeta = user.app_metadata as JwtAppMetadata
 
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) redirect('/login')
+
   const service = createServiceClient()
   const { data: template } = await service
     .from('message_templates')
     .select('id, name, body_template')
     .eq('id', id)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!template) redirect('/admin/sms/templates')

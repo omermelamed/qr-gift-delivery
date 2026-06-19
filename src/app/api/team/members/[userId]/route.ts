@@ -3,19 +3,21 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { normalizePhone } from '@/lib/phone'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 const ALLOWED_ROLES = ['company_admin', 'campaign_manager', 'scanner'] as const
 type AllowedRole = typeof ALLOWED_ROLES[number]
 
-async function getCallerAndPermissions(request?: NextRequest) {
+async function getCallerAndPermissions() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id || !appMeta?.role_id) return null
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId || !appMeta?.role_id) return null
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'users:manage')) return null
-  return { user, appMeta }
+  return { user, appMeta, companyId }
 }
 
 export async function PATCH(
@@ -25,7 +27,7 @@ export async function PATCH(
   const { userId } = await params
   const caller = await getCallerAndPermissions()
   if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const { user, appMeta } = caller
+  const { user, appMeta, companyId } = caller
 
   const service = createServiceClient()
 
@@ -37,9 +39,9 @@ export async function PATCH(
     .from('user_company_roles')
     .select('user_id')
     .eq('user_id', userId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .maybeSingle()
-  const inCompanyViaMeta = targetMeta?.company_id === appMeta.company_id
+  const inCompanyViaMeta = targetMeta?.company_id === companyId
   if (!inCompanyViaUcr.data && !inCompanyViaMeta) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 })
   }
@@ -84,13 +86,13 @@ export async function PATCH(
 
     // Upsert user_company_roles
     await service.from('user_company_roles').upsert(
-      { user_id: userId, company_id: appMeta.company_id, role_id: roleRow.id },
+      { user_id: userId, company_id: companyId, role_id: roleRow.id },
       { onConflict: 'user_id,company_id' }
     )
 
     // Update app_metadata
     await service.auth.admin.updateUserById(userId, {
-      app_metadata: { company_id: appMeta.company_id, role_id: roleRow.id, role_name: roleName },
+      app_metadata: { company_id: companyId, role_id: roleRow.id, role_name: roleName },
     })
   }
 
@@ -115,14 +117,14 @@ export async function PATCH(
       .from('employees')
       .select('id, employee_name, phone')
       .eq('user_id', userId)
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
       .maybeSingle()
 
     await service
       .from('employees')
       .update(employeeUpdates)
       .eq('user_id', userId)
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
 
     // Propagate to gift_tokens so campaign pages reflect the change
     if (emp) {
@@ -134,7 +136,7 @@ export async function PATCH(
         const { data: campaignIds } = await service
           .from('campaigns')
           .select('id')
-          .eq('company_id', appMeta.company_id)
+          .eq('company_id', companyId)
 
         if (campaignIds && campaignIds.length > 0) {
           const cids = campaignIds.map((c) => c.id)
@@ -174,7 +176,7 @@ export async function DELETE(
   const { userId } = await params
   const caller = await getCallerAndPermissions()
   if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const { user, appMeta } = caller
+  const { user, appMeta, companyId } = caller
 
   if (userId === user.id) {
     return NextResponse.json({ error: 'You cannot remove yourself' }, { status: 400 })
@@ -189,7 +191,7 @@ export async function DELETE(
     .from('user_company_roles')
     .delete()
     .eq('user_id', userId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .select()
 
   if (deleteError) return NextResponse.json({ error: 'Failed to remove member' }, { status: 500 })
@@ -199,7 +201,7 @@ export async function DELETE(
   if (!deletedRows || deletedRows.length === 0) {
     const { data: { user: target } } = await service.auth.admin.getUserById(userId)
     const targetMeta = target?.app_metadata as JwtAppMetadata | undefined
-    if (!target || targetMeta?.company_id !== appMeta.company_id) {
+    if (!target || targetMeta?.company_id !== companyId) {
       return NextResponse.json({ error: 'Member not found in your company' }, { status: 404 })
     }
   }
@@ -215,14 +217,14 @@ export async function DELETE(
       .from('employees')
       .update({ user_id: null })
       .eq('user_id', userId)
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
   } else {
     // Delete the employee record entirely
     await service
       .from('employees')
       .delete()
       .eq('user_id', userId)
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
   }
 
   return NextResponse.json({ success: true })

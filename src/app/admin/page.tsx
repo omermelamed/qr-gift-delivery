@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 import { AdminDashboardUI } from '@/components/admin/AdminDashboardUI'
 
 export default async function AdminPage() {
@@ -9,11 +10,14 @@ export default async function AdminPage() {
   if (!user) redirect('/login')
   const appMeta = user.app_metadata as JwtAppMetadata
 
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) redirect('/login')
+
   const service = createServiceClient()
   const { data: campaigns } = await service
     .from('campaigns')
     .select('id, name, campaign_date, sent_at, closed_at')
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .order('created_at', { ascending: false })
 
   const list = campaigns ?? []

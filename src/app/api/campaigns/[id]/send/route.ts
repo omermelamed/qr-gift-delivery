@@ -5,6 +5,7 @@ import { sendGiftSMS, isTwilioConfigured } from '@/lib/twilio'
 import { generateQrBuffer } from '@/lib/qr'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 const BATCH_SIZE = 50
 const DELAY_MS = 1000
@@ -31,11 +32,13 @@ export async function POST(
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     actorUserId = user.id
     const appMeta = user.app_metadata as JwtAppMetadata
+    const resolved = await resolveCompanyId(appMeta)
+    if (!resolved) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     const permissions = await fetchPermissions(appMeta.role_id)
     if (!hasPermission(permissions, 'campaigns:launch')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
-    companyId = appMeta.company_id
+    companyId = resolved
   }
 
   const service = createServiceClient()

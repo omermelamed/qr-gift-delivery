@@ -2,13 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 async function getAuthedService(campaignId: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id || !appMeta?.role_id) return null
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId || !appMeta?.role_id) return null
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'campaigns:launch')) return null
   const service = createServiceClient()
@@ -16,7 +18,7 @@ async function getAuthedService(campaignId: string) {
     .from('campaigns')
     .select('id, sent_at')
     .eq('id', campaignId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
   if (!campaign) return null
   return { service, campaign }

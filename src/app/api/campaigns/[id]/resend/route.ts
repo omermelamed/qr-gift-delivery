@@ -4,6 +4,7 @@ import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { sendGiftSMS } from '@/lib/twilio'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 const BATCH_SIZE = 50
 const DELAY_MS = 1000
@@ -19,6 +20,8 @@ export async function POST(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'campaigns:launch')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
@@ -30,7 +33,7 @@ export async function POST(
     .from('campaigns')
     .select('id, name')
     .eq('id', campaignId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
@@ -38,7 +41,7 @@ export async function POST(
   const { data: company } = await service
     .from('companies')
     .select('sms_template')
-    .eq('id', appMeta.company_id)
+    .eq('id', companyId)
     .single()
 
   const smsTemplate = company?.sms_template ?? null
@@ -70,7 +73,7 @@ export async function POST(
     const { data: credits } = await service
       .from('credits')
       .select('id, balance, total_used')
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
       .single()
 
     if (!credits || credits.balance < smsCount) {
@@ -87,7 +90,7 @@ export async function POST(
         balance: credits.balance - smsCount,
         updated_at: new Date().toISOString(),
       })
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
       .gte('balance', smsCount)
 
     if (reserveError) {
@@ -95,7 +98,7 @@ export async function POST(
     }
 
     await service.from('credit_transactions').insert({
-      company_id: appMeta.company_id,
+      company_id: companyId,
       amount: smsCount,
       type: 'use' as const,
       description: `Campaign "${campaign.name}" resend — ${smsCount} SMS`,
@@ -145,7 +148,7 @@ export async function POST(
     const { data: currentCredits } = await service
       .from('credits')
       .select('total_used, balance')
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
       .single()
 
     if (currentCredits) {
@@ -156,10 +159,10 @@ export async function POST(
           balance: currentCredits.balance + failed,
           updated_at: new Date().toISOString(),
         })
-        .eq('company_id', appMeta.company_id)
+        .eq('company_id', companyId)
 
       await service.from('credit_transactions').insert({
-        company_id: appMeta.company_id,
+        company_id: companyId,
         amount: failed,
         type: 'refund' as const,
         description: `Campaign "${campaign.name}" resend — ${failed} failed SMS refunded`,
@@ -169,7 +172,7 @@ export async function POST(
   }
 
   logAuditEvent({
-    companyId: appMeta.company_id,
+    companyId: companyId,
     actorId: user.id,
     action: 'campaign.reminder_sent',
     resourceType: 'campaign',

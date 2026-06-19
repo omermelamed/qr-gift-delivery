@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { normalizePhone } from '@/lib/phone'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 export async function POST(
   request: NextRequest,
@@ -15,7 +16,8 @@ export async function POST(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id || !appMeta?.role_id) {
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId || !appMeta?.role_id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const permissions = await fetchPermissions(appMeta.role_id)
@@ -29,7 +31,7 @@ export async function POST(
     .from('campaigns')
     .select('id, sent_at')
     .eq('id', campaignId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
@@ -54,7 +56,7 @@ export async function POST(
     const { data: emp } = await service
       .from('employees')
       .select('id')
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
       .eq('phone', phone)
       .maybeSingle()
     employeeId = emp?.id ?? null
@@ -82,7 +84,8 @@ export async function DELETE(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id || !appMeta?.role_id) {
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId || !appMeta?.role_id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const permissions = await fetchPermissions(appMeta.role_id)
@@ -96,7 +99,7 @@ export async function DELETE(
     .from('campaigns')
     .select('id, sent_at')
     .eq('id', campaignId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })

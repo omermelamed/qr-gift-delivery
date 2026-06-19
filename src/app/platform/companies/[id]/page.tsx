@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
+import { AddCreditsForm } from '@/components/platform/AddCreditsForm'
 
 const ROLE_LABELS: Record<string, string> = {
   company_admin: 'Admin',
@@ -46,11 +47,21 @@ export default async function CompanyDetailPage({
       }
     })
 
-  const { data: campaigns } = await service
-    .from('campaigns')
-    .select('id, name, campaign_date, sent_at')
-    .eq('company_id', companyId)
-    .order('created_at', { ascending: false })
+  const [campaignsResult, creditsResult] = await Promise.all([
+    service
+      .from('campaigns')
+      .select('id, name, campaign_date, sent_at')
+      .eq('company_id', companyId)
+      .order('created_at', { ascending: false }),
+    service
+      .from('credits')
+      .select('total_purchased, total_used, balance')
+      .eq('company_id', companyId)
+      .single(),
+  ])
+
+  const campaigns = campaignsResult.data
+  const credits = creditsResult.data ?? { total_purchased: 0, total_used: 0, balance: 0 }
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -98,6 +109,28 @@ export default async function CompanyDetailPage({
               </tbody>
             </table>
           )}
+        </div>
+      </section>
+
+      {/* Credits */}
+      <section className="mb-8">
+        <h2 className="text-base font-semibold text-zinc-900 mb-3">SMS Credits</h2>
+        <div className="bg-white rounded-xl border border-zinc-200 p-5">
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div>
+              <p className="text-xs text-zinc-400 uppercase tracking-wide mb-1">Balance</p>
+              <p className="text-2xl font-bold text-zinc-900">{credits.balance}</p>
+            </div>
+            <div>
+              <p className="text-xs text-zinc-400 uppercase tracking-wide mb-1">Total Purchased</p>
+              <p className="text-2xl font-bold text-zinc-900">{credits.total_purchased}</p>
+            </div>
+            <div>
+              <p className="text-xs text-zinc-400 uppercase tracking-wide mb-1">Total Used</p>
+              <p className="text-2xl font-bold text-zinc-900">{credits.total_used}</p>
+            </div>
+          </div>
+          <AddCreditsForm companyId={companyId} currentBalance={credits.balance} />
         </div>
       </section>
 

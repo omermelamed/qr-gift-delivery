@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 import { CampaignPopulator } from '@/components/admin/CampaignPopulator'
 import { LaunchButton } from '@/components/admin/LaunchButton'
 import { CloseCampaignButton } from '@/components/admin/CloseCampaignButton'
@@ -33,6 +34,9 @@ export default async function CampaignDetailPage({
   if (!user) redirect('/login')
   const appMeta = user.app_metadata as JwtAppMetadata
 
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) redirect('/login')
+
   const service = createServiceClient()
 
   const [campaignResult, creditsResult] = await Promise.all([
@@ -40,12 +44,12 @@ export default async function CampaignDetailPage({
       .from('campaigns')
       .select('id, name, campaign_date, sent_at, closed_at')
       .eq('id', campaignId)
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
       .single(),
     service
       .from('credits')
       .select('balance')
-      .eq('company_id', appMeta.company_id)
+      .eq('company_id', companyId)
       .single(),
   ])
 
@@ -64,7 +68,7 @@ export default async function CampaignDetailPage({
     service
       .from('employees')
       .select('id, employee_name, phone, department')
-      .eq('company_id', appMeta.company_id),
+      .eq('company_id', companyId),
   ])
 
   const employees = employeesResult.data ?? []

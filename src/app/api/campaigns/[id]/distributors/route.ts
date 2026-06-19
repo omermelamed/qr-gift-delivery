@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 export async function GET(
   _request: NextRequest,
@@ -14,7 +15,8 @@ export async function GET(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id || !appMeta?.role_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId || !appMeta?.role_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'campaigns:launch')) {
@@ -27,7 +29,7 @@ export async function GET(
     .from('campaigns')
     .select('id')
     .eq('id', campaignId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
@@ -63,7 +65,8 @@ export async function POST(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id || !appMeta?.role_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId || !appMeta?.role_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const permissions = await fetchPermissions(appMeta.role_id)
   if (!hasPermission(permissions, 'campaigns:launch')) {
@@ -85,14 +88,14 @@ export async function POST(
     .from('user_company_roles')
     .select('roles(name)')
     .eq('user_id', userId)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .maybeSingle()
 
   const targetRole = ucr?.roles as unknown as { name: string } | null
   const isEligible =
     targetRole?.name === 'scanner' ||
     targetRole?.name === 'company_admin' ||
-    targetMeta?.company_id === appMeta.company_id
+    targetMeta?.company_id === companyId
 
   if (!isEligible) {
     return NextResponse.json({ error: 'User is not a member of this company' }, { status: 422 })

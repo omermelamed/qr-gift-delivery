@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { normalizePhone } from '@/lib/phone'
 import type { JwtAppMetadata } from '@/types'
+import { resolveCompanyId } from '@/lib/platform-auth'
 
 export async function PATCH(
   request: NextRequest,
@@ -14,7 +15,8 @@ export async function PATCH(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await request.json().catch(() => ({}))
   const updates: Record<string, string | null> = {}
@@ -41,7 +43,7 @@ export async function PATCH(
     .from('employees')
     .select('id, employee_name, phone, company_id, user_id')
     .eq('id', id)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!oldEmp) return NextResponse.json({ error: 'Employee not found' }, { status: 404 })
@@ -50,7 +52,7 @@ export async function PATCH(
     .from('employees')
     .update(updates)
     .eq('id', id)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
 
   if (error) return NextResponse.json({ error: 'Failed to update employee' }, { status: 500 })
 
@@ -116,7 +118,8 @@ export async function DELETE(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const appMeta = user.app_metadata as JwtAppMetadata
-  if (!appMeta?.company_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const companyId = await resolveCompanyId(appMeta)
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const service = createServiceClient()
 
@@ -125,7 +128,7 @@ export async function DELETE(
     .from('employees')
     .select('user_id')
     .eq('id', id)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
     .single()
 
   if (!emp) return NextResponse.json({ error: 'Employee not found' }, { status: 404 })
@@ -135,7 +138,7 @@ export async function DELETE(
     .from('employees')
     .delete()
     .eq('id', id)
-    .eq('company_id', appMeta.company_id)
+    .eq('company_id', companyId)
 
   return NextResponse.json({ success: true })
 }
