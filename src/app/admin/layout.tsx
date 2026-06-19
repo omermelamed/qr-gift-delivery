@@ -28,11 +28,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   const service = createServiceClient()
-  let company: { logo_url?: string | null; theme_color?: string | null } | null = null
+  let company: { name?: string | null; logo_url?: string | null; theme_color?: string | null } | null = null
   try {
     const { data } = await service
       .from('companies')
-      .select('logo_url, theme_color')
+      .select('name, logo_url, theme_color')
       .eq('id', companyId)
       .single()
     company = data
@@ -43,14 +43,29 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const brand = company?.theme_color ?? DEFAULT_BRAND
 
   return (
-    <div className="flex min-h-screen" style={{ '--brand': brand } as React.CSSProperties}>
+    <div className="flex flex-col min-h-screen" style={{ '--brand': brand } as React.CSSProperties}>
       <style>{`
         :root { --brand: ${brand}; }
       `}</style>
-      <Sidebar logoUrl={company?.logo_url ?? undefined} />
-      <main className="flex-1 overflow-auto bg-zinc-50 pb-20 md:pb-0">
-        {children}
-      </main>
+      {isPlatformAdmin && (
+        <div className="bg-violet-600 text-white text-sm px-4 py-2 flex items-center justify-between z-50">
+          <span>
+            Viewing as platform admin{company?.name ? <> — <strong>{company.name}</strong></> : null}
+          </span>
+          <a
+            href="/platform"
+            className="text-white/90 hover:text-white font-medium underline underline-offset-2 transition-colors"
+          >
+            ← Back to Platform
+          </a>
+        </div>
+      )}
+      <div className="flex flex-1">
+        <Sidebar logoUrl={company?.logo_url ?? undefined} />
+        <main className="flex-1 overflow-auto bg-zinc-50 pb-20 md:pb-0">
+          {children}
+        </main>
+      </div>
     </div>
   )
 }

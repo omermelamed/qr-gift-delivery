@@ -25,6 +25,7 @@ export async function GET() {
 
   const companyUsers = allUsers.filter((u) => {
     const meta = u.app_metadata as JwtAppMetadata | undefined
+    if (meta?.role_name === 'platform_admin') return false
     return ucrIds.has(u.id) || meta?.company_id === companyId
   })
 
