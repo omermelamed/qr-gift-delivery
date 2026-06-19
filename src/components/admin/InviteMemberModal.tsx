@@ -15,6 +15,7 @@ type Props = { onClose: () => void }
 export function InviteMemberModal({ onClose }: Props) {
   const t = useT()
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
   const [roleName, setRoleName] = useState<string>('campaign_manager')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -29,7 +30,7 @@ export function InviteMemberModal({ onClose }: Props) {
       const res = await fetch('/api/team/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), role_name: roleName }),
+        body: JSON.stringify({ email: email.trim(), phone: phone.trim(), role_name: roleName }),
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? t('Invite failed')); return }
@@ -83,6 +84,19 @@ export function InviteMemberModal({ onClose }: Props) {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="inv-phone" className="text-sm font-medium text-zinc-700">{t('Phone')} <span className="text-xs text-zinc-400 font-normal">({t('optional')})</span></label>
+            <input
+              id="inv-phone"
+              type="tel"
+              dir="ltr"
+              placeholder="+972..."
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
           </div>
 

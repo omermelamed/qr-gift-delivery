@@ -49,7 +49,7 @@ export function CreditIndicator({ balance, needed }: Props) {
           className="text-sm font-medium hover:underline"
           style={{ color: 'var(--brand, #6366f1)' }}
         >
-          {balance <= 30 ? t('Buy Credits') : t('Manage')}
+          {t('Manage')}
         </Link>
       </div>
     </div>

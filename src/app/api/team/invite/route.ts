@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { createClient as createAnonClient } from '@supabase/supabase-js'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
+import { normalizePhone } from '@/lib/phone'
 import type { JwtAppMetadata } from '@/types'
 
 const ALLOWED_ROLES = ['company_admin', 'campaign_manager', 'scanner'] as const
@@ -32,9 +33,16 @@ export async function POST(request: NextRequest) {
   }
 
   const email: string = ((body.email as string) ?? '').trim()
+  const phoneRaw: string = ((body.phone as string) ?? '').trim()
   const roleName: string = (body.role_name as string) ?? ''
 
   if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 })
+
+  let phone: string | null = null
+  if (phoneRaw) {
+    phone = normalizePhone(phoneRaw)
+    if (!phone) return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
+  }
   if (!ALLOWED_ROLES.includes(roleName as AllowedRole)) {
     return NextResponse.json(
       { error: `role_name must be one of: ${ALLOWED_ROLES.join(', ')}` },
@@ -100,6 +108,27 @@ export async function POST(request: NextRequest) {
     { onConflict: 'user_id,company_id' }
   )
   if (ucrError) return NextResponse.json({ error: 'Failed to assign company role' }, { status: 500 })
+
+  if (phone) {
+    const employeeName = email.split('@')[0].replace(/[._-]/g, ' ')
+    const { data: existingEmployee } = await service
+      .from('employees')
+      .select('id')
+      .eq('company_id', appMeta.company_id)
+      .eq('user_id', targetUserId)
+      .maybeSingle()
+
+    if (existingEmployee) {
+      await service.from('employees').update({ phone }).eq('id', existingEmployee.id)
+    } else {
+      await service.from('employees').insert({
+        user_id: targetUserId,
+        company_id: appMeta.company_id,
+        employee_name: employeeName,
+        phone,
+      })
+    }
+  }
 
   return NextResponse.json({ success: true })
 }
