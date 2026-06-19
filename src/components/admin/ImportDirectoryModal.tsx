@@ -13,13 +13,21 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
   const t = useT()
   const { locale } = useLocale()
   const [rows, setRows] = useState<ParsedRow[]>([])
+  const [fileName, setFileName] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  function pickFile() {
+    if (inputRef.current) inputRef.current.value = ''
+    inputRef.current?.click()
+  }
+
   async function processFile(file: File) {
     setError(null)
+    setFileName(file.name)
+    setRows([])
     try {
       const buf = await file.arrayBuffer()
       const wb = read(buf)
@@ -75,8 +83,8 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
 
         <div
           role="button" tabIndex={0}
-          onClick={() => inputRef.current?.click()}
-          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click() } }}
+          onClick={pickFile}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pickFile() } }}
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) processFile(f) }}
@@ -84,6 +92,7 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
         >
           <p className="text-sm text-zinc-500"><span className="font-medium text-indigo-600">{t('Click to browse')}</span> {t('or drag and drop')}</p>
           <p className="text-xs text-zinc-400 mt-1">.csv {t('or')} .xlsx · {t('Columns:')} name/שם, phone_number/טלפון, department/מחלקה</p>
+          {fileName && <p className="text-xs text-zinc-600 mt-2 font-medium">{fileName}</p>}
           <input ref={inputRef} type="file" accept=".csv,.xlsx,.xls" onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f) }} className="hidden" />
           <button
             type="button"
