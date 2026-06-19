@@ -78,3 +78,80 @@ export type ScanHistoryEntry = {
   outcome: ScanOutcome
   timestamp: Date
 }
+
+// ============================================================
+// SMS Bulk Messaging SaaS types
+// ============================================================
+
+export type Credits = {
+  id: string
+  company_id: string
+  total_purchased: number
+  total_used: number
+  balance: number
+  updated_at: string
+}
+
+export type CreditTransactionType = 'purchase' | 'use' | 'refund'
+
+export type CreditTransaction = {
+  id: string
+  company_id: string
+  amount: number
+  type: CreditTransactionType
+  description: string | null
+  created_at: string
+  created_by: string | null
+}
+
+export type MessageTemplate = {
+  id: string
+  company_id: string
+  name: string
+  body_template: string
+  variables: string[]
+  created_at: string
+  updated_at: string
+}
+
+export type SmsCampaignStatus = 'draft' | 'validating' | 'sending' | 'sent' | 'failed' | 'cancelled'
+
+export type SmsCampaign = {
+  id: string
+  company_id: string
+  name: string
+  template_id: string | null
+  status: SmsCampaignStatus
+  recipients_count: number
+  sent_count: number
+  failed_count: number
+  credits_reserved: number
+  created_by: string | null
+  created_at: string
+  sent_at: string | null
+}
+
+export type SmsMessageStatus = 'pending' | 'queued' | 'sent' | 'delivered' | 'failed' | 'undelivered'
+
+export type SmsMessage = {
+  id: string
+  campaign_id: string
+  recipient_phone: string
+  recipient_name: string | null
+  body: string
+  status: SmsMessageStatus
+  provider_id: string | null
+  error_message: string | null
+  sent_at: string | null
+  delivered_at: string | null
+  created_at: string
+}
+
+export const CREDIT_PACKAGES = [
+  { name: 'Starter', messages: 100, price: 100 },
+  { name: 'Small', messages: 300, price: 280 },
+  { name: 'Medium', messages: 600, price: 540 },
+  { name: 'Large', messages: 1000, price: 850 },
+] as const
+
+export type CreditPackage = (typeof CREDIT_PACKAGES)[number]
