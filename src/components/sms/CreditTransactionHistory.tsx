@@ -20,6 +20,7 @@ export function CreditTransactionHistory({ transactions }: Props) {
 
   const TYPE_STYLES: Record<CreditTransactionType, { label: string; color: string; sign: string }> = {
     purchase: { label: t('Purchase'), color: 'bg-emerald-100 text-emerald-700', sign: '+' },
+    grant:    { label: t('Grant'), color: 'bg-violet-100 text-violet-700', sign: '+' },
     use:      { label: t('Used'), color: 'bg-zinc-100 text-zinc-600', sign: '-' },
     refund:   { label: t('Refund'), color: 'bg-blue-100 text-blue-700', sign: '+' },
   }
@@ -67,7 +68,7 @@ export function CreditTransactionHistory({ transactions }: Props) {
                   {tx.description ?? '—'}
                 </td>
                 <td className="px-5 py-3 text-sm font-semibold text-right">
-                  <span className={tx.type === 'use' ? 'text-zinc-600' : 'text-emerald-600'}>
+                  <span className={tx.type === 'use' ? 'text-zinc-600' : tx.type === 'grant' ? 'text-violet-600' : 'text-emerald-600'}>
                     {style.sign}{tx.amount.toLocaleString()}
                   </span>
                 </td>

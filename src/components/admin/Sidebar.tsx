@@ -74,7 +74,7 @@ export function Sidebar({ logoUrl }: Props) {
   return (
     <>
       {/* ── Desktop sidebar (md+) ── */}
-      <nav className="hidden md:flex group flex-col bg-zinc-900 w-14 hover:w-56 transition-all duration-200 overflow-hidden flex-shrink-0 min-h-screen">
+      <nav className="hidden md:flex group flex-col bg-zinc-900 w-14 hover:w-56 transition-all duration-200 overflow-hidden flex-shrink-0 h-full">
         <div className="flex items-center gap-3 h-14 px-3 border-b border-zinc-800 flex-shrink-0">
           {logoUrl ? (
             <img src={logoUrl} alt="Logo" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />

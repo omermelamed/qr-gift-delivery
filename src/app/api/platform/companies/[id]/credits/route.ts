@@ -85,7 +85,7 @@ export async function POST(
   await service.from('credit_transactions').insert({
     company_id: companyId,
     amount,
-    type: 'purchase',
+    type: 'grant',
     description: `Platform admin grant (${amount} credits)`,
     created_by: user.id,
   })

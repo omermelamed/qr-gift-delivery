@@ -93,7 +93,7 @@ export type Credits = {
   updated_at: string
 }
 
-export type CreditTransactionType = 'purchase' | 'use' | 'refund'
+export type CreditTransactionType = 'purchase' | 'use' | 'refund' | 'grant'
 
 export type CreditTransaction = {
   id: string

@@ -43,12 +43,13 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const brand = company?.theme_color ?? DEFAULT_BRAND
 
   return (
-    <div className="flex flex-col min-h-screen" style={{ '--brand': brand } as React.CSSProperties}>
+    <div className="flex flex-col h-screen overflow-hidden" style={{ '--brand': brand } as React.CSSProperties}>
       <style>{`
         :root { --brand: ${brand}; }
+        html, body { overflow: hidden; height: 100%; }
       `}</style>
       {isPlatformAdmin && (
-        <div className="bg-violet-600 text-white text-sm px-4 py-2 flex items-center justify-between z-50">
+        <div className="bg-violet-600 text-white text-sm px-4 py-2 flex items-center justify-between z-50 flex-shrink-0">
           <span>
             Viewing as platform admin{company?.name ? <> — <strong>{company.name}</strong></> : null}
           </span>
@@ -60,9 +61,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </a>
         </div>
       )}
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
         <Sidebar logoUrl={company?.logo_url ?? undefined} />
-        <main className="flex-1 overflow-auto bg-zinc-50 pb-20 md:pb-0">
+        <main className="flex-1 min-h-0 overflow-y-auto bg-zinc-50 pb-20 md:pb-0">
           {children}
         </main>
       </div>
