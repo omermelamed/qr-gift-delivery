@@ -28,7 +28,7 @@ export function AdminDashboardUI({ campaigns, totalGifts, totalRedeemed }: Props
   const overallPct = totalGifts > 0 ? Math.round((totalRedeemed / totalGifts) * 100) : 0
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div className="p-4 md:p-8 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-zinc-900">{t('Campaigns')}</h1>
         <Link

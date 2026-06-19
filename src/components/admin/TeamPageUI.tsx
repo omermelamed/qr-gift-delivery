@@ -30,8 +30,8 @@ export function TeamPageUI({ members }: Props) {
   }
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-4 md:p-8 max-w-4xl mx-auto">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900">{t('Team')}</h1>
           <p className="text-sm text-zinc-500 mt-0.5">
@@ -41,7 +41,7 @@ export function TeamPageUI({ members }: Props) {
         <InviteButton />
       </div>
 
-      <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden">
+      <div className="bg-white rounded-xl border border-zinc-200 overflow-x-auto">
         {members.length === 0 ? (
           <div className="text-center py-16 text-zinc-400 text-sm">
             {t('No team members yet. Invite someone to get started.')}

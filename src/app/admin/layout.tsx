@@ -34,7 +34,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         :root { --brand: ${brand}; }
       `}</style>
       <Sidebar logoUrl={company?.logo_url ?? undefined} />
-      <main className="flex-1 overflow-auto bg-zinc-50">
+      <main className="flex-1 overflow-auto bg-zinc-50 pb-20 md:pb-0">
         {children}
       </main>
     </div>

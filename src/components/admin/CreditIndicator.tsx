@@ -18,7 +18,7 @@ export function CreditIndicator({ balance, needed, label }: Props) {
 
   return (
     <div
-      className={`flex items-center justify-between rounded-xl p-4 mb-4 border ${
+      className={`flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 rounded-xl p-4 mb-4 border ${
         insufficient || isLow
           ? 'bg-red-50 border-red-200'
           : isWarning

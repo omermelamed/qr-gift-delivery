@@ -242,7 +242,7 @@ export function EmployeeTable({
   return (
     <>
       <div className="bg-white rounded-xl border border-zinc-200 p-5 flex flex-col min-h-0">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-3 mb-4">
           <h2 className="font-semibold text-zinc-900">{t('Employees')} <span className="text-zinc-400 font-normal">({rows.length})</span></h2>
           <div className="flex items-center gap-2">
             <input
@@ -250,7 +250,7 @@ export function EmployeeTable({
               placeholder={t('Search employees…')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm w-48 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm w-full sm:w-48 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
             <button
               onClick={handleExport}

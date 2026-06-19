@@ -76,7 +76,7 @@ export default async function CampaignDetailPage({
   const unredeemedCount = allTokens.filter((t) => !t.redeemed).length
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-4 md:p-6 max-w-7xl mx-auto">
       {/* Header */}
       <CampaignDetailHeader
         campaignName={campaign.name}
@@ -87,7 +87,7 @@ export default async function CampaignDetailPage({
 
       <div className="flex items-start justify-between gap-4 mb-6">
         <div />
-        <div className="group flex items-center gap-3 flex-shrink-0">
+        <div className="group flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
           <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} />
           {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter />}
           <DuplicateCampaignButton

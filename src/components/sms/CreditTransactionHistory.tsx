@@ -33,7 +33,7 @@ export function CreditTransactionHistory({ transactions }: Props) {
   }
 
   return (
-    <div className="bg-white border border-zinc-200 rounded-xl overflow-hidden">
+    <div className="bg-white border border-zinc-200 rounded-xl overflow-x-auto">
       <table className="w-full">
         <thead>
           <tr className="border-b border-zinc-100">
