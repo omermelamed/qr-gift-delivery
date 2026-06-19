@@ -73,7 +73,7 @@ export function TemplateList({ templates }: Props) {
                 ))}
                 <span className="text-xs text-zinc-300">·</span>
                 <span className="text-xs text-zinc-400">
-                  {t('Updated')} {new Date(tmpl.updated_at).toLocaleDateString('en-IL')}
+                  {t('Updated')} {new Date(tmpl.updated_at).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' })}
                 </span>
               </div>
             </div>

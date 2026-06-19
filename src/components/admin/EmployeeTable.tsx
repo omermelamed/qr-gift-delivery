@@ -332,7 +332,7 @@ export function EmployeeTable({
                             : <span className="text-zinc-300">—</span>}
                         </td>
                         <td className="px-3 py-2.5 text-xs text-zinc-400">
-                          {row.redeemed_at ? new Date(row.redeemed_at).toLocaleString(undefined, { hour12: false }) : <span className="text-zinc-300">—</span>}
+                          {row.redeemed_at ? new Date(row.redeemed_at).toLocaleString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }) : <span className="text-zinc-300">—</span>}
                         </td>
                         <td className="px-3 py-2.5 text-xs text-zinc-400">
                           {row.redeemed_by
@@ -401,7 +401,7 @@ export function EmployeeTable({
                           : <span className="text-zinc-300">—</span>}
                       </td>
                       <td className="px-3 py-2.5 text-xs text-zinc-400">
-                        {r.redeemed_at ? new Date(r.redeemed_at).toLocaleString() : <span className="text-zinc-300">—</span>}
+                        {r.redeemed_at ? new Date(r.redeemed_at).toLocaleString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }) : <span className="text-zinc-300">—</span>}
                       </td>
                       <td className="px-3 py-2.5 text-xs text-zinc-400">
                         {r.redeemed_by

@@ -63,7 +63,7 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
               <tr key={company.id} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50 transition-colors">
                 <td className="px-5 py-4 font-medium text-zinc-900">{company.name}</td>
                 <td className="px-5 py-4 text-zinc-500 font-mono text-xs">{company.slug}</td>
-                <td className="px-5 py-4 text-zinc-500">{new Date(company.created_at).toLocaleDateString()}</td>
+                <td className="px-5 py-4 text-zinc-500">{new Date(company.created_at).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' })}</td>
                 <td className="px-5 py-4">
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                     company.active

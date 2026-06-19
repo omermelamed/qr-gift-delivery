@@ -19,6 +19,7 @@ import { ReminderButton } from '@/components/admin/ReminderButton'
 import { GiftBreakdown } from '@/components/admin/GiftBreakdown'
 import { CampaignDetailHeader } from '@/components/admin/CampaignDetailHeader'
 import { CreditIndicator } from '@/components/admin/CreditIndicator'
+import { ViewQrLink, ExportCsvLink } from '@/components/admin/CampaignActions'
 
 export default async function CampaignDetailPage({
   params,
@@ -118,23 +119,8 @@ export default async function CampaignDetailPage({
             sourceName={campaign.name}
             sourceDate={campaign.campaign_date}
           />
-          {campaign.sent_at && (
-            <Link
-              href={`/admin/campaigns/${campaign.id}/qr`}
-              className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
-            >
-              View QR Codes
-            </Link>
-          )}
-          {campaign.sent_at && (
-            <a
-              href={`/api/campaigns/${campaign.id}/export`}
-              download
-              className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
-            >
-              Export CSV
-            </a>
-          )}
+          {campaign.sent_at && <ViewQrLink campaignId={campaign.id} />}
+          {campaign.sent_at && <ExportCsvLink campaignId={campaign.id} />}
           {campaign.sent_at && !campaign.closed_at && (
             <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} />
           )}

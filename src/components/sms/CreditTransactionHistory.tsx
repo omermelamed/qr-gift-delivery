@@ -49,12 +49,13 @@ export function CreditTransactionHistory({ transactions }: Props) {
             return (
               <tr key={tx.id} className="border-b border-zinc-50 last:border-0 hover:bg-zinc-50 transition-colors">
                 <td className="px-5 py-3 text-sm text-zinc-600">
-                  {new Date(tx.created_at).toLocaleDateString('en-IL', {
+                  {new Date(tx.created_at).toLocaleString(undefined, {
                     day: '2-digit',
-                    month: 'short',
-                    year: 'numeric',
+                    month: '2-digit',
+                    year: '2-digit',
                     hour: '2-digit',
                     minute: '2-digit',
+                    hour12: false,
                   })}
                 </td>
                 <td className="px-5 py-3">

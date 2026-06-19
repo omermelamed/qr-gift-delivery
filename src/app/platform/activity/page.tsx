@@ -106,7 +106,7 @@ export default async function ActivityPage() {
                 <p className="text-xs text-zinc-400 mt-0.5">{e.company}</p>
               </div>
               <time className="text-xs text-zinc-400 flex-shrink-0 whitespace-nowrap">
-                {new Date(e.timestamp).toLocaleString()}
+                {new Date(e.timestamp).toLocaleString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })}
               </time>
             </div>
           ))}
