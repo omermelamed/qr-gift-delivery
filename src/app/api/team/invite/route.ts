@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
 
   const appMeta = user.app_metadata as JwtAppMetadata
   const companyId = await resolveCompanyId(appMeta)
-  if (!companyId || !appMeta?.role_id) {
+  if (!companyId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 

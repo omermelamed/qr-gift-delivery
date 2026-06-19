@@ -16,7 +16,7 @@ export async function GET(
 
   const appMeta = user.app_metadata as JwtAppMetadata
   const companyId = await resolveCompanyId(appMeta)
-  if (!companyId || !appMeta?.role_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
   if (!hasPermission(permissions, 'campaigns:launch')) {
@@ -66,7 +66,7 @@ export async function POST(
 
   const appMeta = user.app_metadata as JwtAppMetadata
   const companyId = await resolveCompanyId(appMeta)
-  if (!companyId || !appMeta?.role_id) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
   if (!hasPermission(permissions, 'campaigns:launch')) {
