@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { logAuditEvent } from '@/lib/audit'
+import type { JwtAppMetadata } from '@/types'
 
 export async function POST(
   request: NextRequest,
@@ -50,7 +51,9 @@ export async function POST(
 
   if (assignedDistributors && assignedDistributors.length > 0 && distributorId) {
     const assignedIds = new Set(assignedDistributors.map((r) => r.user_id))
-    if (!assignedIds.has(distributorId)) {
+    const callerMeta = caller.app_metadata as JwtAppMetadata | undefined
+    const callerIsPlatformAdmin = callerMeta?.role_name === 'platform_admin'
+    if (!assignedIds.has(distributorId) && !callerIsPlatformAdmin) {
       const companyId = campaign?.company_id
       const { data: privilegedRole } = companyId
         ? await supabase

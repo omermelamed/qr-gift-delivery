@@ -19,7 +19,7 @@ export default async function VerifyPage({
   }
 
   const meta = user.app_metadata as JwtAppMetadata | undefined
-  const canScan = meta?.role_name === 'scanner' || meta?.role_name === 'company_admin'
+  const canScan = meta?.role_name === 'platform_admin' || meta?.role_name === 'scanner' || meta?.role_name === 'company_admin'
 
   // Logged in but not a scanner — redirect to admin or show not authorized
   if (!canScan) {
