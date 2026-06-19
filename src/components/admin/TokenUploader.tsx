@@ -29,8 +29,8 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
 
   async function processFile(file: File) {
     setMessage(null)
-    const buf = await file.arrayBuffer()
-    const wb = read(buf)
+    const text = await file.text()
+    const wb = read(text, { type: 'string' })
     const sheet = wb.Sheets[wb.SheetNames[0]]
     const raw: Record<string, string>[] = utils.sheet_to_json(sheet, { defval: '' })
     const parsed: ParsedRow[] = raw.map(normalizeCSVRow)

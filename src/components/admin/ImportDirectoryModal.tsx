@@ -29,8 +29,8 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
     setFileName(file.name)
     setRows([])
     try {
-      const buf = await file.arrayBuffer()
-      const wb = read(buf)
+      const text = await file.text()
+      const wb = read(text, { type: 'string' })
       const sheet = wb.Sheets[wb.SheetNames[0]]
       const raw: Record<string, unknown>[] = utils.sheet_to_json(sheet, { defval: '' })
       if (raw.length === 0) {
