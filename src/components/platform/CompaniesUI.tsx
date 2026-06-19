@@ -63,11 +63,10 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
         <table className="w-full text-sm table-fixed">
           <thead>
             <tr className="border-b border-zinc-100 bg-zinc-50">
-              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[16%]">Company</th>
-              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[18%]">Admin Email</th>
-              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[8%]">Slug</th>
-              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[10%]">Created</th>
-              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[8%]">Status</th>
+              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[18%]">Company</th>
+              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[20%]">Admin Email</th>
+              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[12%]">Created</th>
+              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[10%]">Status</th>
               <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[14%]">Credits</th>
               <th className="px-5 py-3 w-[26%]" />
             </tr>
@@ -75,14 +74,13 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
           <tbody>
             {companies.length === 0 && (
               <tr>
-                <td colSpan={7} className="text-center py-16 text-zinc-400">No companies yet. Create one to get started.</td>
+                <td colSpan={6} className="text-center py-16 text-zinc-400">No companies yet. Create one to get started.</td>
               </tr>
             )}
             {companies.map(company => (
               <tr key={company.id} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50 transition-colors">
                 <td className="px-5 py-4 font-medium text-zinc-900 truncate">{company.name}</td>
                 <td className="px-5 py-4 text-zinc-500 text-xs truncate">{company.admin_email ?? <span className="text-zinc-300">—</span>}</td>
-                <td className="px-5 py-4 text-zinc-500 font-mono text-xs truncate">{company.slug}</td>
                 <td className="px-5 py-4 text-zinc-500">{new Date(company.created_at).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' })}</td>
                 <td className="px-5 py-4">
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
