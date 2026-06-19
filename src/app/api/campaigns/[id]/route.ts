@@ -24,7 +24,7 @@ export async function PATCH(
 
   const { data: campaign } = await service
     .from('campaigns')
-    .select('id, sent_at')
+    .select('id, sent_at, scheduled_at')
     .eq('id', campaignId)
     .eq('company_id', appMeta.company_id)
     .single()
@@ -40,7 +40,8 @@ export async function PATCH(
     if (!body.scheduledAt) updates.scheduled_confirmed_at = null
   }
 
-  if ('confirmSchedule' in body && body.confirmSchedule) {
+  const confirmingSchedule = 'confirmSchedule' in body && body.confirmSchedule
+  if (confirmingSchedule) {
     updates.scheduled_confirmed_at = new Date().toISOString()
   }
 
@@ -59,6 +60,18 @@ export async function PATCH(
     .eq('company_id', appMeta.company_id)
 
   if (updateError) return NextResponse.json({ error: 'Update failed' }, { status: 500 })
+
+  // If confirming and scheduled time is now or in the past, trigger send immediately
+  if (confirmingSchedule && campaign.scheduled_at && new Date(campaign.scheduled_at) <= new Date()) {
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
+    fetch(`${appUrl}/api/campaigns/${campaignId}/send`, {
+      method: 'POST',
+      headers: {
+        'x-cron-secret': process.env.CRON_SECRET ?? '',
+        'x-company-id': appMeta.company_id,
+      },
+    }).catch(() => {})
+  }
 
   return NextResponse.json({ ok: true })
 }
