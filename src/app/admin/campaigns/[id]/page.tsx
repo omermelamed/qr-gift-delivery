@@ -37,7 +37,7 @@ export default async function CampaignDetailPage({
   const [campaignResult, creditsResult] = await Promise.all([
     service
       .from('campaigns')
-      .select('id, name, campaign_date, sent_at, closed_at, scheduled_at, scheduled_confirmed_at')
+      .select('id, name, campaign_date, sent_at, closed_at')
       .eq('id', campaignId)
       .eq('company_id', appMeta.company_id)
       .single(),
@@ -95,9 +95,7 @@ export default async function CampaignDetailPage({
 
   const gifts = giftsData ?? []
   const claimedCount = allTokens.filter((t) => t.redeemed).length
-  const isConfirmedSchedule = !!campaign.scheduled_confirmed_at && !campaign.sent_at
-  const isDraft = !campaign.sent_at && !isConfirmedSchedule
-  const showActiveLayout = !!campaign.sent_at || isConfirmedSchedule
+  const isDraft = !campaign.sent_at
   const canLaunch = isDraft && allTokens.length > 0
   const canClose = !!campaign.sent_at && !campaign.closed_at
   const unredeemedCount = allTokens.filter((t) => !t.redeemed).length
@@ -108,21 +106,19 @@ export default async function CampaignDetailPage({
       <CampaignDetailHeader
         campaignName={campaign.name}
         campaignDate={campaign.campaign_date}
-        scheduledAt={campaign.scheduled_at}
-        sentAt={campaign.sent_at}
       />
 
       <div className="flex items-start justify-between gap-4 mb-6">
         <div />
         <div className="group flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
-          <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} scheduledConfirmedAt={campaign.scheduled_confirmed_at} />
+          <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} />
           {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter />}
           <DuplicateCampaignButton
             campaignId={campaign.id}
             sourceName={campaign.name}
             sourceDate={campaign.campaign_date}
           />
-          {showActiveLayout && (
+          {campaign.sent_at && (
             <Link
               href={`/admin/campaigns/${campaign.id}/qr`}
               className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
@@ -130,7 +126,7 @@ export default async function CampaignDetailPage({
               View QR Codes
             </Link>
           )}
-          {showActiveLayout && (
+          {campaign.sent_at && (
             <a
               href={`/api/campaigns/${campaign.id}/export`}
               download
@@ -143,8 +139,8 @@ export default async function CampaignDetailPage({
             <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} />
           )}
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
-          {(canLaunch || isConfirmedSchedule) && (
-            <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} creditBalance={creditBalance} scheduledAt={campaign.scheduled_at} scheduledConfirmedAt={campaign.scheduled_confirmed_at} />
+          {canLaunch && (
+            <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} creditBalance={creditBalance} />
           )}
         </div>
       </div>
@@ -162,7 +158,7 @@ export default async function CampaignDetailPage({
       {/* ── Bento grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
 
-        {!showActiveLayout ? (
+        {isDraft ? (
           <>
             {/* Draft: Populator (2 cols) + Distributor + GiftOptions (1 col) */}
             <div className="lg:col-span-2">
