@@ -34,7 +34,7 @@ export async function POST(
     const appMeta = user.app_metadata as JwtAppMetadata
     const resolved = await resolveCompanyId(appMeta)
     if (!resolved) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    const permissions = await fetchPermissions(appMeta.role_id)
+    const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
     if (!hasPermission(permissions, 'campaigns:launch')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }

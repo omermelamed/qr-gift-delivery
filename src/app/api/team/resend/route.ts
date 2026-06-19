@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const permissions = await fetchPermissions(appMeta.role_id)
+  const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
   if (!hasPermission(permissions, 'users:manage')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }

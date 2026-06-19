@@ -3,9 +3,13 @@ import type { Permission } from '@/types'
 
 type RolePermissionRow = { permissions: Pick<Permission, 'name'> | null }
 
-// Fetches permission names for a role from the DB.
-// Used by API routes to gate access without repeating the query.
-export async function fetchPermissions(roleId: string): Promise<string[]> {
+const PLATFORM_ADMIN_SENTINEL = ['__platform_admin__'] as const
+
+export async function fetchPermissions(roleId: string | undefined, roleName?: string): Promise<string[]> {
+  if (roleName === 'platform_admin') return [...PLATFORM_ADMIN_SENTINEL]
+
+  if (!roleId) return []
+
   const supabase = createServiceClient()
   const { data, error } = await supabase
     .from('role_permissions')
@@ -19,5 +23,6 @@ export async function fetchPermissions(roleId: string): Promise<string[]> {
 }
 
 export function hasPermission(permissions: string[], required: string): boolean {
+  if (permissions.includes('__platform_admin__')) return true
   return permissions.includes(required)
 }

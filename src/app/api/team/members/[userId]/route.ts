@@ -14,8 +14,8 @@ async function getCallerAndPermissions() {
   if (!user) return null
   const appMeta = user.app_metadata as JwtAppMetadata
   const companyId = await resolveCompanyId(appMeta)
-  if (!companyId || !appMeta?.role_id) return null
-  const permissions = await fetchPermissions(appMeta.role_id)
+  if (!companyId) return null
+  const permissions = await fetchPermissions(appMeta?.role_id, appMeta?.role_name)
   if (!hasPermission(permissions, 'users:manage')) return null
   return { user, appMeta, companyId }
 }

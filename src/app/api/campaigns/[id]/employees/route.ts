@@ -20,7 +20,7 @@ export async function POST(
   if (!companyId || !appMeta?.role_id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const permissions = await fetchPermissions(appMeta.role_id)
+  const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
   if (!hasPermission(permissions, 'campaigns:create')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
@@ -88,7 +88,7 @@ export async function DELETE(
   if (!companyId || !appMeta?.role_id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  const permissions = await fetchPermissions(appMeta.role_id)
+  const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
   if (!hasPermission(permissions, 'campaigns:create')) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }

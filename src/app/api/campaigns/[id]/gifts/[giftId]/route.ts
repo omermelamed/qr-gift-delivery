@@ -11,7 +11,7 @@ async function getAuthedService(campaignId: string) {
   const appMeta = user.app_metadata as JwtAppMetadata
   const companyId = await resolveCompanyId(appMeta)
   if (!companyId || !appMeta?.role_id) return null
-  const permissions = await fetchPermissions(appMeta.role_id)
+  const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
   if (!hasPermission(permissions, 'campaigns:launch')) return null
   const service = createServiceClient()
   const { data: campaign } = await service
