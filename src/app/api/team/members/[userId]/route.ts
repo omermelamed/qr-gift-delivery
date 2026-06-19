@@ -110,11 +110,47 @@ export async function PATCH(
   }
 
   if (Object.keys(employeeUpdates).length > 0) {
+    // Get current employee data before updating (needed for gift_tokens matching)
+    const { data: emp } = await service
+      .from('employees')
+      .select('employee_name, phone')
+      .eq('user_id', userId)
+      .eq('company_id', appMeta.company_id)
+      .maybeSingle()
+
     await service
       .from('employees')
       .update(employeeUpdates)
       .eq('user_id', userId)
       .eq('company_id', appMeta.company_id)
+
+    // Propagate to gift_tokens so campaign pages reflect the change
+    if (emp) {
+      const tokenUpdates: Record<string, string | null> = {}
+      if (employeeUpdates.employee_name) tokenUpdates.employee_name = employeeUpdates.employee_name as string
+      if (employeeUpdates.phone !== undefined) tokenUpdates.phone_number = employeeUpdates.phone as string | null
+
+      if (Object.keys(tokenUpdates).length > 0) {
+        const { data: campaignIds } = await service
+          .from('campaigns')
+          .select('id')
+          .eq('company_id', appMeta.company_id)
+
+        if (campaignIds && campaignIds.length > 0) {
+          let query = service
+            .from('gift_tokens')
+            .update(tokenUpdates)
+            .in('campaign_id', campaignIds.map((c) => c.id))
+            .eq('employee_name', emp.employee_name)
+
+          if (emp.phone) {
+            query = query.eq('phone_number', emp.phone)
+          }
+
+          await query
+        }
+      }
+    }
   }
 
   return NextResponse.json({ success: true })
