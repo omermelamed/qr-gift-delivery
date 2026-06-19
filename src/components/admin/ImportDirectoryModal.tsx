@@ -19,21 +19,34 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   async function processFile(file: File) {
-    const buf = await file.arrayBuffer()
-    const wb = read(buf)
-    const sheet = wb.Sheets[wb.SheetNames[0]]
-    const raw: Record<string, string>[] = utils.sheet_to_json(sheet, { defval: '' })
-    const parsed: ParsedRow[] = raw
-      .map((r) => {
-        const normalized = normalizeCSVRow(r)
-        return {
-          employee_name: normalized.name,
-          phone: normalized.phone_number,
-          department: normalized.department,
-        }
-      })
-      .filter((r) => r.employee_name && r.phone)
-    setRows(parsed)
+    setError(null)
+    try {
+      const buf = await file.arrayBuffer()
+      const wb = read(buf)
+      const sheet = wb.Sheets[wb.SheetNames[0]]
+      const raw: Record<string, unknown>[] = utils.sheet_to_json(sheet, { defval: '' })
+      if (raw.length === 0) {
+        setError(t('File is empty or has no data rows'))
+        return
+      }
+      const parsed: ParsedRow[] = raw
+        .map((r) => {
+          const normalized = normalizeCSVRow(r)
+          return {
+            employee_name: normalized.name,
+            phone: normalized.phone_number,
+            department: normalized.department,
+          }
+        })
+        .filter((r) => r.employee_name && r.phone)
+      if (parsed.length === 0 && raw.length > 0) {
+        const keys = Object.keys(raw[0]).join(', ')
+        setError(`${t('No matching columns found. Your columns:')} ${keys}. ${t('Expected: name/שם, phone_number/טלפון, department/מחלקה')}`)
+      }
+      setRows(parsed)
+    } catch (err) {
+      setError(`${t('Failed to read file')}: ${err instanceof Error ? err.message : String(err)}`)
+    }
   }
 
   async function handleImport() {
