@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
     .upload(path, buffer, { upsert: true, contentType: file.type })
 
   if (uploadError) {
+    console.error('[logo upload]', uploadError.message)
     return NextResponse.json({ error: uploadError.message }, { status: 500 })
   }
 
