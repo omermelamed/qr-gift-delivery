@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { data: { publicUrl } } = service.storage.from('logos').getPublicUrl(path)
+  const bustUrl = `${publicUrl}?v=${Date.now()}`
 
-  return NextResponse.json({ url: publicUrl })
+  return NextResponse.json({ url: bustUrl })
 }
