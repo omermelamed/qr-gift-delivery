@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
 import { TemplateEditor } from '@/components/sms/TemplateEditor'
-import { PageHeading } from '@/components/sms/PageHeading'
 
 type Props = { params: Promise<{ id: string }> }
 
@@ -25,7 +24,7 @@ export default async function EditTemplatePage({ params }: Props) {
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
-      <PageHeading text="Edit Template" />
+      <h1 className="text-2xl font-bold text-zinc-900 mb-6">Edit Template</h1>
       <TemplateEditor
         mode="edit"
         templateId={template.id}

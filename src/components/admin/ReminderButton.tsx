@@ -16,9 +16,10 @@ type TokenSlice = {
 type Props = {
   campaignId: string
   tokens: TokenSlice[]
+  creditBalance: number
 }
 
-export function ReminderButton({ campaignId, tokens }: Props) {
+export function ReminderButton({ campaignId, tokens, creditBalance }: Props) {
   const t = useT()
   const [showModal, setShowModal] = useState(false)
   const [result, setResult] = useState<{ dispatched: number; failed: number } | null>(null)
@@ -44,6 +45,7 @@ export function ReminderButton({ campaignId, tokens }: Props) {
         <ResendModal
           campaignId={campaignId}
           tokens={tokens}
+          creditBalance={creditBalance}
           onClose={() => setShowModal(false)}
           onDone={(dispatched, failed) => {
             setResult({ dispatched, failed })

@@ -9,8 +9,8 @@ type AuditAction =
   | 'campaign.reminder_sent'
   | 'token.redeemed'
   | 'credits.purchased'
-  | 'sms_campaign.created'
-  | 'sms_campaign.sent'
+  | 'credits.used'
+  | 'credits.refunded'
   | 'template.created'
   | 'template.updated'
   | 'template.deleted'
@@ -19,7 +19,7 @@ type AuditEventInput = {
   companyId: string
   actorId: string | null
   action: AuditAction
-  resourceType: 'campaign' | 'gift_token' | 'credits' | 'sms_campaign' | 'template'
+  resourceType: 'campaign' | 'gift_token' | 'credits' | 'template'
   resourceId?: string
   metadata?: Record<string, unknown>
 }

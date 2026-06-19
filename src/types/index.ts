@@ -114,39 +114,6 @@ export type MessageTemplate = {
   updated_at: string
 }
 
-export type SmsCampaignStatus = 'draft' | 'validating' | 'sending' | 'sent' | 'failed' | 'cancelled'
-
-export type SmsCampaign = {
-  id: string
-  company_id: string
-  name: string
-  template_id: string | null
-  status: SmsCampaignStatus
-  recipients_count: number
-  sent_count: number
-  failed_count: number
-  credits_reserved: number
-  created_by: string | null
-  created_at: string
-  sent_at: string | null
-}
-
-export type SmsMessageStatus = 'pending' | 'queued' | 'sent' | 'delivered' | 'failed' | 'undelivered'
-
-export type SmsMessage = {
-  id: string
-  campaign_id: string
-  recipient_phone: string
-  recipient_name: string | null
-  body: string
-  status: SmsMessageStatus
-  provider_id: string | null
-  error_message: string | null
-  sent_at: string | null
-  delivered_at: string | null
-  created_at: string
-}
-
 export const CREDIT_PACKAGES = [
   { name: 'Starter', messages: 100, price: 100 },
   { name: 'Small', messages: 300, price: 280 },

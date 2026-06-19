@@ -466,6 +466,8 @@ export const he: Record<string, string> = {
   'Sending...': 'שולח...',
   'Credits Reserved': 'קרדיטים שמורים',
   'Insufficient credits': 'אין מספיק קרדיטים',
+  'SMS credits remaining': 'קרדיטי SMS נותרו',
+  'after sending': 'לאחר שליחה',
   'Campaign sent:': 'קמפיין נשלח:',
   'Messages': 'הודעות',
   'Recipient': 'נמען',
@@ -478,10 +480,13 @@ export const he: Record<string, string> = {
   'Sending': 'שולח',
   'Cancelled': 'בוטל',
 
+  'Need': 'צריך',
+  'have': 'יש',
+  'Manage': 'ניהול',
+  'credits will be used': 'קרדיטים ישמשו',
+
   // SMS Audit actions
   'Purchased credits': 'רכש קרדיטים',
-  'Created SMS campaign': 'יצר קמפיין SMS',
-  'Sent SMS campaign': 'שלח קמפיין SMS',
   'Created template': 'יצר תבנית',
   'Updated template': 'עדכן תבנית',
   'Deleted template': 'מחק תבנית',

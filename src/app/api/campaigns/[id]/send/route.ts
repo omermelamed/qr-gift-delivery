@@ -73,6 +73,48 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to fetch tokens' }, { status: 500 })
   }
 
+  // Credit check — count tokens that will actually send SMS
+  const smsTokens = tokens.filter((t) => t.phone_number)
+  const smsCount = smsTokens.length
+
+  if (smsCount > 0) {
+    const { data: credits } = await service
+      .from('credits')
+      .select('id, balance, total_used')
+      .eq('company_id', companyId)
+      .single()
+
+    if (!credits || credits.balance < smsCount) {
+      return NextResponse.json(
+        { error: `Insufficient SMS credits: need ${smsCount}, have ${credits?.balance ?? 0}` },
+        { status: 402 }
+      )
+    }
+
+    // Atomic reserve — .gte guard prevents race conditions
+    const { error: reserveError } = await service
+      .from('credits')
+      .update({
+        total_used: credits.total_used + smsCount,
+        balance: credits.balance - smsCount,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('company_id', companyId)
+      .gte('balance', smsCount)
+
+    if (reserveError) {
+      return NextResponse.json({ error: 'Failed to reserve credits' }, { status: 402 })
+    }
+
+    await service.from('credit_transactions').insert({
+      company_id: companyId,
+      amount: smsCount,
+      type: 'use' as const,
+      description: `Campaign "${campaign.name}" — ${smsCount} SMS`,
+      created_by: actorUserId ?? null,
+    })
+  }
+
   const smsSending = isTwilioConfigured()
   let dispatched = 0
   let failed = 0
@@ -137,8 +179,34 @@ export async function POST(
     }
   }
 
-  // Stamp sent_at unconditionally — the campaign is "launched" regardless of
-  // individual SMS delivery results. Failures are surfaced via the dispatched/failed counts.
+  // Refund credits for failed SMS sends
+  if (failed > 0 && smsCount > 0) {
+    const { data: currentCredits } = await service
+      .from('credits')
+      .select('total_used, balance')
+      .eq('company_id', companyId!)
+      .single()
+
+    if (currentCredits) {
+      await service
+        .from('credits')
+        .update({
+          total_used: currentCredits.total_used - failed,
+          balance: currentCredits.balance + failed,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('company_id', companyId!)
+
+      await service.from('credit_transactions').insert({
+        company_id: companyId!,
+        amount: failed,
+        type: 'refund' as const,
+        description: `Campaign "${campaign.name}" — ${failed} failed SMS refunded`,
+        created_by: actorUserId ?? null,
+      })
+    }
+  }
+
   await service
     .from('campaigns')
     .update({ sent_at: new Date().toISOString() })

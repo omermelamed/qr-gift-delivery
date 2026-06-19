@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
@@ -19,6 +18,7 @@ import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignBut
 import { ReminderButton } from '@/components/admin/ReminderButton'
 import { GiftBreakdown } from '@/components/admin/GiftBreakdown'
 import { CampaignDetailHeader } from '@/components/admin/CampaignDetailHeader'
+import { CreditIndicator } from '@/components/admin/CreditIndicator'
 
 export default async function CampaignDetailPage({
   params,
@@ -34,14 +34,24 @@ export default async function CampaignDetailPage({
 
   const service = createServiceClient()
 
-  const { data: campaign } = await service
-    .from('campaigns')
-    .select('id, name, campaign_date, sent_at, closed_at, scheduled_at')
-    .eq('id', campaignId)
-    .eq('company_id', appMeta.company_id)
-    .single()
+  const [campaignResult, creditsResult] = await Promise.all([
+    service
+      .from('campaigns')
+      .select('id, name, campaign_date, sent_at, closed_at, scheduled_at')
+      .eq('id', campaignId)
+      .eq('company_id', appMeta.company_id)
+      .single(),
+    service
+      .from('credits')
+      .select('balance')
+      .eq('company_id', appMeta.company_id)
+      .single(),
+  ])
 
-  if (!campaign) notFound()
+  const campaign = campaignResult.data
+  if (!campaign) redirect('/admin')
+
+  const creditBalance = creditsResult.data?.balance ?? 0
 
   const { data: tokens } = await service
     .from('gift_tokens')
@@ -103,14 +113,16 @@ export default async function CampaignDetailPage({
             </a>
           )}
           {campaign.sent_at && !campaign.closed_at && (
-            <ReminderButton campaignId={campaign.id} tokens={allTokens} />
+            <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} />
           )}
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
           {canLaunch && (
-            <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} />
+            <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} creditBalance={creditBalance} />
           )}
         </div>
       </div>
+
+      <CreditIndicator balance={creditBalance} needed={isDraft ? allTokens.filter((t) => !!t.phone_number).length : undefined} />
 
       {/* ── Bento grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">

@@ -107,50 +107,50 @@ ALTER TABLE sms_messages         ENABLE ROW LEVEL SECURITY;
 
 -- credits
 CREATE POLICY "credits_platform_admin" ON credits
-  FOR ALL USING (auth.is_platform_admin());
+  FOR ALL USING (coalesce(auth.jwt() -> 'app_metadata' ->> 'role_name', '') = 'platform_admin');
 
 CREATE POLICY "credits_company_isolation" ON credits
-  FOR SELECT USING (company_id = auth.jwt_company_id());
+  FOR SELECT USING (company_id = (auth.jwt() -> 'app_metadata' ->> 'company_id')::uuid);
 
 -- credit_transactions
 CREATE POLICY "credit_transactions_platform_admin" ON credit_transactions
-  FOR ALL USING (auth.is_platform_admin());
+  FOR ALL USING (coalesce(auth.jwt() -> 'app_metadata' ->> 'role_name', '') = 'platform_admin');
 
 CREATE POLICY "credit_transactions_company_isolation" ON credit_transactions
-  FOR SELECT USING (company_id = auth.jwt_company_id());
+  FOR SELECT USING (company_id = (auth.jwt() -> 'app_metadata' ->> 'company_id')::uuid);
 
 -- message_templates
 CREATE POLICY "message_templates_platform_admin" ON message_templates
-  FOR ALL USING (auth.is_platform_admin());
+  FOR ALL USING (coalesce(auth.jwt() -> 'app_metadata' ->> 'role_name', '') = 'platform_admin');
 
 CREATE POLICY "message_templates_company_isolation" ON message_templates
-  FOR ALL USING (company_id = auth.jwt_company_id())
-  WITH CHECK (company_id = auth.jwt_company_id());
+  FOR ALL USING (company_id = (auth.jwt() -> 'app_metadata' ->> 'company_id')::uuid)
+  WITH CHECK (company_id = (auth.jwt() -> 'app_metadata' ->> 'company_id')::uuid);
 
 -- sms_campaigns
 CREATE POLICY "sms_campaigns_platform_admin" ON sms_campaigns
-  FOR ALL USING (auth.is_platform_admin());
+  FOR ALL USING (coalesce(auth.jwt() -> 'app_metadata' ->> 'role_name', '') = 'platform_admin');
 
 CREATE POLICY "sms_campaigns_company_isolation" ON sms_campaigns
-  FOR ALL USING (company_id = auth.jwt_company_id())
-  WITH CHECK (company_id = auth.jwt_company_id());
+  FOR ALL USING (company_id = (auth.jwt() -> 'app_metadata' ->> 'company_id')::uuid)
+  WITH CHECK (company_id = (auth.jwt() -> 'app_metadata' ->> 'company_id')::uuid);
 
 -- sms_messages (inherit company scope through sms_campaigns)
 CREATE POLICY "sms_messages_platform_admin" ON sms_messages
-  FOR ALL USING (auth.is_platform_admin());
+  FOR ALL USING (coalesce(auth.jwt() -> 'app_metadata' ->> 'role_name', '') = 'platform_admin');
 
 CREATE POLICY "sms_messages_company_isolation" ON sms_messages
   FOR ALL USING (
     EXISTS (
       SELECT 1 FROM sms_campaigns sc
       WHERE sc.id = campaign_id
-        AND sc.company_id = auth.jwt_company_id()
+        AND sc.company_id = (auth.jwt() -> 'app_metadata' ->> 'company_id')::uuid
     )
   )
   WITH CHECK (
     EXISTS (
       SELECT 1 FROM sms_campaigns sc
       WHERE sc.id = campaign_id
-        AND sc.company_id = auth.jwt_company_id()
+        AND sc.company_id = (auth.jwt() -> 'app_metadata' ->> 'company_id')::uuid
     )
   );

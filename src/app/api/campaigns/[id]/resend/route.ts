@@ -62,6 +62,47 @@ export async function POST(
     return NextResponse.json({ dispatched: 0, failed: 0 })
   }
 
+  // Credit check for resend
+  const smsTokens = tokens.filter((t) => !!t.phone_number)
+  const smsCount = smsTokens.length
+
+  if (smsCount > 0) {
+    const { data: credits } = await service
+      .from('credits')
+      .select('id, balance, total_used')
+      .eq('company_id', appMeta.company_id)
+      .single()
+
+    if (!credits || credits.balance < smsCount) {
+      return NextResponse.json(
+        { error: `Insufficient SMS credits: need ${smsCount}, have ${credits?.balance ?? 0}` },
+        { status: 402 }
+      )
+    }
+
+    const { error: reserveError } = await service
+      .from('credits')
+      .update({
+        total_used: credits.total_used + smsCount,
+        balance: credits.balance - smsCount,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('company_id', appMeta.company_id)
+      .gte('balance', smsCount)
+
+    if (reserveError) {
+      return NextResponse.json({ error: 'Failed to reserve credits' }, { status: 402 })
+    }
+
+    await service.from('credit_transactions').insert({
+      company_id: appMeta.company_id,
+      amount: smsCount,
+      type: 'use' as const,
+      description: `Campaign "${campaign.name}" resend — ${smsCount} SMS`,
+      created_by: user.id,
+    })
+  }
+
   let dispatched = 0
   let failed = 0
 
@@ -96,6 +137,34 @@ export async function POST(
     }
     if (i + BATCH_SIZE < tokens.length) {
       await new Promise((r) => setTimeout(r, DELAY_MS))
+    }
+  }
+
+  // Refund credits for failed resends
+  if (failed > 0 && smsCount > 0) {
+    const { data: currentCredits } = await service
+      .from('credits')
+      .select('total_used, balance')
+      .eq('company_id', appMeta.company_id)
+      .single()
+
+    if (currentCredits) {
+      await service
+        .from('credits')
+        .update({
+          total_used: currentCredits.total_used - failed,
+          balance: currentCredits.balance + failed,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('company_id', appMeta.company_id)
+
+      await service.from('credit_transactions').insert({
+        company_id: appMeta.company_id,
+        amount: failed,
+        type: 'refund' as const,
+        description: `Campaign "${campaign.name}" resend — ${failed} failed SMS refunded`,
+        created_by: user.id,
+      })
     }
   }
 

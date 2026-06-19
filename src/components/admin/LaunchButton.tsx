@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useT } from '@/lib/i18n/useT'
 
-export function LaunchButton({ campaignId, employeeCount }: { campaignId: string; employeeCount: number }) {
+export function LaunchButton({ campaignId, employeeCount, creditBalance }: { campaignId: string; employeeCount: number; creditBalance: number }) {
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -41,9 +41,10 @@ export function LaunchButton({ campaignId, employeeCount }: { campaignId: string
       )}
       <button
         onClick={() => setShowModal(true)}
-        className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-5 py-2.5 text-sm font-semibold hover:brightness-110 transition-all"
+        disabled={creditBalance < employeeCount}
+        className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-5 py-2.5 text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {t('🚀 Launch Campaign')}
+        {creditBalance < employeeCount ? t('Insufficient credits') : t('🚀 Launch Campaign')}
       </button>
       {showModal && (
         <ConfirmModal
