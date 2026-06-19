@@ -37,7 +37,7 @@ export default async function CampaignDetailPage({
   const [campaignResult, creditsResult] = await Promise.all([
     service
       .from('campaigns')
-      .select('id, name, campaign_date, sent_at, closed_at, scheduled_at')
+      .select('id, name, campaign_date, sent_at, closed_at, scheduled_at, scheduled_confirmed_at')
       .eq('id', campaignId)
       .eq('company_id', appMeta.company_id)
       .single(),
@@ -113,7 +113,7 @@ export default async function CampaignDetailPage({
       <div className="flex items-start justify-between gap-4 mb-6">
         <div />
         <div className="group flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
-          <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} />
+          <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} scheduledConfirmedAt={campaign.scheduled_confirmed_at} />
           {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter />}
           <DuplicateCampaignButton
             campaignId={campaign.id}
@@ -142,7 +142,7 @@ export default async function CampaignDetailPage({
           )}
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
           {canLaunch && (
-            <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} creditBalance={creditBalance} scheduledAt={campaign.scheduled_at} />
+            <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} creditBalance={creditBalance} scheduledAt={campaign.scheduled_at} scheduledConfirmedAt={campaign.scheduled_confirmed_at} />
           )}
         </div>
       </div>

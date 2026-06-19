@@ -25,7 +25,7 @@ export default function NewCampaignPage() {
         body: JSON.stringify({
           name,
           campaignDate,
-          scheduledAt: scheduledAt || null,
+          scheduledAt: scheduledAt ? new Date(scheduledAt).toISOString() : null,
         }),
       })
       const data = await res.json()

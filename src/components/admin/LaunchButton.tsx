@@ -5,7 +5,15 @@ import { useRouter } from 'next/navigation'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useT } from '@/lib/i18n/useT'
 
-export function LaunchButton({ campaignId, employeeCount, creditBalance, scheduledAt }: { campaignId: string; employeeCount: number; creditBalance: number; scheduledAt?: string | null }) {
+type Props = {
+  campaignId: string
+  employeeCount: number
+  creditBalance: number
+  scheduledAt?: string | null
+  scheduledConfirmedAt?: string | null
+}
+
+export function LaunchButton({ campaignId, employeeCount, creditBalance, scheduledAt, scheduledConfirmedAt }: Props) {
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -13,8 +21,10 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance, schedul
   const t = useT()
 
   const isScheduled = !!(scheduledAt && new Date(scheduledAt) > new Date())
+  const isConfirmed = !!scheduledConfirmedAt
+  const insufficientCredits = creditBalance < employeeCount
 
-  async function handleConfirm() {
+  async function handleLaunch() {
     setLoading(true)
     setError(null)
     try {
@@ -34,18 +44,18 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance, schedul
     }
   }
 
-  async function handleClearSchedule() {
+  async function patchCampaign(body: Record<string, unknown>) {
     setLoading(true)
     setError(null)
     try {
       const res = await fetch(`/api/campaigns/${campaignId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scheduledAt: null }),
+        body: JSON.stringify(body),
       })
       if (!res.ok) {
         const data = await res.json()
-        setError(data.error ?? t('Failed to clear schedule'))
+        setError(data.error ?? t('Something went wrong'))
         return
       }
       router.refresh()
@@ -56,21 +66,24 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance, schedul
     }
   }
 
-  if (isScheduled) {
+  const errorBanner = error && (
+    <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-2">
+      {error}
+    </p>
+  )
+
+  // State 1: Scheduled + confirmed → show badge + cancel button
+  if (isScheduled && isConfirmed) {
     const scheduledDate = new Date(scheduledAt!)
     return (
       <>
-        {error && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-2">
-            {error}
-          </p>
-        )}
+        {errorBanner}
         <div className="flex items-center gap-2">
           <span className="bg-amber-50 text-amber-700 border border-amber-200 rounded-lg px-4 py-2.5 text-sm font-medium">
             {t('Scheduled:')} {scheduledDate.toLocaleString(undefined, { hour12: false })}
           </span>
           <button
-            onClick={handleClearSchedule}
+            onClick={() => patchCampaign({ cancelConfirmation: true })}
             disabled={loading}
             className="border border-zinc-200 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
           >
@@ -81,19 +94,45 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance, schedul
     )
   }
 
+  // State 2: Scheduled but not confirmed → show confirm button + cancel
+  if (isScheduled && !isConfirmed) {
+    const scheduledDate = new Date(scheduledAt!)
+    return (
+      <>
+        {errorBanner}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-amber-600 font-medium">
+            {scheduledDate.toLocaleString(undefined, { hour12: false })}
+          </span>
+          <button
+            onClick={() => patchCampaign({ confirmSchedule: true })}
+            disabled={loading || insufficientCredits}
+            className="bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-lg px-5 py-2.5 text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? '…' : insufficientCredits ? t('Insufficient credits') : t('Confirm Schedule')}
+          </button>
+          <button
+            onClick={() => patchCampaign({ scheduledAt: null })}
+            disabled={loading}
+            className="border border-zinc-200 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+          >
+            {t('Cancel schedule')}
+          </button>
+        </div>
+      </>
+    )
+  }
+
+  // State 3: No schedule → show launch button
   return (
     <>
-      {error && (
-        <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-2">
-          {error}
-        </p>
-      )}
+      {errorBanner}
       <button
         onClick={() => setShowModal(true)}
-        disabled={creditBalance < employeeCount}
+        disabled={insufficientCredits}
         className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-5 py-2.5 text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {creditBalance < employeeCount ? t('Insufficient credits') : t('🚀 Launch Campaign')}
+        {insufficientCredits ? t('Insufficient credits') : t('🚀 Launch Campaign')}
       </button>
       {showModal && (
         <ConfirmModal
@@ -101,7 +140,7 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance, schedul
           message={`This will send QR codes via SMS to ${employeeCount} employee${employeeCount === 1 ? '' : 's'}. ${t('This cannot be undone.')}`}
           confirmLabel={t('Launch')}
           loading={loading}
-          onConfirm={handleConfirm}
+          onConfirm={handleLaunch}
           onCancel={() => setShowModal(false)}
         />
       )}

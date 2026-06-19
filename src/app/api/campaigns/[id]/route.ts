@@ -37,6 +37,15 @@ export async function PATCH(
 
   if ('scheduledAt' in body) {
     updates.scheduled_at = body.scheduledAt ?? null
+    if (!body.scheduledAt) updates.scheduled_confirmed_at = null
+  }
+
+  if ('confirmSchedule' in body && body.confirmSchedule) {
+    updates.scheduled_confirmed_at = new Date().toISOString()
+  }
+
+  if ('cancelConfirmation' in body && body.cancelConfirmation) {
+    updates.scheduled_confirmed_at = null
   }
 
   if (Object.keys(updates).length === 0) {

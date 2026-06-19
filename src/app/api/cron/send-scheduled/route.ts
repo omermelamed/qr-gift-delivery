@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
     .from('campaigns')
     .select('id, company_id')
     .lte('scheduled_at', new Date().toISOString())
+    .not('scheduled_confirmed_at', 'is', null)
     .is('sent_at', null)
     .is('closed_at', null)
 

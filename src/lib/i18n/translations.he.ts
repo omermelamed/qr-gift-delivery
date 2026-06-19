@@ -140,7 +140,9 @@ export const he: Record<string, string> = {
   'Employee added': 'העובד נוסף',
 
   // Admin campaign detail
+  'Scheduled': 'מתוזמן',
   'Scheduled:': 'מתוזמן:',
+  'Confirm Schedule': 'אשר תזמון',
   'Cancel schedule': 'בטל תזמון',
   'Failed to clear schedule': 'ביטול התזמון נכשל',
   'View QR Codes': 'צפה בקודי QR',
