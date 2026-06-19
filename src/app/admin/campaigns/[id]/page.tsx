@@ -122,7 +122,15 @@ export default async function CampaignDetailPage({
         </div>
       </div>
 
-      <CreditIndicator balance={creditBalance} needed={isDraft ? allTokens.filter((t) => !!t.phone_number).length : undefined} />
+      <CreditIndicator
+        balance={creditBalance}
+        needed={
+          isDraft
+            ? allTokens.filter((t) => !!t.phone_number).length
+            : allTokens.filter((t) => !t.redeemed && !!t.phone_number).length
+        }
+        label={isDraft ? undefined : 'if resending to all unclaimed'}
+      />
 
       {/* ── Bento grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">

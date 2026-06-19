@@ -6,9 +6,10 @@ import { useT } from '@/lib/i18n/useT'
 type Props = {
   balance: number
   needed?: number
+  label?: string
 }
 
-export function CreditIndicator({ balance, needed }: Props) {
+export function CreditIndicator({ balance, needed, label }: Props) {
   const t = useT()
 
   const isLow = balance <= 10
@@ -41,7 +42,7 @@ export function CreditIndicator({ balance, needed }: Props) {
           <span className="text-sm text-zinc-500">
             {insufficient
               ? `${t('Need')} ${needed}, ${t('have')} ${balance}`
-              : `${balance - needed} ${t('after sending')}`}
+              : `${balance - needed} ${t('after sending')}${label ? ` (${t(label)})` : ''}`}
           </span>
         )}
         <Link

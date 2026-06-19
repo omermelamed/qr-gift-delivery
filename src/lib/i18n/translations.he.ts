@@ -485,6 +485,7 @@ export const he: Record<string, string> = {
   'Manage': 'ניהול',
   'credits will be used': 'קרדיטים ישמשו',
   'Contact us to purchase more credits': 'צרו קשר לרכישת קרדיטים נוספים',
+  'if resending to all unclaimed': 'אם שולחים מחדש לכל מי שלא דרש',
 
   // SMS Audit actions
   'Purchased credits': 'רכש קרדיטים',
