@@ -5,7 +5,7 @@ import { normalizePhone } from '@/lib/phone'
 import type { JwtAppMetadata } from '@/types'
 
 type InputRow = { name: string; phone_number: string; department?: string }
-type InsertRow = { campaign_id: string; employee_name: string; phone_number: string | null; department: string | null }
+type InsertRow = { campaign_id: string; employee_name: string; phone_number: string | null; department: string | null; employee_id?: string }
 type RowError = { row: number; reason: string }
 
 export async function POST(
@@ -48,7 +48,7 @@ export async function POST(
 
     const { data: employees } = await service
       .from('employees')
-      .select('employee_name, phone, department')
+      .select('id, employee_name, phone, department')
       .in('id', employeeIds)
       .eq('company_id', appMeta.company_id)
 
@@ -57,6 +57,7 @@ export async function POST(
       employee_name: e.employee_name,
       phone_number: e.phone ?? null,
       department: e.department,
+      employee_id: e.id,
     }))
   } else if (source === 'clone') {
     const sourceCampaignId: string | undefined = body.sourceCampaignId
@@ -73,7 +74,7 @@ export async function POST(
 
     const { data: sourceTokens } = await service
       .from('gift_tokens')
-      .select('employee_name, phone_number, department')
+      .select('employee_name, phone_number, department, employee_id')
       .eq('campaign_id', sourceCampaignId)
 
     insertRows = (sourceTokens ?? []).map((t) => ({
@@ -81,9 +82,21 @@ export async function POST(
       employee_name: t.employee_name,
       phone_number: t.phone_number,
       department: t.department,
+      employee_id: t.employee_id ?? undefined,
     }))
   } else {
     const rows: InputRow[] = Array.isArray(body.rows) ? body.rows : []
+
+    const phones: string[] = []
+    for (const row of rows) {
+      const p = normalizePhone(row.phone_number ?? '')
+      if (p) phones.push(p)
+    }
+
+    const { data: matchedEmps } = phones.length > 0
+      ? await service.from('employees').select('id, phone').in('phone', phones).eq('company_id', appMeta.company_id)
+      : { data: [] }
+    const empByPhone = new Map((matchedEmps ?? []).map((e) => [e.phone, e.id]))
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i]
@@ -95,6 +108,7 @@ export async function POST(
         employee_name: row.name.trim(),
         phone_number: phone,
         department: row.department?.trim() || null,
+        employee_id: empByPhone.get(phone),
       })
     }
   }

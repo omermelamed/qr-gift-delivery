@@ -53,14 +53,39 @@ export default async function CampaignDetailPage({
 
   const creditBalance = creditsResult.data?.balance ?? 0
 
-  const { data: tokens } = await service
-    .from('gift_tokens')
-    .select('id, employee_name, phone_number, department, sms_sent_at, redeemed, redeemed_at, redeemed_by, gift_id, token, qr_image_url')
-    .eq('campaign_id', campaignId)
-    .order('redeemed', { ascending: true })
-    .order('employee_name', { ascending: true })
+  const [tokensResult, employeesResult] = await Promise.all([
+    service
+      .from('gift_tokens')
+      .select('id, employee_name, phone_number, department, sms_sent_at, redeemed, redeemed_at, redeemed_by, gift_id, token, qr_image_url')
+      .eq('campaign_id', campaignId)
+      .order('redeemed', { ascending: true })
+      .order('employee_name', { ascending: true }),
+    service
+      .from('employees')
+      .select('id, employee_name, phone, department')
+      .eq('company_id', appMeta.company_id),
+  ])
 
-  const allTokens = tokens ?? []
+  const employees = employeesResult.data ?? []
+  const empByName = new Map(employees.map((e) => [e.employee_name, e]))
+  const empByPhone = new Map(employees.filter((e) => e.phone).map((e) => [e.phone!, e]))
+
+  const allTokens = (tokensResult.data ?? []).map((t) => {
+    const emp = empByName.get(t.employee_name) ?? (t.phone_number ? empByPhone.get(t.phone_number) : undefined)
+    return {
+      id: t.id,
+      employee_name: emp?.employee_name ?? t.employee_name,
+      phone_number: emp?.phone ?? t.phone_number,
+      department: emp?.department ?? t.department,
+      sms_sent_at: t.sms_sent_at,
+      redeemed: t.redeemed,
+      redeemed_at: t.redeemed_at,
+      redeemed_by: t.redeemed_by,
+      gift_id: t.gift_id,
+      token: t.token,
+      qr_image_url: t.qr_image_url,
+    }
+  })
 
   const { data: giftsData } = await service
     .from('campaign_gifts')

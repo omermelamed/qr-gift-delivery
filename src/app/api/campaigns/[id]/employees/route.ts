@@ -49,9 +49,20 @@ export async function POST(
   if (!name) return NextResponse.json({ error: 'Name is required' }, { status: 400 })
   if (rawPhone && !phone) return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
 
+  let employeeId: string | null = null
+  if (phone) {
+    const { data: emp } = await service
+      .from('employees')
+      .select('id')
+      .eq('company_id', appMeta.company_id)
+      .eq('phone', phone)
+      .maybeSingle()
+    employeeId = emp?.id ?? null
+  }
+
   const { data, error } = await service
     .from('gift_tokens')
-    .insert({ campaign_id: campaignId, employee_name: name, phone_number: phone, department })
+    .insert({ campaign_id: campaignId, employee_name: name, phone_number: phone, department, employee_id: employeeId })
     .select('id')
     .single()
 

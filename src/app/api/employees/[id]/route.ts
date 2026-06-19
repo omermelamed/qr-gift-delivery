@@ -35,69 +35,74 @@ export async function PATCH(
   if (body.department !== undefined) updates.department = body.department?.trim() || null
 
   const service = createServiceClient()
-  const { data, error } = await service
+
+  // Fetch OLD employee data BEFORE update — needed for matching gift_tokens
+  const { data: oldEmp } = await service
+    .from('employees')
+    .select('id, employee_name, phone, company_id, user_id')
+    .eq('id', id)
+    .eq('company_id', appMeta.company_id)
+    .single()
+
+  if (!oldEmp) return NextResponse.json({ error: 'Employee not found' }, { status: 404 })
+
+  const { error } = await service
     .from('employees')
     .update(updates)
     .eq('id', id)
     .eq('company_id', appMeta.company_id)
-    .select('id')
-    .single()
 
-  if (error || !data) return NextResponse.json({ error: 'Employee not found' }, { status: 404 })
+  if (error) return NextResponse.json({ error: 'Failed to update employee' }, { status: 500 })
 
-  const { data: emp } = await service
-    .from('employees')
-    .select('employee_name, phone, company_id')
-    .eq('id', id)
-    .single()
-
-  if (emp) {
-    // Sync name back to auth user if this employee is linked to a team member
-    if (updates.employee_name) {
-      const { data: linked } = await service
-        .from('employees')
-        .select('user_id')
-        .eq('id', id)
-        .single()
-
-      if (linked?.user_id) {
-        const { data: { user: targetUser } } = await service.auth.admin.getUserById(linked.user_id)
-        if (targetUser) {
-          await service.auth.admin.updateUserById(linked.user_id, {
-            user_metadata: { ...(targetUser.user_metadata ?? {}), full_name: updates.employee_name },
-          })
-        }
-      }
-    }
-
-    const tokenUpdates: Record<string, string | null> = {}
-    if (updates.employee_name) tokenUpdates.employee_name = updates.employee_name
-    if (updates.phone !== undefined) tokenUpdates.phone_number = updates.phone
-    if (updates.department !== undefined) tokenUpdates.department = updates.department
-
-    if (Object.keys(tokenUpdates).length > 0) {
-      const { data: campaignIds } = await service
-        .from('campaigns')
-        .select('id')
-        .eq('company_id', emp.company_id)
-
-      if (campaignIds && campaignIds.length > 0) {
-        let query = service
-          .from('gift_tokens')
-          .update(tokenUpdates)
-          .in('campaign_id', campaignIds.map((c) => c.id))
-          .eq('employee_name', emp.employee_name)
-
-        if (emp.phone) {
-          query = query.eq('phone_number', emp.phone)
-        }
-
-        await query
-      }
+  // Sync name back to auth user if this employee is linked to a team member
+  if (updates.employee_name && oldEmp.user_id) {
+    const { data: { user: targetUser } } = await service.auth.admin.getUserById(oldEmp.user_id)
+    if (targetUser) {
+      await service.auth.admin.updateUserById(oldEmp.user_id, {
+        user_metadata: { ...(targetUser.user_metadata ?? {}), full_name: updates.employee_name },
+      })
     }
   }
 
-  return NextResponse.json({ id: data.id })
+  // Sync changes to gift_tokens — match by OLD name/phone, then update
+  const tokenUpdates: Record<string, string | null> = {}
+  if (updates.employee_name) tokenUpdates.employee_name = updates.employee_name
+  if (updates.phone !== undefined) tokenUpdates.phone_number = updates.phone
+  if (updates.department !== undefined) tokenUpdates.department = updates.department
+
+  if (Object.keys(tokenUpdates).length > 0) {
+    const { data: campaignIds } = await service
+      .from('campaigns')
+      .select('id')
+      .eq('company_id', oldEmp.company_id)
+
+    if (campaignIds && campaignIds.length > 0) {
+      const cids = campaignIds.map((c) => c.id)
+
+      // Strategy 1: match by employee_id FK (reliable)
+      await service
+        .from('gift_tokens')
+        .update(tokenUpdates)
+        .in('campaign_id', cids)
+        .eq('employee_id', oldEmp.id)
+
+      // Strategy 2: match by old name (for tokens without employee_id)
+      let fallback = service
+        .from('gift_tokens')
+        .update({ ...tokenUpdates, employee_id: oldEmp.id })
+        .in('campaign_id', cids)
+        .eq('employee_name', oldEmp.employee_name)
+        .is('employee_id', null)
+
+      if (oldEmp.phone) {
+        fallback = fallback.eq('phone_number', oldEmp.phone)
+      }
+
+      await fallback
+    }
+  }
+
+  return NextResponse.json({ id: oldEmp.id })
 }
 
 export async function DELETE(

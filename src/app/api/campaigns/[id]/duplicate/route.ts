@@ -55,7 +55,7 @@ export async function POST(
   if (copyEmployees) {
     const { data: tokens } = await service
       .from('gift_tokens')
-      .select('employee_name, phone_number, department')
+      .select('employee_name, phone_number, department, employee_id')
       .eq('campaign_id', sourceCampaignId)
 
     if (tokens && tokens.length > 0) {
@@ -65,6 +65,7 @@ export async function POST(
           employee_name: t.employee_name,
           phone_number: t.phone_number,
           department: t.department,
+          employee_id: t.employee_id,
         }))
       )
       if (tokenInsertError) {

@@ -30,13 +30,34 @@ export default async function CampaignQrPage({
   if (!campaign) notFound()
   if (!campaign.sent_at) redirect(`/admin/campaigns/${campaignId}`)
 
-  const { data: tokens } = await service
-    .from('gift_tokens')
-    .select('id, employee_name, phone_number, department, token, qr_image_url, redeemed')
-    .eq('campaign_id', campaignId)
-    .order('employee_name')
+  const [tokensResult, employeesResult] = await Promise.all([
+    service
+      .from('gift_tokens')
+      .select('id, employee_name, phone_number, department, token, qr_image_url, redeemed')
+      .eq('campaign_id', campaignId)
+      .order('employee_name'),
+    service
+      .from('employees')
+      .select('id, employee_name, phone, department')
+      .eq('company_id', appMeta.company_id),
+  ])
 
-  const rows = tokens ?? []
+  const employees = employeesResult.data ?? []
+  const empByName = new Map(employees.map((e) => [e.employee_name, e]))
+  const empByPhone = new Map(employees.filter((e) => e.phone).map((e) => [e.phone!, e]))
+
+  const rows = (tokensResult.data ?? []).map((t) => {
+    const emp = empByName.get(t.employee_name) ?? (t.phone_number ? empByPhone.get(t.phone_number) : undefined)
+    return {
+      id: t.id,
+      employee_name: emp?.employee_name ?? t.employee_name,
+      phone_number: emp?.phone ?? t.phone_number,
+      department: emp?.department ?? t.department,
+      token: t.token,
+      qr_image_url: t.qr_image_url,
+      redeemed: t.redeemed,
+    }
+  })
 
   return (
     <div className="p-8 max-w-7xl mx-auto">

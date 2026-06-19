@@ -30,13 +30,36 @@ export async function GET(
 
   if (!campaign) return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
 
-  const { data: tokens } = await service
-    .from('gift_tokens')
-    .select('employee_name, phone_number, department, sms_sent_at, redeemed, redeemed_at, redeemed_by')
-    .eq('campaign_id', campaignId)
-    .order('employee_name')
+  const [tokensResult, employeesResult] = await Promise.all([
+    service
+      .from('gift_tokens')
+      .select('employee_name, phone_number, department, sms_sent_at, redeemed, redeemed_at, redeemed_by')
+      .eq('campaign_id', campaignId)
+      .order('employee_name'),
+    service
+      .from('employees')
+      .select('employee_name, phone, department')
+      .eq('company_id', appMeta.company_id),
+  ])
 
-  if (!tokens) return NextResponse.json({ error: 'Failed to fetch tokens' }, { status: 500 })
+  if (!tokensResult.data) return NextResponse.json({ error: 'Failed to fetch tokens' }, { status: 500 })
+
+  const empList = employeesResult.data ?? []
+  const empByName = new Map(empList.map((e) => [e.employee_name, e]))
+  const empByPhone = new Map(empList.filter((e) => e.phone).map((e) => [e.phone!, e]))
+
+  const tokens = tokensResult.data.map((t) => {
+    const emp = empByName.get(t.employee_name) ?? (t.phone_number ? empByPhone.get(t.phone_number) : undefined)
+    return {
+      employee_name: emp?.employee_name ?? t.employee_name,
+      phone_number: emp?.phone ?? t.phone_number,
+      department: emp?.department ?? t.department,
+      sms_sent_at: t.sms_sent_at,
+      redeemed: t.redeemed,
+      redeemed_at: t.redeemed_at,
+      redeemed_by: t.redeemed_by,
+    }
+  })
 
   // Resolve redeemed_by UUIDs to human-readable names
   const scannerIds = [...new Set(tokens.map((t) => t.redeemed_by).filter(Boolean) as string[])]

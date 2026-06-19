@@ -30,9 +30,9 @@ export default async function TeamPage() {
 
   const userIds = companyUsers.map((u) => u.id)
   const { data: employeeRows } = userIds.length > 0
-    ? await service.from('employees').select('user_id, phone').in('user_id', userIds).eq('company_id', appMeta.company_id)
+    ? await service.from('employees').select('user_id, employee_name, phone').in('user_id', userIds).eq('company_id', appMeta.company_id)
     : { data: [] }
-  const phoneByUserId = new Map((employeeRows ?? []).map((e) => [e.user_id, e.phone]))
+  const employeeByUserId = new Map((employeeRows ?? []).map((e) => [e.user_id, e]))
 
   const members: Member[] = companyUsers.map((u) => {
     const ucrRow = (ucr ?? []).find((r) => r.user_id === u.id)
@@ -41,11 +41,12 @@ export default async function TeamPage() {
     const bannedUntil = (u as unknown as { banned_until?: string }).banned_until
     const reinvitedAt = (u.app_metadata as Record<string, unknown>)?.reinvited_at as string | undefined
     const isReinvited = !!(reinvitedAt && (!u.last_sign_in_at || new Date(reinvitedAt) > new Date(u.last_sign_in_at)))
+    const emp = employeeByUserId.get(u.id)
     return {
       id: u.id,
       email: u.email ?? '',
-      name: u.user_metadata?.full_name ?? u.email?.split('@')[0] ?? '—',
-      phone: phoneByUserId.get(u.id) ?? '',
+      name: emp?.employee_name ?? u.user_metadata?.full_name ?? u.email?.split('@')[0] ?? '—',
+      phone: emp?.phone ?? '',
       role_name: roleRow?.name ?? meta?.role_name ?? '—',
       isPending: !u.last_sign_in_at,
       isReinvited,

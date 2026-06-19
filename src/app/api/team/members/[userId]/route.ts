@@ -110,10 +110,10 @@ export async function PATCH(
   }
 
   if (Object.keys(employeeUpdates).length > 0) {
-    // Get current employee data before updating (needed for gift_tokens matching)
+    // Get current employee data BEFORE updating (needed for gift_tokens matching)
     const { data: emp } = await service
       .from('employees')
-      .select('employee_name, phone')
+      .select('id, employee_name, phone')
       .eq('user_id', userId)
       .eq('company_id', appMeta.company_id)
       .maybeSingle()
@@ -137,17 +137,28 @@ export async function PATCH(
           .eq('company_id', appMeta.company_id)
 
         if (campaignIds && campaignIds.length > 0) {
-          let query = service
+          const cids = campaignIds.map((c) => c.id)
+
+          // Strategy 1: match by employee_id FK (reliable)
+          await service
             .from('gift_tokens')
             .update(tokenUpdates)
-            .in('campaign_id', campaignIds.map((c) => c.id))
+            .in('campaign_id', cids)
+            .eq('employee_id', emp.id)
+
+          // Strategy 2: match by old name for tokens without employee_id
+          let fallback = service
+            .from('gift_tokens')
+            .update({ ...tokenUpdates, employee_id: emp.id })
+            .in('campaign_id', cids)
             .eq('employee_name', emp.employee_name)
+            .is('employee_id', null)
 
           if (emp.phone) {
-            query = query.eq('phone_number', emp.phone)
+            fallback = fallback.eq('phone_number', emp.phone)
           }
 
-          await query
+          await fallback
         }
       }
     }
