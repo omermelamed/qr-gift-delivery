@@ -94,15 +94,25 @@ export async function PATCH(
     })
   }
 
-  // Phone — update linked employee record
+  // Sync name and phone to linked employee record
+  const employeeUpdates: Record<string, unknown> = {}
+
+  if (typeof body.name === 'string' && body.name.trim()) {
+    employeeUpdates.employee_name = body.name.trim()
+  }
+
   if (typeof body.phone === 'string') {
     const phone = body.phone.trim() ? normalizePhone(body.phone) : null
     if (body.phone.trim() && !phone) {
       return NextResponse.json({ error: 'Invalid phone number' }, { status: 400 })
     }
+    employeeUpdates.phone = phone
+  }
+
+  if (Object.keys(employeeUpdates).length > 0) {
     await service
       .from('employees')
-      .update({ phone })
+      .update(employeeUpdates)
       .eq('user_id', userId)
       .eq('company_id', appMeta.company_id)
   }

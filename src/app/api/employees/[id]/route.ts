@@ -52,6 +52,24 @@ export async function PATCH(
     .single()
 
   if (emp) {
+    // Sync name back to auth user if this employee is linked to a team member
+    if (updates.employee_name) {
+      const { data: linked } = await service
+        .from('employees')
+        .select('user_id')
+        .eq('id', id)
+        .single()
+
+      if (linked?.user_id) {
+        const { data: { user: targetUser } } = await service.auth.admin.getUserById(linked.user_id)
+        if (targetUser) {
+          await service.auth.admin.updateUserById(linked.user_id, {
+            user_metadata: { ...(targetUser.user_metadata ?? {}), full_name: updates.employee_name },
+          })
+        }
+      }
+    }
+
     const tokenUpdates: Record<string, string | null> = {}
     if (updates.employee_name) tokenUpdates.employee_name = updates.employee_name
     if (updates.phone !== undefined) tokenUpdates.phone_number = updates.phone
