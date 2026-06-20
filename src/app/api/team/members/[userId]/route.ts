@@ -12,13 +12,13 @@ type AllowedRole = typeof ALLOWED_ROLES[number]
 async function getCallerAndPermissions() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return null
+  if (!user) return { ok: false as const, status: 401 as const }
   const appMeta = user.app_metadata as JwtAppMetadata
   const companyId = await resolveCompanyId(appMeta)
-  if (!companyId) return null
+  if (!companyId) return { ok: false as const, status: 401 as const }
   const permissions = await fetchPermissions(appMeta?.role_id, appMeta?.role_name)
-  if (!hasPermission(permissions, 'users:manage')) return null
-  return { user, appMeta, companyId }
+  if (!hasPermission(permissions, 'users:manage')) return { ok: false as const, status: 403 as const }
+  return { ok: true as const, user, appMeta, companyId }
 }
 
 export async function PATCH(
@@ -27,7 +27,12 @@ export async function PATCH(
 ) {
   const { userId } = await params
   const caller = await getCallerAndPermissions()
-  if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!caller.ok) {
+    return NextResponse.json(
+      { error: caller.status === 403 ? 'Forbidden' : 'Unauthorized' },
+      { status: caller.status }
+    )
+  }
   const { user, appMeta, companyId } = caller
 
   const service = createServiceClient()
@@ -185,7 +190,12 @@ export async function DELETE(
 ) {
   const { userId } = await params
   const caller = await getCallerAndPermissions()
-  if (!caller) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!caller.ok) {
+    return NextResponse.json(
+      { error: caller.status === 403 ? 'Forbidden' : 'Unauthorized' },
+      { status: caller.status }
+    )
+  }
   const { user, appMeta, companyId } = caller
 
   if (userId === user.id) {

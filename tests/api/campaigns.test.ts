@@ -84,8 +84,10 @@ describe('POST /api/campaigns', () => {
 })
 
 describe('GET /api/campaigns', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.resetAllMocks()
+    const { hasPermission } = await import('@/lib/permissions')
+    vi.mocked(hasPermission).mockReturnValue(true)
     mockGetUser.mockResolvedValue({
       data: {
         user: {
@@ -106,6 +108,26 @@ describe('GET /api/campaigns', () => {
   it('returns company-scoped campaign list', async () => {
     mockFromService.mockReturnValue({
       select: () => ({ eq: () => ({ order: () => Promise.resolve({ data: [{ id: 'c-1', name: 'Campaign 1', campaign_date: null, sent_at: null }], error: null }) }) }),
+    })
+    const { GET } = await import('@/app/api/campaigns/route')
+    const res = await GET()
+    const body = await res.json()
+    expect(res.status).toBe(200)
+    expect(body.campaigns).toHaveLength(1)
+    expect(body.campaigns[0].id).toBe('c-1')
+  })
+
+  it('returns only assigned campaigns for a scanner', async () => {
+    const { hasPermission } = await import('@/lib/permissions')
+    vi.mocked(hasPermission).mockImplementation((_perms: string[], required: string) => required === 'tokens:scan')
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: 'scanner-1', app_metadata: { company_id: 'co-1', role_id: 'role-s', role_name: 'scanner' } } },
+    })
+    mockFromService.mockImplementation((table: string) => {
+      if (table === 'campaign_distributors') {
+        return { select: () => ({ eq: () => Promise.resolve({ data: [{ campaign_id: 'c-1' }], error: null }) }) }
+      }
+      return { select: () => ({ eq: () => ({ in: () => ({ order: () => Promise.resolve({ data: [{ id: 'c-1', name: 'Campaign 1', campaign_date: null, sent_at: null }], error: null }) }) }) }) }
     })
     const { GET } = await import('@/app/api/campaigns/route')
     const res = await GET()

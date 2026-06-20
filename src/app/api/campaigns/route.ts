@@ -13,15 +13,38 @@ export async function GET() {
   const appMeta = user.app_metadata as JwtAppMetadata
   const companyId = await resolveCompanyId(appMeta)
   if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
 
   const service = createServiceClient()
-  const { data } = await service
-    .from('campaigns')
-    .select('id, name, campaign_date, sent_at')
-    .eq('company_id', companyId)
-    .order('created_at', { ascending: false })
 
-  return NextResponse.json({ campaigns: data ?? [] })
+  // Admins/managers (campaigns:read) see every campaign in the company.
+  if (hasPermission(permissions, 'campaigns:read')) {
+    const { data } = await service
+      .from('campaigns')
+      .select('id, name, campaign_date, sent_at')
+      .eq('company_id', companyId)
+      .order('created_at', { ascending: false })
+    return NextResponse.json({ campaigns: data ?? [] })
+  }
+
+  // Scanners (tokens:scan) see only the campaigns they're assigned to scan.
+  if (hasPermission(permissions, 'tokens:scan')) {
+    const { data: assignments } = await service
+      .from('campaign_distributors')
+      .select('campaign_id')
+      .eq('user_id', user.id)
+    const ids = (assignments ?? []).map((a) => a.campaign_id)
+    if (ids.length === 0) return NextResponse.json({ campaigns: [] })
+    const { data } = await service
+      .from('campaigns')
+      .select('id, name, campaign_date, sent_at')
+      .eq('company_id', companyId)
+      .in('id', ids)
+      .order('created_at', { ascending: false })
+    return NextResponse.json({ campaigns: data ?? [] })
+  }
+
+  return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 }
 
 export async function POST(request: NextRequest) {
