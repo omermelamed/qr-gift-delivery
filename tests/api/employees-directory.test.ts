@@ -9,6 +9,14 @@ vi.mock('@/lib/supabase/server', () => ({
   createServiceClient: () => ({ from: mockFromService }),
 }))
 
+// Directory routes now require a role permission; the admin user under test
+// holds it. Use plain functions (not vi.fn) so the vi.resetAllMocks() in each
+// beforeEach can't clear their return values.
+vi.mock('@/lib/permissions', () => ({
+  fetchPermissions: async () => ['campaigns:read', 'campaigns:create'],
+  hasPermission: () => true,
+}))
+
 function adminUser(companyId = 'co-1') {
   return {
     data: {
