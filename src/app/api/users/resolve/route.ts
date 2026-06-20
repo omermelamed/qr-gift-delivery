@@ -24,13 +24,32 @@ export async function POST(request: NextRequest) {
 
   const service = createServiceClient()
 
-  // Only resolve names for users that belong to the caller's company (M1).
-  // Foreign IDs are echoed back as-is, never enriched with a name.
+  // Only resolve names for users that legitimately appear in this company's
+  // context (M1) — never let a caller harvest arbitrary user names. The allowed
+  // set is: (a) company members, plus (b) anyone who redeemed one of this
+  // company's tokens (i.e. shows up as a "distributor"), which includes admins
+  // and the platform admin acting on the company's behalf.
+  const allowed = new Set<string>()
+
   const { data: ucr } = await service
     .from('user_company_roles')
     .select('user_id')
     .eq('company_id', companyId)
-  const allowed = new Set((ucr ?? []).map((r) => r.user_id))
+  for (const r of ucr ?? []) allowed.add(r.user_id)
+
+  const { data: campaignRows } = await service
+    .from('campaigns')
+    .select('id')
+    .eq('company_id', companyId)
+  const campaignIds = (campaignRows ?? []).map((c) => c.id)
+  if (campaignIds.length > 0) {
+    const { data: redeemers } = await service
+      .from('gift_tokens')
+      .select('redeemed_by')
+      .in('campaign_id', campaignIds)
+      .in('redeemed_by', ids)
+    for (const r of redeemers ?? []) if (r.redeemed_by) allowed.add(r.redeemed_by)
+  }
 
   const users = await Promise.all(
     ids.map(async (id) => {
