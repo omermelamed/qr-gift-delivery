@@ -13,7 +13,7 @@ export const he: Record<string, string> = {
   "This code doesn't exist.": 'קוד זה אינו קיים.',
   'Campaign closed': 'הקמפיין נסגר',
   'No further gifts can be claimed.': 'לא ניתן לדרוש מתנות נוספות.',
-  'Already claimed': 'כבר נדרש',
+  'Already claimed': 'כבר מומש',
   'already redeemed this gift.': 'כבר מימש את המתנה.',
   'Gift collected!': 'המתנה נלקחה!',
   'Not authorised': 'לא מורשה',
@@ -45,7 +45,7 @@ export const he: Record<string, string> = {
   'Done': 'סיום',
   'Re-invited': 'הוזמן מחדש',
   'Unknown': 'לא ידוע',
-  'Claimed': 'נדרש',
+  'Claimed': 'מומש',
   'Not auth.': 'לא מורשה',
   'Invalid': 'לא תקין',
   'Closed': 'סגור',
@@ -95,7 +95,7 @@ export const he: Record<string, string> = {
   'No campaigns yet': 'אין קמפיינים עדיין',
   'Create your first campaign to get started': 'צור את הקמפיין הראשון שלך כדי להתחיל',
   'of': 'מתוך',
-  'claimed': 'נדרשו',
+  'claimed': 'מומשו',
 
   // Admin team page
   'Member': 'חבר',
@@ -238,7 +238,7 @@ export const he: Record<string, string> = {
 
   // ResendModal
   'Resend SMS': 'שלח שוב SMS',
-  'Not claimed yet': 'עדיין לא נדרשו',
+  'Not claimed yet': 'עדיין לא מומשו',
   'Manual selection': 'בחירה ידנית',
   'All employees have already claimed their gift.': 'כל העובדים כבר קיבלו את מתנתם.',
   'No department data available.': 'אין נתוני מחלקה זמינים.',
