@@ -15,7 +15,7 @@ All findings below have been remediated in code except where noted. Migration
 | C1 generate-qr | ✅ Fixed | Route deleted (was unused; `send` makes QRs inline). |
 | C2 invite hijack | ✅ Fixed | Rejects platform-admin / foreign-company targets. |
 | C3 campaign_notes RLS | ✅ Fixed | New migration — **apply in Supabase**. |
-| H1 gift/lookup | ◑ Partial / accepted | In-memory IP rate-limit added, but **prod test confirmed it does NOT trip** — Vercel spreads requests across serverless instances with no shared memory, so the per-instance counter never accumulates. Left as-is by decision (2026-06-20). Real fix needs a shared store (Upstash Redis) or Vercel Firewall (Pro). Low live risk: endpoint only returns name/company for an unredeemed gift and phones aren't bulk-guessable. |
+| H1 gift/lookup | ◑ Partial / accepted | In-memory IP rate-limit (5/min) now committed & deployed. **Best-effort only** — Vercel spreads requests across serverless instances with no shared memory, so a distributed burst can exceed the limit (an earlier prod test saw no 429). Accepted as-is by decision (2026-06-20). Real fix needs a shared store (Upstash Redis) or Vercel Firewall (Pro). Low live risk: endpoint only returns name/company for an unredeemed gift and phones aren't bulk-guessable. |
 | H2 broken authz | ✅ Fixed | Role gates added to employees/notes/credits/scanners/logo. |
 | H3 qr-codes bucket | ✅ Fixed | INSERT/SELECT restricted to service_role — **apply migration; verify QR images still render in staging**. |
 | H4 xlsx | ✅ Fixed | Repointed to xlsx-0.20.3; run `npm install`. |

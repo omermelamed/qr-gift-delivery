@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import { normalizePhone } from '@/lib/phone'
+import { rateLimit, clientIp } from '@/lib/rate-limit'
 
 export async function POST(request: NextRequest) {
+  // Public, unauthenticated endpoint — rate-limit to curb phone enumeration (H1).
+  const rl = rateLimit(`gift-lookup:${clientIp(request)}`, 5, 60_000)
+  if (!rl.ok) {
+    return NextResponse.json(
+      { error: 'Too many requests. Please wait a moment and try again.' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } }
+    )
+  }
+
   const body = await request.json().catch(() => ({}))
   const raw: string = body.phone ?? ''
 
