@@ -148,6 +148,7 @@ export default function ScanPage() {
   const [scanState, setScanState] = useState<ScanState>('scanning')
   const [result, setResult] = useState<TokenVerifyResult | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+  const [role, setRole] = useState<string | null>(null)
   const [scanHistory, setScanHistory] = useState<ScanHistoryEntry[]>([])
   const [showHistory, setShowHistory] = useState(false)
   // Multi-gift state
@@ -163,6 +164,7 @@ export default function ScanPage() {
   useEffect(() => {
     createClient().auth.getUser().then(({ data }) => {
       setUserId(data.user?.id ?? null)
+      setRole((data.user?.app_metadata as { role_name?: string } | undefined)?.role_name ?? null)
     })
   }, [])
 
@@ -443,12 +445,14 @@ export default function ScanPage() {
             {/* Back to admin + Batch Mode button + History */}
             {scanState !== 'result' && scanState !== 'gift_selection' && (
               <>
-                <a
-                  href="/admin"
-                  className="absolute top-5 start-5 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"
-                >
-                  {t('← Admin')}
-                </a>
+                {role !== 'scanner' && (
+                  <a
+                    href="/admin"
+                    className="absolute top-5 start-5 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"
+                  >
+                    {t('← Admin')}
+                  </a>
+                )}
                 <button
                   onClick={() => setIsBatchMode(true)}
                   className="absolute bottom-8 start-6 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"

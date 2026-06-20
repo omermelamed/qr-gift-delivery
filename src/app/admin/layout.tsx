@@ -23,6 +23,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     if (!companyId) redirect('/platform')
   } else if (meta?.role_name && ADMIN_ROLES.includes(meta.role_name)) {
     companyId = meta.company_id
+  } else if (meta?.role_name === 'scanner') {
+    // Scanners have no admin access — send them to their workspace, not an error.
+    redirect('/scan')
   } else {
     redirect('/unauthorized')
   }
