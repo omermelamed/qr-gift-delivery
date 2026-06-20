@@ -311,6 +311,8 @@ export const he: Record<string, string> = {
   // CampaignNotes
   'Notes': 'הערות',
   'No notes yet. Be the first to add one.': 'אין הערות עדיין. היה הראשון להוסיף.',
+  'Search notes…': 'חיפוש בהערות…',
+  'No matching notes.': 'אין הערות תואמות.',
   'just now': 'הרגע',
   'edited': 'נערך',
   'Add a note…': 'הוסף הערה…',

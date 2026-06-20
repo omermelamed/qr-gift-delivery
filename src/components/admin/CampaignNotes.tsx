@@ -37,7 +37,13 @@ export function CampaignNotes({
   const [submitting, setSubmitting] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editBody, setEditBody] = useState('')
+  const [query, setQuery] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
+
+  const q = query.trim().toLowerCase()
+  const filtered = q
+    ? notes.filter((n) => n.body.toLowerCase().includes(q) || n.author_name.toLowerCase().includes(q))
+    : notes
 
   useEffect(() => {
     fetch(`/api/campaigns/${campaignId}/notes`)
@@ -111,8 +117,17 @@ export function CampaignNotes({
 
   return (
     <div className="bg-white border border-zinc-200 rounded-xl flex flex-col h-full">
-      <div className="px-4 py-3 border-b border-zinc-100">
+      <div className="px-4 py-3 border-b border-zinc-100 flex flex-col gap-2">
         <h3 className="text-sm font-semibold text-zinc-900">{t('Notes')}</h3>
+        {!loading && notes.length > 0 && (
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('Search notes…')}
+            className="border border-zinc-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 w-full"
+          />
+        )}
       </div>
 
       <div className="flex flex-col gap-3 p-4 flex-1 overflow-y-auto min-h-0">
@@ -120,8 +135,10 @@ export function CampaignNotes({
           <p className="text-xs text-zinc-400 text-center py-4">{t('Loading…')}</p>
         ) : notes.length === 0 ? (
           <p className="text-xs text-zinc-400 text-center py-4">{t('No notes yet. Be the first to add one.')}</p>
+        ) : filtered.length === 0 ? (
+          <p className="text-xs text-zinc-400 text-center py-4">{t('No matching notes.')}</p>
         ) : (
-          notes.map((note) => (
+          filtered.map((note) => (
             <div key={note.id} className="flex flex-col gap-1">
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-medium text-zinc-700">{note.author_name}</span>
