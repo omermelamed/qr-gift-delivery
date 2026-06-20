@@ -14,6 +14,7 @@ type Props = { onClose: () => void }
 
 export function InviteMemberModal({ onClose }: Props) {
   const t = useT()
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [roleName, setRoleName] = useState<string>('campaign_manager')
@@ -30,7 +31,7 @@ export function InviteMemberModal({ onClose }: Props) {
       const res = await fetch('/api/team/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), phone: phone.trim(), role_name: roleName }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), phone: phone.trim(), role_name: roleName }),
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error ?? t('Invite failed')); return }
@@ -54,7 +55,7 @@ export function InviteMemberModal({ onClose }: Props) {
             </svg>
           </div>
           <p className="font-semibold text-zinc-900 mb-1">{t('Invite sent')}</p>
-          <p className="text-sm text-zinc-500 mb-4">{email} {t('will receive a sign-in link by email.')}</p>
+          <p className="text-sm text-zinc-500 mb-4">{email} {t('will receive an email with a link to set their password.')}</p>
           <button onClick={onClose} className="text-sm font-medium text-indigo-600 hover:underline">{t('Close')}</button>
         </div>
       </div>
@@ -74,6 +75,19 @@ export function InviteMemberModal({ onClose }: Props) {
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label htmlFor="inv-name" className="text-sm font-medium text-zinc-700">{t('Full name')}</label>
+            <input
+              id="inv-name"
+              type="text"
+              placeholder={t('Jane Cohen')}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+
           <div className="flex flex-col gap-1.5">
             <label htmlFor="inv-email" className="text-sm font-medium text-zinc-700">{t('Email')}</label>
             <input
@@ -125,7 +139,7 @@ export function InviteMemberModal({ onClose }: Props) {
             </button>
             <button
               type="submit"
-              disabled={loading || !email.trim()}
+              disabled={loading || !name.trim() || !email.trim()}
               className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-violet-500 rounded-lg hover:brightness-110 transition-all disabled:opacity-50"
             >
               {loading ? t('Sending…') : t('Send invite')}

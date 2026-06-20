@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
   const email: string = ((body.email as string) ?? '').trim()
   const phoneRaw: string = ((body.phone as string) ?? '').trim()
   const roleName: string = (body.role_name as string) ?? ''
+  const name: string = ((body.name as string) ?? '').trim()
 
   if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 })
 
@@ -67,8 +68,11 @@ export async function POST(request: NextRequest) {
   let targetUserId: string
   let isReInvite = false
 
+  // New invitees land on the set-password page (not /admin/login), and we seed
+  // their display name into user_metadata so it shows up across the app.
   const { data: invited, error: inviteError } = await service.auth.admin.inviteUserByEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/admin`,
+    data: name ? { full_name: name } : undefined,
+    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
   })
 
   if (inviteError) {
@@ -94,6 +98,14 @@ export async function POST(request: NextRequest) {
 
     targetUserId = existing.id
     isReInvite = true
+
+    // Keep the display name fresh on re-invite, preserving other metadata.
+    if (name) {
+      await service.auth.admin.updateUserById(existing.id, {
+        user_metadata: { ...(existing.user_metadata ?? {}), full_name: name },
+      })
+    }
+
     // signInWithOtp actually sends the magic link email via Supabase's email provider
     const anonClient = createAnonClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -134,7 +146,7 @@ export async function POST(request: NextRequest) {
   })
 
   if (phone) {
-    const employeeName = email.split('@')[0].replace(/[._-]/g, ' ')
+    const employeeName = name || email.split('@')[0].replace(/[._-]/g, ' ')
     const { data: existingEmployee } = await service
       .from('employees')
       .select('id')

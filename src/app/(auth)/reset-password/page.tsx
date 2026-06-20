@@ -14,8 +14,13 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     const supabase = createClient()
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
+    // Both password-recovery links and invite links establish a session from
+    // the token in the URL. Become ready as soon as that session exists.
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) setReady(true)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN' || (event === 'INITIAL_SESSION' && session)) {
         setReady(true)
       }
     })
@@ -68,7 +73,8 @@ export default function ResetPasswordPage() {
             </>
           ) : (
             <>
-              <h1 className="text-lg font-semibold text-zinc-900">Set new password</h1>
+              <h1 className="text-lg font-semibold text-zinc-900">Set your password</h1>
+              <p className="text-sm text-zinc-500 -mt-2">Choose a password to finish setting up your account.</p>
 
               {error && (
                 <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">

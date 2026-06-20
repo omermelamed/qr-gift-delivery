@@ -251,6 +251,9 @@ export const he: Record<string, string> = {
   'Invite failed': 'ההזמנה נכשלה',
   'Invite sent': 'ההזמנה נשלחה',
   'will receive a sign-in link by email.': 'יקבל קישור כניסה באימייל.',
+  'will receive an email with a link to set their password.': 'יקבל אימייל עם קישור להגדרת סיסמה.',
+  'Full name': 'שם מלא',
+  'Jane Cohen': 'ישראל ישראלי',
   'Send invite': 'שלח הזמנה',
   'Scanner (Distributor)': 'סורק (מפיץ)',
 
