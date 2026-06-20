@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-// Routes that don't need authentication
-const PUBLIC_PREFIXES = ['/login', '/reset-password', '/verify', '/gift']
+// Routes that don't need authentication.
+// '/auth' covers the email-link confirmation route (/auth/confirm), which runs
+// BEFORE a session exists — it's the handler that establishes the session.
+const PUBLIC_PREFIXES = ['/login', '/reset-password', '/verify', '/gift', '/auth']
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -13,8 +15,6 @@ export async function proxy(request: NextRequest) {
   }
 
   const allCookies = request.cookies.getAll()
-  const cookieNames = allCookies.map(c => c.name)
-  console.log('[proxy] path:', pathname, '| cookies:', cookieNames)
 
   // Optimistic check: Supabase SSR stores the session under 'supabase.auth.token'
   // (possibly chunked as 'supabase.auth.token.0', '.1', etc.)
@@ -24,8 +24,6 @@ export async function proxy(request: NextRequest) {
     c.name.includes('-auth-token') ||
     c.name.startsWith('sb-')
   )
-
-  console.log('[proxy] hasSession:', hasSession)
 
   if (!hasSession) {
     const loginUrl = new URL('/login', request.url)
