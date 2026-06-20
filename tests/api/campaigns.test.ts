@@ -127,6 +127,9 @@ describe('GET /api/campaigns', () => {
       if (table === 'campaign_distributors') {
         return { select: () => ({ eq: () => Promise.resolve({ data: [{ campaign_id: 'c-1' }], error: null }) }) }
       }
+      if (table === 'gift_tokens') {
+        return { select: () => ({ in: () => Promise.resolve({ data: [{ campaign_id: 'c-1', redeemed: true }, { campaign_id: 'c-1', redeemed: false }], error: null }) }) }
+      }
       return { select: () => ({ eq: () => ({ in: () => ({ order: () => Promise.resolve({ data: [{ id: 'c-1', name: 'Campaign 1', campaign_date: null, sent_at: null }], error: null }) }) }) }) }
     })
     const { GET } = await import('@/app/api/campaigns/route')
@@ -135,5 +138,7 @@ describe('GET /api/campaigns', () => {
     expect(res.status).toBe(200)
     expect(body.campaigns).toHaveLength(1)
     expect(body.campaigns[0].id).toBe('c-1')
+    expect(body.campaigns[0].total).toBe(2)
+    expect(body.campaigns[0].redeemed).toBe(1)
   })
 })

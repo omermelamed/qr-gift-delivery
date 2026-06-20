@@ -41,7 +41,26 @@ export async function GET() {
       .eq('company_id', companyId)
       .in('id', ids)
       .order('created_at', { ascending: false })
-    return NextResponse.json({ campaigns: data ?? [] })
+
+    // Redemption progress per campaign, so distributors can see what's left.
+    const { data: tokens } = await service
+      .from('gift_tokens')
+      .select('campaign_id, redeemed')
+      .in('campaign_id', ids)
+    const counts = new Map<string, { total: number; redeemed: number }>()
+    for (const tk of tokens ?? []) {
+      const e = counts.get(tk.campaign_id) ?? { total: 0, redeemed: 0 }
+      e.total++
+      if (tk.redeemed) e.redeemed++
+      counts.set(tk.campaign_id, e)
+    }
+
+    const campaigns = (data ?? []).map((c) => ({
+      ...c,
+      total: counts.get(c.id)?.total ?? 0,
+      redeemed: counts.get(c.id)?.redeemed ?? 0,
+    }))
+    return NextResponse.json({ campaigns })
   }
 
   return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
