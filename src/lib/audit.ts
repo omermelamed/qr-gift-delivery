@@ -14,12 +14,17 @@ type AuditAction =
   | 'template.created'
   | 'template.updated'
   | 'template.deleted'
+  | 'member.invited'
+  | 'member.updated'
+  | 'member.role_changed'
+  | 'member.removed'
+  | 'platform.impersonated'
 
 type AuditEventInput = {
   companyId: string
   actorId: string | null
   action: AuditAction
-  resourceType: 'campaign' | 'gift_token' | 'credits' | 'template'
+  resourceType: 'campaign' | 'gift_token' | 'credits' | 'template' | 'user' | 'company'
   resourceId?: string
   metadata?: Record<string, unknown>
 }

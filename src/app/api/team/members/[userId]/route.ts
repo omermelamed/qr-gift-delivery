@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { normalizePhone } from '@/lib/phone'
+import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
 
@@ -93,6 +94,15 @@ export async function PATCH(
     // Update app_metadata
     await service.auth.admin.updateUserById(userId, {
       app_metadata: { company_id: companyId, role_id: roleRow.id, role_name: roleName },
+    })
+
+    logAuditEvent({
+      companyId,
+      actorId: user.id,
+      action: 'member.role_changed',
+      resourceType: 'user',
+      resourceId: userId,
+      metadata: { role_name: roleName },
     })
   }
 
@@ -210,6 +220,15 @@ export async function DELETE(
     app_metadata: { company_id: null, role_id: null, role_name: null },
   })
   if (metaError) console.error('[team/remove] failed to clear app_metadata:', metaError.message)
+
+  logAuditEvent({
+    companyId,
+    actorId: user.id,
+    action: 'member.removed',
+    resourceType: 'user',
+    resourceId: userId,
+    metadata: { keepEmployee },
+  })
 
   if (keepEmployee) {
     // Unlink user_id so the employee record stays but is no longer team-managed

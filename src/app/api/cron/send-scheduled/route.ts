@@ -24,11 +24,12 @@ export async function GET(request: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
   const results = await Promise.allSettled(
     dueCampaigns.map((campaign) =>
+      // company is derived from the campaign row inside the send route (H6),
+      // so we no longer pass an x-company-id header.
       fetch(`${appUrl}/api/campaigns/${campaign.id}/send`, {
         method: 'POST',
         headers: {
           'x-cron-secret': process.env.CRON_SECRET ?? '',
-          'x-company-id': campaign.company_id,
         },
       })
     )

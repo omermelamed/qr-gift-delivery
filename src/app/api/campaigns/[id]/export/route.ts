@@ -77,7 +77,11 @@ export async function GET(
   }
 
   function csvEscape(v: unknown): string {
-    return `"${String(v ?? '').replace(/"/g, '""')}"`
+    let s = String(v ?? '')
+    // Neutralize spreadsheet formula injection: a cell starting with = + - @
+    // (or a tab/CR) is treated as a formula by Excel/Sheets even when quoted.
+    if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`
+    return `"${s.replace(/"/g, '""')}"`
   }
 
   const header = 'name,phone_number,department,sms_sent_at,redeemed,redeemed_at,redeemed_by'

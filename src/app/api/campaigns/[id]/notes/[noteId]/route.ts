@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
 
@@ -16,6 +17,10 @@ export async function PATCH(
   const appMeta = user.app_metadata as JwtAppMetadata
   const companyId = await resolveCompanyId(appMeta)
   if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
+  if (!hasPermission(permissions, 'campaigns:read')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
   const service = createServiceClient()
 
   const { data: note } = await service
@@ -60,6 +65,10 @@ export async function DELETE(
   const appMeta = user.app_metadata as JwtAppMetadata
   const companyId = await resolveCompanyId(appMeta)
   if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
+  if (!hasPermission(permissions, 'campaigns:read')) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
   const service = createServiceClient()
 
   const { data: note } = await service

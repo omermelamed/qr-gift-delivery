@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { createClient as createAnonClient } from '@supabase/supabase-js'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { normalizePhone } from '@/lib/phone'
+import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
 
@@ -79,6 +80,18 @@ export async function POST(request: NextRequest) {
     const { data: { users } } = await service.auth.admin.listUsers({ perPage: 1000 })
     const existing = users.find((u) => u.email?.toLowerCase() === email.toLowerCase())
     if (!existing) return NextResponse.json({ error: 'Invite failed' }, { status: 500 })
+
+    // C2 guard: never clobber the metadata of a platform admin or a user who
+    // already belongs to a different company. Otherwise a company admin could
+    // hijack a foreign user (or downgrade the platform admin) via re-invite.
+    const existingMeta = existing.app_metadata as JwtAppMetadata | undefined
+    if (existingMeta?.role_name === 'platform_admin') {
+      return NextResponse.json({ error: 'This user cannot be invited.' }, { status: 403 })
+    }
+    if (existingMeta?.company_id && existingMeta.company_id !== companyId) {
+      return NextResponse.json({ error: 'This user already belongs to another company.' }, { status: 409 })
+    }
+
     targetUserId = existing.id
     isReInvite = true
     // signInWithOtp actually sends the magic link email via Supabase's email provider
@@ -110,6 +123,15 @@ export async function POST(request: NextRequest) {
     { onConflict: 'user_id,company_id' }
   )
   if (ucrError) return NextResponse.json({ error: 'Failed to assign company role' }, { status: 500 })
+
+  logAuditEvent({
+    companyId,
+    actorId: user.id,
+    action: 'member.invited',
+    resourceType: 'user',
+    resourceId: targetUserId,
+    metadata: { email, role_name: roleName, reinvite: isReInvite },
+  })
 
   if (phone) {
     const employeeName = email.split('@')[0].replace(/[._-]/g, ' ')

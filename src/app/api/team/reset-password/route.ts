@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient as createAnonClient } from '@supabase/supabase-js'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
@@ -42,14 +43,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'User has no email address' }, { status: 422 })
   }
 
-  const { error: linkError } = await service.auth.admin.generateLink({
-    type: 'recovery',
-    email: target.email,
-    options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/admin` },
+  // resetPasswordForEmail actually delivers the recovery email via Supabase's
+  // email provider (generateLink only mints a link without sending it) (L1).
+  const anon = createAnonClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+  const { error: resetError } = await anon.auth.resetPasswordForEmail(target.email, {
+    redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/reset-password`,
   })
 
-  if (linkError) {
-    return NextResponse.json({ error: linkError.message ?? 'Failed to send reset email' }, { status: 500 })
+  if (resetError) {
+    return NextResponse.json({ error: resetError.message ?? 'Failed to send reset email' }, { status: 500 })
   }
 
   return NextResponse.json({ success: true })

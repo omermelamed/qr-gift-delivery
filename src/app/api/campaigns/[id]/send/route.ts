@@ -23,10 +23,7 @@ export async function POST(
   let companyId: string | undefined
   let actorUserId: string | undefined
 
-  if (isCronCall) {
-    companyId = _request.headers.get('x-company-id') ?? undefined
-    if (!companyId) return NextResponse.json({ error: 'Missing company id' }, { status: 400 })
-  } else {
+  if (!isCronCall) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -43,16 +40,22 @@ export async function POST(
 
   const service = createServiceClient()
 
-  const { data: campaign, error: campaignError } = await service
+  // For user calls, scope the lookup to their company. For cron calls, derive
+  // the company from the campaign row itself — never trust a client header (H6).
+  const baseQuery = service
     .from('campaigns')
     .select('id, name, company_id, sent_at')
     .eq('id', campaignId)
-    .eq('company_id', companyId)
-    .single()
+  const { data: campaign, error: campaignError } = isCronCall
+    ? await baseQuery.single()
+    : await baseQuery.eq('company_id', companyId!).single()
 
   if (campaignError || !campaign) {
     return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
   }
+
+  // Cron path: company is whatever the campaign belongs to.
+  if (isCronCall) companyId = campaign.company_id
 
   if (campaign.sent_at) {
     return NextResponse.json({ error: 'Campaign already dispatched' }, { status: 409 })

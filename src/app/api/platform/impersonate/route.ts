@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 
 export const IMPERSONATE_COOKIE = 'impersonate_company_id'
@@ -39,6 +40,15 @@ export async function POST(request: NextRequest) {
     sameSite: 'lax',
     path: '/',
     maxAge: 60 * 60 * 8, // 8 hours
+  })
+
+  logAuditEvent({
+    companyId,
+    actorId: user.id,
+    action: 'platform.impersonated',
+    resourceType: 'company',
+    resourceId: companyId,
+    metadata: { email: user.email },
   })
 
   return NextResponse.json({ ok: true })

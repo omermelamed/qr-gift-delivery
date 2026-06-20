@@ -19,7 +19,13 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const resetSuccess = searchParams.get('reset') === 'success'
-  const nextPath = searchParams.get('next')
+  // Only honor same-origin relative paths — reject absolute/protocol-relative
+  // URLs so `?next=//evil.com` can't be used as an open redirect (L3).
+  const rawNext = searchParams.get('next')
+  const nextPath =
+    rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.startsWith('/\\')
+      ? rawNext
+      : null
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
