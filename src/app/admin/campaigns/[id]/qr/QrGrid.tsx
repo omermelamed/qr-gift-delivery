@@ -5,11 +5,17 @@ import { useState, useEffect, useCallback } from 'react'
 type TokenRow = {
   id: string
   employee_name: string
-  phone_number: string
+  phone_number: string | null
   department: string | null
   token: string
   qr_image_url: string | null
   redeemed: boolean
+}
+
+// Mask all but the last 4 digits; tolerate a missing phone (it's optional).
+function maskPhone(phone: string | null): string {
+  if (!phone) return ''
+  return phone.replace(/\d(?=\d{4})/g, '•')
 }
 
 export function QrGrid({ rows }: { rows: TokenRow[] }) {
@@ -54,9 +60,11 @@ export function QrGrid({ rows }: { rows: TokenRow[] }) {
                 QR generating…
               </div>
             )}
-            <p className="text-xs text-zinc-400 font-mono break-all text-center">
-              {t.phone_number.replace(/\d(?=\d{4})/g, '•')}
-            </p>
+            {t.phone_number && (
+              <p className="text-xs text-zinc-400 font-mono break-all text-center">
+                {maskPhone(t.phone_number)}
+              </p>
+            )}
             {t.redeemed && (
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-zinc-100 text-zinc-500">
                 Redeemed
@@ -102,9 +110,11 @@ export function QrGrid({ rows }: { rows: TokenRow[] }) {
               className="rounded-xl"
             />
 
-            <p className="text-sm text-zinc-400 font-mono">
-              {enlarged.phone_number.replace(/\d(?=\d{4})/g, '•')}
-            </p>
+            {enlarged.phone_number && (
+              <p className="text-sm text-zinc-400 font-mono">
+                {maskPhone(enlarged.phone_number)}
+              </p>
+            )}
 
             {enlarged.redeemed && (
               <span className="text-sm font-semibold px-3 py-1 rounded-full bg-zinc-100 text-zinc-500">
