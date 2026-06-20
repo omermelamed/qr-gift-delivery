@@ -445,14 +445,12 @@ export default function ScanPage() {
             {/* Back to admin + Batch Mode button + History */}
             {scanState !== 'result' && scanState !== 'gift_selection' && (
               <>
-                {role !== 'scanner' && (
-                  <a
-                    href="/admin"
-                    className="absolute top-5 start-5 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"
-                  >
-                    {t('← Admin')}
-                  </a>
-                )}
+                <a
+                  href={role === 'scanner' ? '/scan/campaigns' : '/admin'}
+                  className="absolute top-5 start-5 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"
+                >
+                  {role === 'scanner' ? t('My Campaigns') : t('← Admin')}
+                </a>
                 <button
                   onClick={() => setIsBatchMode(true)}
                   className="absolute bottom-8 start-6 bg-zinc-800/80 text-white text-sm font-medium px-4 py-2 rounded-full backdrop-blur-sm"
