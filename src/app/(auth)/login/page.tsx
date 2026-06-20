@@ -40,7 +40,7 @@ function LoginForm() {
       }
       const meta = data.user.app_metadata as JwtAppMetadata | undefined
       let defaultPath = '/admin'
-      if (meta?.role_name === 'scanner') defaultPath = '/scan'
+      if (meta?.role_name === 'scanner') defaultPath = '/scan/campaigns'
       else if (meta?.role_name === 'platform_admin') defaultPath = '/platform'
       router.push(nextPath ?? defaultPath)
     } finally {
