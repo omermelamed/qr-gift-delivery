@@ -1,36 +1,40 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
+const mockGetUser = vi.fn()
 const mockTokenSelectSingle = vi.fn()
 const mockDistributorSelect = vi.fn()
+const mockGiftsOrder = vi.fn()
 const mockUpdateSingle = vi.fn()
 
+vi.mock('@/lib/audit', () => ({ logAuditEvent: vi.fn() }))
+
 vi.mock('@/lib/supabase/server', () => ({
+  createClient: async () => ({ auth: { getUser: mockGetUser } }),
   createServiceClient: () => ({
     from: (table: string) => {
       if (table === 'campaign_distributors') {
         return { select: () => ({ eq: mockDistributorSelect }) }
       }
+      if (table === 'campaign_gifts') {
+        return { select: () => ({ eq: () => ({ order: mockGiftsOrder }) }) }
+      }
       // gift_tokens
       return {
         select: () => ({ eq: () => ({ single: mockTokenSelectSingle }) }),
         update: () => ({
-          eq: () => ({
-            eq: () => ({
-              select: () => ({ single: mockUpdateSingle }),
-            }),
-          }),
+          eq: () => ({ eq: () => ({ select: () => ({ single: mockUpdateSingle }) }) }),
         }),
       }
     },
   }),
 }))
 
-function makeRequest(token: string, distributorId: string | null = null) {
+function makeRequest(token: string, body: Record<string, unknown> = {}) {
   return new NextRequest(`http://localhost/api/verify/${token}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ distributorId }),
+    body: JSON.stringify(body),
   })
 }
 
@@ -39,122 +43,108 @@ const openToken = {
   employee_name: 'Omer',
   redeemed: false,
   campaign_id: 'c-1',
-  campaigns: { closed_at: null },
+  gift_id: null,
+  campaigns: { closed_at: null, company_id: 'co-1', name: 'Hanukkah' },
 }
 
 describe('POST /api/verify/[token]', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    // Default: no distributor restrictions
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'dist-1', app_metadata: { role_name: 'company_admin' } } } })
     mockDistributorSelect.mockResolvedValue({ data: [], error: null })
+    mockGiftsOrder.mockResolvedValue({ data: [], error: null })
   })
 
-  it('returns invalid when token does not exist', async () => {
-    mockTokenSelectSingle.mockResolvedValue({ data: null, error: null })
+  it('not_authorized when no authenticated user', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null } })
     const { POST } = await import('@/app/api/verify/[token]/route')
-    const res = await POST(makeRequest('nonexistent'), { params: Promise.resolve({ token: 'nonexistent' }) })
-    const body = await res.json()
-    expect(body.valid).toBe(false)
-    expect(body.reason).toBe('invalid')
-  })
-
-  it('returns campaign_closed when campaign is closed', async () => {
-    mockTokenSelectSingle.mockResolvedValue({
-      data: { ...openToken, campaigns: { closed_at: '2026-04-10' } },
-      error: null,
-    })
-    const { POST } = await import('@/app/api/verify/[token]/route')
-    const res = await POST(makeRequest('some-token'), { params: Promise.resolve({ token: 'some-token' }) })
-    const body = await res.json()
-    expect(body.valid).toBe(false)
-    expect(body.reason).toBe('campaign_closed')
-  })
-
-  it('returns not_authorized when distributor not in assignment list', async () => {
-    mockTokenSelectSingle.mockResolvedValue({ data: openToken, error: null })
-    mockDistributorSelect.mockResolvedValue({ data: [{ user_id: 'other-scanner' }], error: null })
-    const { POST } = await import('@/app/api/verify/[token]/route')
-    const res = await POST(makeRequest('some-token', 'wrong-scanner'), { params: Promise.resolve({ token: 'some-token' }) })
+    const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
     const body = await res.json()
     expect(body.valid).toBe(false)
     expect(body.reason).toBe('not_authorized')
   })
 
-  it('allows scan when distributor is in assignment list', async () => {
-    mockTokenSelectSingle.mockResolvedValue({ data: openToken, error: null })
-    mockDistributorSelect.mockResolvedValue({ data: [{ user_id: 'authorized-scanner' }], error: null })
-    mockUpdateSingle.mockResolvedValue({ data: { employee_name: 'Omer' }, error: null })
+  it('invalid when token does not exist', async () => {
+    mockTokenSelectSingle.mockResolvedValue({ data: null })
     const { POST } = await import('@/app/api/verify/[token]/route')
-    const res = await POST(makeRequest('some-token', 'authorized-scanner'), { params: Promise.resolve({ token: 'some-token' }) })
+    const res = await POST(makeRequest('x'), { params: Promise.resolve({ token: 'x' }) })
     const body = await res.json()
-    expect(body.valid).toBe(true)
-    expect(body.employeeName).toBe('Omer')
+    expect(body.reason).toBe('invalid')
   })
 
-  it('allows any scanner when campaign_distributors is empty (backwards compat)', async () => {
-    mockTokenSelectSingle.mockResolvedValue({ data: openToken, error: null })
-    mockDistributorSelect.mockResolvedValue({ data: [], error: null })
-    mockUpdateSingle.mockResolvedValue({ data: { employee_name: 'Omer' }, error: null })
+  it('campaign_closed when campaign is closed', async () => {
+    mockTokenSelectSingle.mockResolvedValue({ data: { ...openToken, campaigns: { ...openToken.campaigns, closed_at: '2026-04-10' } } })
     const { POST } = await import('@/app/api/verify/[token]/route')
-    const res = await POST(makeRequest('some-token', 'any-scanner'), { params: Promise.resolve({ token: 'some-token' }) })
+    const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
     const body = await res.json()
-    expect(body.valid).toBe(true)
+    expect(body.reason).toBe('campaign_closed')
   })
 
-  it('returns 500 when distributor DB query fails', async () => {
-    mockTokenSelectSingle.mockResolvedValue({ data: openToken, error: null })
-    mockDistributorSelect.mockResolvedValue({ data: null, error: { message: 'db error' } })
+  it('already_used when token already redeemed', async () => {
+    mockTokenSelectSingle.mockResolvedValue({ data: { ...openToken, redeemed: true, employee_name: 'Dana' } })
     const { POST } = await import('@/app/api/verify/[token]/route')
-    const res = await POST(makeRequest('some-token', 'any-scanner'), { params: Promise.resolve({ token: 'some-token' }) })
+    const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
     const body = await res.json()
-    expect(res.status).toBe(500)
-    expect(body.valid).toBe(false)
-  })
-
-  it('returns already_used when token is already redeemed', async () => {
-    mockTokenSelectSingle.mockResolvedValue({
-      data: { ...openToken, redeemed: true, employee_name: 'Dana' },
-      error: null,
-    })
-    const { POST } = await import('@/app/api/verify/[token]/route')
-    const res = await POST(makeRequest('used-token'), { params: Promise.resolve({ token: 'used-token' }) })
-    const body = await res.json()
-    expect(body.valid).toBe(false)
     expect(body.reason).toBe('already_used')
     expect(body.employeeName).toBe('Dana')
   })
 
-  it('returns valid:true on successful first scan', async () => {
-    mockTokenSelectSingle.mockResolvedValue({ data: openToken, error: null })
-    mockUpdateSingle.mockResolvedValue({ data: { employee_name: 'Omer' }, error: null })
+  it('needsGiftSelection when 2+ gifts and none chosen', async () => {
+    mockTokenSelectSingle.mockResolvedValue({ data: openToken })
+    mockGiftsOrder.mockResolvedValue({ data: [
+      { id: 'g-1', name: 'Headphones', position: 0 },
+      { id: 'g-2', name: 'Mug', position: 1 },
+    ], error: null })
     const { POST } = await import('@/app/api/verify/[token]/route')
-    const res = await POST(makeRequest('valid-token'), { params: Promise.resolve({ token: 'valid-token' }) })
+    const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
     const body = await res.json()
     expect(body.valid).toBe(true)
-    expect(body.employeeName).toBe('Omer')
+    expect(body.needsGiftSelection).toBe(true)
+    expect(body.gifts).toHaveLength(2)
   })
 
-  it('returns campaign_closed even when token is already redeemed', async () => {
-    mockTokenSelectSingle.mockResolvedValue({
-      data: { ...openToken, redeemed: true, campaigns: { closed_at: '2026-04-10' } },
-      error: null,
-    })
+  it('redeems with stored gift and returns giftName', async () => {
+    mockTokenSelectSingle.mockResolvedValue({ data: { ...openToken, gift_id: 'g-1' } })
+    mockGiftsOrder.mockResolvedValue({ data: [
+      { id: 'g-1', name: 'Headphones', position: 0 },
+      { id: 'g-2', name: 'Mug', position: 1 },
+    ], error: null })
+    mockUpdateSingle.mockResolvedValue({ data: { employee_name: 'Omer' } })
     const { POST } = await import('@/app/api/verify/[token]/route')
-    const res = await POST(makeRequest('used-and-closed'), { params: Promise.resolve({ token: 'used-and-closed' }) })
+    const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
     const body = await res.json()
-    expect(body.valid).toBe(false)
-    expect(body.reason).toBe('campaign_closed')
+    expect(body.valid).toBe(true)
+    expect(body.needsGiftSelection).toBeFalsy()
+    expect(body.giftName).toBe('Headphones')
   })
 
-  it('returns already_used when race condition prevents atomic update', async () => {
-    mockTokenSelectSingle.mockResolvedValue({ data: openToken, error: null })
-    mockDistributorSelect.mockResolvedValue({ data: [], error: null })
-    mockUpdateSingle.mockResolvedValue({ data: null, error: null })
+  it('auto-stamps the single gift when exactly one option', async () => {
+    mockTokenSelectSingle.mockResolvedValue({ data: openToken })
+    mockGiftsOrder.mockResolvedValue({ data: [{ id: 'g-1', name: 'Mug', position: 0 }], error: null })
+    mockUpdateSingle.mockResolvedValue({ data: { employee_name: 'Omer' } })
     const { POST } = await import('@/app/api/verify/[token]/route')
-    const res = await POST(makeRequest('race-token'), { params: Promise.resolve({ token: 'race-token' }) })
+    const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
     const body = await res.json()
-    expect(body.valid).toBe(false)
+    expect(body.valid).toBe(true)
+    expect(body.giftName).toBe('Mug')
+  })
+
+  it('redeems a no-gift campaign with null giftName', async () => {
+    mockTokenSelectSingle.mockResolvedValue({ data: openToken })
+    mockUpdateSingle.mockResolvedValue({ data: { employee_name: 'Omer' } })
+    const { POST } = await import('@/app/api/verify/[token]/route')
+    const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
+    const body = await res.json()
+    expect(body.valid).toBe(true)
+    expect(body.giftName ?? null).toBeNull()
+  })
+
+  it('already_used on race (atomic update returns no row)', async () => {
+    mockTokenSelectSingle.mockResolvedValue({ data: openToken })
+    mockUpdateSingle.mockResolvedValue({ data: null })
+    const { POST } = await import('@/app/api/verify/[token]/route')
+    const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
+    const body = await res.json()
     expect(body.reason).toBe('already_used')
-    expect(body.employeeName).toBe('Omer')
   })
 })

@@ -26,7 +26,7 @@ export async function POST(
   // Fetch token row with campaign info in one query
   const { data: tokenRow } = await supabase
     .from('gift_tokens')
-    .select('id, employee_name, redeemed, campaign_id, campaigns(closed_at, company_id, name)')
+    .select('id, employee_name, redeemed, campaign_id, gift_id, campaigns(closed_at, company_id, name)')
     .eq('token', token)
     .single()
 
@@ -81,7 +81,7 @@ export async function POST(
     })
   }
 
-  // Fetch gift options for this campaign
+  // Fetch gift options for this campaign (also gives us names for the response)
   const { data: campaignGifts } = await supabase
     .from('campaign_gifts')
     .select('id, name, position')
@@ -89,9 +89,10 @@ export async function POST(
     .order('position', { ascending: true })
 
   const gifts = campaignGifts ?? []
+  const storedGiftId = (tokenRow as { gift_id: string | null }).gift_id
 
-  // If campaign has gift options and no gift has been chosen yet, ask the scanner to pick
-  if (gifts.length >= 1 && !giftId) {
+  // Multi-gift with no employee choice and no scanner pick -> fall back to scanner selection
+  if (gifts.length >= 2 && !storedGiftId && !giftId) {
     return NextResponse.json({
       valid: true,
       needsGiftSelection: true,
@@ -100,24 +101,39 @@ export async function POST(
     })
   }
 
-  // Auto-stamp single gift when campaign has exactly one option
-  const resolvedGiftId = giftId ?? (gifts.length === 1 ? gifts[0].id : null)
+  // Resolution order: employee's stored choice > scanner pick > single auto-stamp > none
+  const resolvedGiftId = storedGiftId ?? giftId ?? (gifts.length === 1 ? gifts[0].id : null)
+
+  const updatePayload: {
+    redeemed: true
+    redeemed_at: string
+    redeemed_by: string
+    gift_id: string | null
+    gift_chosen_at?: string
+  } = {
+    redeemed: true,
+    redeemed_at: new Date().toISOString(),
+    redeemed_by: distributorId,
+    gift_id: resolvedGiftId,
+  }
+  // Stamp choice time only when we are recording a gift the employee hadn't pre-chosen
+  if (!storedGiftId && resolvedGiftId) {
+    updatePayload.gift_chosen_at = new Date().toISOString()
+  }
 
   // Atomic write: first writer wins
   const { data: redeemed } = await supabase
     .from('gift_tokens')
-    .update({
-      redeemed: true,
-      redeemed_at: new Date().toISOString(),
-      redeemed_by: distributorId,
-      gift_id: resolvedGiftId,
-    })
+    .update(updatePayload)
     .eq('token', token)
     .eq('redeemed', false)
     .select('employee_name')
     .single()
 
   if (redeemed) {
+    const giftName = resolvedGiftId
+      ? gifts.find((g) => g.id === resolvedGiftId)?.name ?? null
+      : null
     logAuditEvent({
       companyId: campaign?.company_id ?? '',
       actorId: distributorId,
@@ -130,7 +146,7 @@ export async function POST(
         gift_id: resolvedGiftId,
       },
     })
-    return NextResponse.json({ valid: true, employeeName: redeemed.employee_name })
+    return NextResponse.json({ valid: true, employeeName: redeemed.employee_name, giftName })
   }
 
   // Race condition: another request redeemed it between our read and write
