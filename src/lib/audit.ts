@@ -8,6 +8,7 @@ type AuditAction =
   | 'campaign.duplicated'
   | 'campaign.reminder_sent'
   | 'token.redeemed'
+  | 'token.gift_changed'
   | 'credits.purchased'
   | 'credits.used'
   | 'credits.refunded'
