@@ -79,6 +79,20 @@ describe('POST /api/gift/[token]/choose', () => {
     expect(body.gift).toEqual({ id: 'g-1', name: 'Headphones' })
   })
 
+  it('returns locked:true when atomic lock loses a race', async () => {
+    mockTokenSingle
+      .mockResolvedValueOnce({ data: { campaign_id: 'c-1', gift_id: null, redeemed: false } })
+      .mockResolvedValueOnce({ data: { gift_id: 'g-9' } })
+    mockGiftSingle.mockResolvedValue({ data: { id: 'g-9', name: 'Notebook' } })
+    mockLockSingle.mockResolvedValue({ data: null })
+    const { POST } = await import('@/app/api/gift/[token]/choose/route')
+    const res = await POST(makeRequest('t', 'g-9'), { params: Promise.resolve({ token: 't' }) })
+    const body = await res.json()
+    expect(body.ok).toBe(true)
+    expect(body.locked).toBe(true)
+    expect(body.gift).toEqual({ id: 'g-9', name: 'Notebook' })
+  })
+
   it('returns locked:true when a choice already exists (no change allowed)', async () => {
     mockTokenSingle.mockResolvedValue({ data: { campaign_id: 'c-1', gift_id: 'g-2', redeemed: false } })
     mockGiftSingle.mockResolvedValue({ data: { id: 'g-2', name: 'Mug' } })

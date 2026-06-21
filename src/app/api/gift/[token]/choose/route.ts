@@ -24,6 +24,18 @@ export async function POST(
     return NextResponse.json({ ok: false, error: 'invalid' }, { status: 404 })
   }
 
+  // Already chosen or already redeemed -> locked. Return the effective choice.
+  // Checked before gift validation to skip the redundant DB call.
+  if (tokenRow.gift_id || tokenRow.redeemed) {
+    const effectiveId = tokenRow.gift_id ?? giftId
+    const { data: current } = await service
+      .from('campaign_gifts')
+      .select('id, name')
+      .eq('id', effectiveId)
+      .single()
+    return NextResponse.json({ ok: true, locked: true, gift: current })
+  }
+
   // Validate the chosen gift belongs to this token's campaign
   const { data: gift } = await service
     .from('campaign_gifts')
@@ -34,17 +46,6 @@ export async function POST(
 
   if (!gift) {
     return NextResponse.json({ ok: false, error: 'invalid_gift' }, { status: 400 })
-  }
-
-  // Already chosen or already redeemed -> locked. Return the effective choice.
-  if (tokenRow.gift_id || tokenRow.redeemed) {
-    const effectiveId = tokenRow.gift_id ?? giftId
-    const { data: current } = await service
-      .from('campaign_gifts')
-      .select('id, name')
-      .eq('id', effectiveId)
-      .single()
-    return NextResponse.json({ ok: true, locked: true, gift: current ?? gift })
   }
 
   // Atomic lock: first writer wins
