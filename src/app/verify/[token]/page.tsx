@@ -31,7 +31,7 @@ export default async function VerifyPage({
 
   const { data: tokenRow } = await service
     .from('gift_tokens')
-    .select('id, employee_name, redeemed, campaign_id, campaigns(closed_at, company_id)')
+    .select('id, employee_name, redeemed, campaign_id, gift_id, campaigns(closed_at, company_id)')
     .eq('token', token)
     .single()
 
@@ -45,6 +45,17 @@ export default async function VerifyPage({
     return <ResultCard icon="✗" color="red" title="Campaign closed" subtitle="No further gifts can be claimed." />
   }
 
+  // Resolve the chosen gift name so the distributor knows what to bring
+  const { data: campaignGifts } = await service
+    .from('campaign_gifts')
+    .select('id, name, position')
+    .eq('campaign_id', tokenRow.campaign_id)
+    .order('position', { ascending: true })
+  const gifts = campaignGifts ?? []
+  const storedGiftId = (tokenRow as { gift_id: string | null }).gift_id
+  const giftNameFor = (id: string | null) =>
+    id ? gifts.find((g) => g.id === id)?.name ?? null : null
+
   if (tokenRow.redeemed) {
     return (
       <ResultCard
@@ -53,6 +64,7 @@ export default async function VerifyPage({
         title="Already claimed"
         subtitlePrefix={tokenRow.employee_name}
         subtitle="already redeemed this gift."
+        giftName={giftNameFor(storedGiftId)}
       />
     )
   }
@@ -91,14 +103,28 @@ export default async function VerifyPage({
     }
   }
 
+  // Keep the employee's stored choice; auto-stamp the only option for single-gift campaigns
+  const resolvedGiftId = storedGiftId ?? (gifts.length === 1 ? gifts[0].id : null)
+  const updatePayload: {
+    redeemed: true
+    redeemed_at: string
+    redeemed_by: string
+    gift_id: string | null
+    gift_chosen_at?: string
+  } = {
+    redeemed: true,
+    redeemed_at: new Date().toISOString(),
+    redeemed_by: user.id,
+    gift_id: resolvedGiftId,
+  }
+  if (!storedGiftId && resolvedGiftId) {
+    updatePayload.gift_chosen_at = new Date().toISOString()
+  }
+
   // Atomic redemption
   const { data: redeemed } = await service
     .from('gift_tokens')
-    .update({
-      redeemed: true,
-      redeemed_at: new Date().toISOString(),
-      redeemed_by: user.id,
-    })
+    .update(updatePayload)
     .eq('token', token)
     .eq('redeemed', false)
     .select('employee_name')
@@ -112,6 +138,7 @@ export default async function VerifyPage({
         title={redeemed.employee_name}
         subtitle="Gift collected!"
         rawTitle
+        giftName={giftNameFor(resolvedGiftId)}
       />
     )
   }

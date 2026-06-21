@@ -9,9 +9,10 @@ type Props = {
   subtitle: string
   subtitlePrefix?: string
   rawTitle?: boolean  // when true, render title as-is without translation lookup
+  giftName?: string | null  // the gift the employee chose, shown prominently to the distributor
 }
 
-export function ResultCard({ icon, color, title, subtitle, subtitlePrefix, rawTitle }: Props) {
+export function ResultCard({ icon, color, title, subtitle, subtitlePrefix, rawTitle, giftName }: Props) {
   const t = useT()
   const bg = color === 'green' ? 'bg-green-600' : 'bg-red-600'
   return (
@@ -20,6 +21,12 @@ export function ResultCard({ icon, color, title, subtitle, subtitlePrefix, rawTi
         <span className="text-4xl">{icon}</span>
       </div>
       <p className="text-white text-4xl font-bold text-center">{rawTitle ? title : t(title)}</p>
+      {giftName && (
+        <div className="bg-white/20 rounded-2xl px-6 py-4">
+          <p className="text-white/70 text-sm text-center mb-0.5">{t('Gift to hand over')}</p>
+          <p className="text-white text-3xl font-bold text-center">{giftName}</p>
+        </div>
+      )}
       <p className="text-white/80 text-lg text-center">
         {subtitlePrefix ? `${subtitlePrefix} ${t(subtitle)}` : t(subtitle)}
       </p>

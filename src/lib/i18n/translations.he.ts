@@ -16,6 +16,7 @@ export const he: Record<string, string> = {
   'Already claimed': 'כבר מומש',
   'already redeemed this gift.': 'כבר מימש את המתנה.',
   'Gift collected!': 'המתנה נלקחה!',
+  'Gift to hand over': 'המתנה למסירה',
   'Not authorised': 'לא מורשה',
   'You are not assigned to this campaign.': 'אינך משויך לקמפיין זה.',
   'Back to scanner': 'חזרה לסורק',
