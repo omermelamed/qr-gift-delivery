@@ -4,15 +4,39 @@ import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
 
-async function getAuthorizedUser(campaignId: string, companyId: string) {
-  const service = createServiceClient()
+type Service = ReturnType<typeof createServiceClient>
+
+// Notes are readable/writable by admins & managers (campaigns:read) for any
+// company campaign, and by scanners (tokens:scan) only for campaigns they're
+// assigned to scan. Returns true when the caller may access this campaign's notes.
+async function hasCampaignAccess(
+  service: Service,
+  campaignId: string,
+  companyId: string,
+  userId: string,
+  permissions: string[]
+): Promise<boolean> {
   const { data: campaign } = await service
     .from('campaigns')
     .select('id')
     .eq('id', campaignId)
     .eq('company_id', companyId)
     .single()
-  return campaign
+  if (!campaign) return false
+
+  if (hasPermission(permissions, 'campaigns:read')) return true
+
+  if (hasPermission(permissions, 'tokens:scan')) {
+    const { data: assignment } = await service
+      .from('campaign_distributors')
+      .select('user_id')
+      .eq('campaign_id', campaignId)
+      .eq('user_id', userId)
+      .maybeSingle()
+    return !!assignment
+  }
+
+  return false
 }
 
 export async function GET(
@@ -29,13 +53,12 @@ export async function GET(
   const companyId = await resolveCompanyId(appMeta)
   if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
-  if (!hasPermission(permissions, 'campaigns:read')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
-  }
-  const campaign = await getAuthorizedUser(campaignId, companyId)
-  if (!campaign) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const service = createServiceClient()
+  if (!(await hasCampaignAccess(service, campaignId, companyId, user.id, permissions))) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+
   const { data: notes } = await service
     .from('campaign_notes')
     .select('id, author_id, author_name, body, created_at, updated_at')
@@ -59,11 +82,11 @@ export async function POST(
   const companyId = await resolveCompanyId(appMeta)
   if (!companyId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
-  if (!hasPermission(permissions, 'campaigns:read')) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+  const service = createServiceClient()
+  if (!(await hasCampaignAccess(service, campaignId, companyId, user.id, permissions))) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
-  const campaign = await getAuthorizedUser(campaignId, companyId)
-  if (!campaign) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
   const body = await request.json().catch(() => ({}))
   const text: string = typeof body.body === 'string' ? body.body.trim() : ''
@@ -74,7 +97,6 @@ export async function POST(
     user.email?.split('@')[0] ??
     'Unknown'
 
-  const service = createServiceClient()
   const { data: note, error } = await service
     .from('campaign_notes')
     .insert({ campaign_id: campaignId, author_id: user.id, author_name: authorName, body: text })

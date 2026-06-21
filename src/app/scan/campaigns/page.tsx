@@ -48,7 +48,7 @@ export default function ScannerCampaignsPage() {
             {campaigns.map((c) => (
               <Link
                 key={c.id}
-                href="/scan"
+                href={`/scan/campaigns/${c.id}`}
                 className="bg-white rounded-2xl border border-zinc-200 p-5 flex items-center justify-between hover:border-indigo-300 hover:shadow-sm transition-all"
               >
                 <div className="min-w-0">
@@ -73,7 +73,7 @@ export default function ScannerCampaignsPage() {
                     </div>
                   )}
                 </div>
-                <span className="text-sm font-medium text-indigo-600 flex-shrink-0 ms-3">{t('Scan')} →</span>
+                <span className="text-sm font-medium text-indigo-600 flex-shrink-0 ms-3" aria-hidden>→</span>
               </Link>
             ))}
           </div>
