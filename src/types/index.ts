@@ -50,6 +50,7 @@ export type GiftToken = {
   redeemed_at: string | null
   redeemed_by: string | null
   gift_id: string | null
+  gift_chosen_at: string | null
 }
 
 export type GiftOption = {
@@ -59,7 +60,7 @@ export type GiftOption = {
 }
 
 export type TokenVerifyResult =
-  | { valid: true; employeeName: string; needsGiftSelection?: false }
+  | { valid: true; employeeName: string; needsGiftSelection?: false; giftName?: string | null }
   | { valid: true; employeeName: string; needsGiftSelection: true; gifts: GiftOption[] }
   | { valid: false; reason: 'already_used'; employeeName: string }
   | { valid: false; reason: 'invalid' }
