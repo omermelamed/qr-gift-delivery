@@ -383,6 +383,8 @@ export const he: Record<string, string> = {
   'Sent': 'נשלח',
 
   // TokenUploader / CampaignPopulator shared
+  'File is empty or has no data rows': 'הקובץ ריק או שאין בו שורות נתונים',
+  'Failed to read file': 'קריאת הקובץ נכשלה',
   'Confirm Upload': 'אשר העלאה',
   'more rows not shown': 'שורות נוספות לא מוצגות',
   'Columns:': 'עמודות:',

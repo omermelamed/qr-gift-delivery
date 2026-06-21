@@ -28,10 +28,19 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
 
   async function processFile(file: File) {
     setMessage(null)
-    const bytes = new Uint8Array(await file.arrayBuffer())
-    const raw = parseSheetRows(bytes)
-    const parsed: ParsedRow[] = raw.map(normalizeCSVRow)
-    setRows(validateRows(parsed))
+    setRows([])
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      const raw = parseSheetRows(bytes)
+      if (raw.length === 0) {
+        setMessage({ text: t('File is empty or has no data rows'), type: 'error' })
+        return
+      }
+      const parsed: ParsedRow[] = raw.map(normalizeCSVRow)
+      setRows(validateRows(parsed))
+    } catch (err) {
+      setMessage({ text: `${t('Failed to read file')}: ${err instanceof Error ? err.message : String(err)}`, type: 'error' })
+    }
   }
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
