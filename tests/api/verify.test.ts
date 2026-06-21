@@ -6,6 +6,7 @@ const mockTokenSelectSingle = vi.fn()
 const mockDistributorSelect = vi.fn()
 const mockGiftsOrder = vi.fn()
 const mockUpdateSingle = vi.fn()
+const mockRoleMaybeSingle = vi.fn()
 
 vi.mock('@/lib/audit', () => ({ logAuditEvent: vi.fn() }))
 
@@ -18,6 +19,9 @@ vi.mock('@/lib/supabase/server', () => ({
       }
       if (table === 'campaign_gifts') {
         return { select: () => ({ eq: () => ({ order: mockGiftsOrder }) }) }
+      }
+      if (table === 'user_company_roles') {
+        return { select: () => ({ eq: () => ({ eq: () => ({ in: () => ({ maybeSingle: mockRoleMaybeSingle }) }) }) }) }
       }
       // gift_tokens
       return {
@@ -53,6 +57,7 @@ describe('POST /api/verify/[token]', () => {
     mockGetUser.mockResolvedValue({ data: { user: { id: 'dist-1', app_metadata: { role_name: 'company_admin' } } } })
     mockDistributorSelect.mockResolvedValue({ data: [], error: null })
     mockGiftsOrder.mockResolvedValue({ data: [], error: null })
+    mockRoleMaybeSingle.mockResolvedValue({ data: null })
   })
 
   it('not_authorized when no authenticated user', async () => {
@@ -114,7 +119,7 @@ describe('POST /api/verify/[token]', () => {
     const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
     const body = await res.json()
     expect(body.valid).toBe(true)
-    expect(body.needsGiftSelection).toBeFalsy()
+    expect(body.needsGiftSelection).toBeUndefined()
     expect(body.giftName).toBe('Headphones')
   })
 
@@ -136,7 +141,7 @@ describe('POST /api/verify/[token]', () => {
     const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
     const body = await res.json()
     expect(body.valid).toBe(true)
-    expect(body.giftName ?? null).toBeNull()
+    expect(body.giftName).toBeNull()
   })
 
   it('already_used on race (atomic update returns no row)', async () => {
@@ -146,5 +151,43 @@ describe('POST /api/verify/[token]', () => {
     const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
     const body = await res.json()
     expect(body.reason).toBe('already_used')
+  })
+
+  it('scanner fallback: redeems with body giftId when no stored gift_id', async () => {
+    mockTokenSelectSingle.mockResolvedValue({ data: openToken })
+    mockGiftsOrder.mockResolvedValue({ data: [
+      { id: 'g-1', name: 'Headphones', position: 0 },
+      { id: 'g-2', name: 'Mug', position: 1 },
+    ], error: null })
+    mockUpdateSingle.mockResolvedValue({ data: { employee_name: 'Omer' } })
+    const { POST } = await import('@/app/api/verify/[token]/route')
+    const res = await POST(makeRequest('t', { giftId: 'g-2' }), { params: Promise.resolve({ token: 't' }) })
+    const body = await res.json()
+    expect(body.valid).toBe(true)
+    expect(body.needsGiftSelection).toBeUndefined()
+    expect(body.giftName).toBe('Mug')
+  })
+
+  it('not_authorized when caller not in non-empty assignment list', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'outsider-1', app_metadata: { role_name: 'scanner' } } } })
+    mockTokenSelectSingle.mockResolvedValue({ data: openToken })
+    mockDistributorSelect.mockResolvedValue({ data: [{ user_id: 'someone-else' }], error: null })
+    mockRoleMaybeSingle.mockResolvedValue({ data: null })
+    const { POST } = await import('@/app/api/verify/[token]/route')
+    const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
+    const body = await res.json()
+    expect(body.valid).toBe(false)
+    expect(body.reason).toBe('not_authorized')
+  })
+
+  it('allows scan when caller IS in the assignment list', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: { id: 'assigned-1', app_metadata: { role_name: 'scanner' } } } })
+    mockTokenSelectSingle.mockResolvedValue({ data: openToken })
+    mockDistributorSelect.mockResolvedValue({ data: [{ user_id: 'assigned-1' }], error: null })
+    mockUpdateSingle.mockResolvedValue({ data: { employee_name: 'Omer' } })
+    const { POST } = await import('@/app/api/verify/[token]/route')
+    const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
+    const body = await res.json()
+    expect(body.valid).toBe(true)
   })
 })
