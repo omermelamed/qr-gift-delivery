@@ -2,9 +2,8 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { read, utils } from 'xlsx'
 import { normalizePhone } from '@/lib/phone'
-import { normalizeCSVRow } from '@/lib/csv'
+import { normalizeCSVRow, parseSheetRows } from '@/lib/csv'
 import { DirectoryEmployeePicker } from '@/components/admin/DirectoryEmployeePicker'
 import { useT } from '@/lib/i18n/useT'
 
@@ -47,12 +46,19 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
 
   async function processFile(file: File) {
     setMessage(null)
-    const text = await file.text()
-    const wb = read(text, { type: 'string' })
-    const sheet = wb.Sheets[wb.SheetNames[0]]
-    const raw: Record<string, string>[] = utils.sheet_to_json(sheet, { defval: '' })
-    const parsed: ParsedRow[] = raw.map(normalizeCSVRow)
-    setRows(validateRows(parsed))
+    setRows([])
+    try {
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      const raw = parseSheetRows(bytes)
+      if (raw.length === 0) {
+        setMessage({ text: t('File is empty or has no data rows'), type: 'error' })
+        return
+      }
+      const parsed: ParsedRow[] = raw.map(normalizeCSVRow)
+      setRows(validateRows(parsed))
+    } catch (err) {
+      setMessage({ text: `${t('Failed to read file')}: ${err instanceof Error ? err.message : String(err)}`, type: 'error' })
+    }
   }
 
   const validRows = rows.filter((r) => r._status === 'valid')
