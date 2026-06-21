@@ -412,8 +412,17 @@ export default function ScanPage() {
                 </div>
                 {result.valid ? (
                   <>
-                    <p className="text-white text-4xl font-bold text-center px-8">{result.employeeName}</p>
-                    <p className="text-white/80 text-lg">{t('Gift collected')}</p>
+                    {result.giftName ? (
+                      <>
+                        <p className="text-white text-4xl font-bold text-center px-8">{result.giftName}</p>
+                        <p className="text-white/80 text-lg">{result.employeeName}</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-white text-4xl font-bold text-center px-8">{result.employeeName}</p>
+                        <p className="text-white/80 text-lg">{t('Gift collected')}</p>
+                      </>
+                    )}
                   </>
                 ) : result.reason === 'campaign_closed' ? (
                   <>
