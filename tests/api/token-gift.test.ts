@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { fetchPermissions } from '@/lib/permissions'
 
 const mockGetUser = vi.fn()
 const mockCampaignSingle = vi.fn()
@@ -54,6 +55,13 @@ describe('PATCH /api/campaigns/[id]/tokens/[tokenId]/gift', () => {
     const { PATCH } = await import('@/app/api/campaigns/[id]/tokens/[tokenId]/gift/route')
     const res = await PATCH(makeRequest('g-1'), ctx)
     expect(res.status).toBe(401)
+  })
+
+  it('403 when caller lacks campaigns:launch permission', async () => {
+    vi.mocked(fetchPermissions).mockResolvedValueOnce([] as any)
+    const { PATCH } = await import('@/app/api/campaigns/[id]/tokens/[tokenId]/gift/route')
+    const res = await PATCH(makeRequest('g-1'), ctx)
+    expect(res.status).toBe(403)
   })
 
   it('404 when campaign not in caller company', async () => {

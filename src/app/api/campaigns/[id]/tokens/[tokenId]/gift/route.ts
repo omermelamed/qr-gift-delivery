@@ -50,7 +50,7 @@ export async function PATCH(
   // Admin override is allowed anytime, including after redemption.
   const { data: updated } = await service
     .from('gift_tokens')
-    .update({ gift_id: giftId, gift_chosen_at: new Date().toISOString() })
+    .update({ gift_id: giftId, gift_chosen_at: giftId ? new Date().toISOString() : null })
     .eq('id', tokenId)
     .eq('campaign_id', campaignId)
     .select('id, gift_id')
