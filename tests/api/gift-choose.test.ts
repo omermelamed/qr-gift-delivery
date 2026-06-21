@@ -83,14 +83,27 @@ describe('POST /api/gift/[token]/choose', () => {
     mockTokenSingle
       .mockResolvedValueOnce({ data: { campaign_id: 'c-1', gift_id: null, redeemed: false } })
       .mockResolvedValueOnce({ data: { gift_id: 'g-9' } })
-    mockGiftSingle.mockResolvedValue({ data: { id: 'g-9', name: 'Notebook' } })
+    // First call: validate the requested gift g-1 (two .eq() path)
+    mockGiftSingle.mockResolvedValueOnce({ data: { id: 'g-1', name: 'Headphones' } })
+    // Second call: look up the winner's gift g-9 (one .eq() path)
+    mockGiftSingle.mockResolvedValueOnce({ data: { id: 'g-9', name: 'Notebook' } })
     mockLockSingle.mockResolvedValue({ data: null })
     const { POST } = await import('@/app/api/gift/[token]/choose/route')
-    const res = await POST(makeRequest('t', 'g-9'), { params: Promise.resolve({ token: 't' }) })
+    const res = await POST(makeRequest('t', 'g-1'), { params: Promise.resolve({ token: 't' }) })
     const body = await res.json()
     expect(body.ok).toBe(true)
     expect(body.locked).toBe(true)
     expect(body.gift).toEqual({ id: 'g-9', name: 'Notebook' })
+  })
+
+  it('returns locked:true with gift:null when redeemed without a choice', async () => {
+    mockTokenSingle.mockResolvedValue({ data: { campaign_id: 'c-1', gift_id: null, redeemed: true } })
+    const { POST } = await import('@/app/api/gift/[token]/choose/route')
+    const res = await POST(makeRequest('t', 'g-1'), { params: Promise.resolve({ token: 't' }) })
+    const body = await res.json()
+    expect(body.ok).toBe(true)
+    expect(body.locked).toBe(true)
+    expect(body.gift).toBeNull()
   })
 
   it('returns locked:true when a choice already exists (no change allowed)', async () => {

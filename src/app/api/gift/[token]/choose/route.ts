@@ -24,16 +24,19 @@ export async function POST(
     return NextResponse.json({ ok: false, error: 'invalid' }, { status: 404 })
   }
 
-  // Already chosen or already redeemed -> locked. Return the effective choice.
+  // Already chosen or already redeemed -> locked. Return the real state.
   // Checked before gift validation to skip the redundant DB call.
   if (tokenRow.gift_id || tokenRow.redeemed) {
-    const effectiveId = tokenRow.gift_id ?? giftId
-    const { data: current } = await service
-      .from('campaign_gifts')
-      .select('id, name')
-      .eq('id', effectiveId)
-      .single()
-    return NextResponse.json({ ok: true, locked: true, gift: current })
+    if (tokenRow.gift_id) {
+      const { data: current } = await service
+        .from('campaign_gifts')
+        .select('id, name')
+        .eq('id', tokenRow.gift_id)
+        .single()
+      return NextResponse.json({ ok: true, locked: true, gift: current })
+    }
+    // Redeemed but never chose a gift
+    return NextResponse.json({ ok: true, locked: true, gift: null })
   }
 
   // Validate the chosen gift belongs to this token's campaign
@@ -65,13 +68,16 @@ export async function POST(
       .select('gift_id')
       .eq('token', token)
       .single()
-    const chosenId = row?.gift_id ?? giftId
-    const { data: g } = await service
-      .from('campaign_gifts')
-      .select('id, name')
-      .eq('id', chosenId)
-      .single()
-    return NextResponse.json({ ok: true, locked: true, gift: g ?? gift })
+    if (row?.gift_id) {
+      const { data: g } = await service
+        .from('campaign_gifts')
+        .select('id, name')
+        .eq('id', row.gift_id)
+        .single()
+      return NextResponse.json({ ok: true, locked: true, gift: g })
+    }
+    // Race lost but no gift set (token was redeemed without a choice)
+    return NextResponse.json({ ok: true, locked: true, gift: null })
   }
 
   return NextResponse.json({ ok: true, locked: false, gift })
