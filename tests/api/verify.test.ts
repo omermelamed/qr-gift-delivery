@@ -94,6 +94,20 @@ describe('POST /api/verify/[token]', () => {
     expect(body.employeeName).toBe('Dana')
   })
 
+  it('already_used returns the chosen giftName when the redeemed token has a gift', async () => {
+    mockTokenSelectSingle.mockResolvedValue({ data: { ...openToken, redeemed: true, employee_name: 'Dana', gift_id: 'g-1' } })
+    mockGiftsOrder.mockResolvedValue({ data: [
+      { id: 'g-1', name: 'Headphones', position: 0 },
+      { id: 'g-2', name: 'Mug', position: 1 },
+    ], error: null })
+    const { POST } = await import('@/app/api/verify/[token]/route')
+    const res = await POST(makeRequest('t'), { params: Promise.resolve({ token: 't' }) })
+    const body = await res.json()
+    expect(body.reason).toBe('already_used')
+    expect(body.employeeName).toBe('Dana')
+    expect(body.giftName).toBe('Headphones')
+  })
+
   it('needsGiftSelection when 2+ gifts and none chosen', async () => {
     mockTokenSelectSingle.mockResolvedValue({ data: openToken })
     mockGiftsOrder.mockResolvedValue({ data: [

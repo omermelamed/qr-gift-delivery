@@ -440,6 +440,9 @@ export default function ScanPage() {
                     {result.employeeName && (
                       <p className="text-white/80 text-lg">{result.employeeName}</p>
                     )}
+                    {result.giftName && (
+                      <p className="text-white text-2xl font-semibold mt-1">{result.giftName}</p>
+                    )}
                   </>
                 ) : (
                   <>

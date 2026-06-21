@@ -62,7 +62,7 @@ export type GiftOption = {
 export type TokenVerifyResult =
   | { valid: true; employeeName: string; needsGiftSelection?: false; giftName?: string | null }
   | { valid: true; employeeName: string; needsGiftSelection: true; gifts: GiftOption[]; giftName?: string | null }
-  | { valid: false; reason: 'already_used'; employeeName: string }
+  | { valid: false; reason: 'already_used'; employeeName: string; giftName?: string | null }
   | { valid: false; reason: 'invalid' }
   | { valid: false; reason: 'campaign_closed' }
   | { valid: false; reason: 'not_authorized' }
