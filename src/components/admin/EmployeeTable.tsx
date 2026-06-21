@@ -92,16 +92,58 @@ function EmployeeQrModal({
   )
 }
 
+function GiftCell({
+  giftId,
+  gifts,
+  giftMap,
+  editable,
+  onChange,
+}: {
+  giftId: string | null
+  gifts: { id: string; name: string }[]
+  giftMap: Map<string, { name: string; color: string }>
+  editable: boolean
+  onChange: (giftId: string) => void
+}) {
+  if (editable) {
+    return (
+      <select
+        value={giftId ?? ''}
+        onChange={(e) => onChange(e.target.value)}
+        className="text-xs border border-zinc-200 rounded-md px-1.5 py-1 bg-white max-w-[10rem]"
+      >
+        <option value="">—</option>
+        {gifts.map((g) => (
+          <option key={g.id} value={g.id}>{g.name}</option>
+        ))}
+      </select>
+    )
+  }
+  if (giftId && giftMap.get(giftId)) {
+    return (
+      <span
+        className="inline-block px-2 py-0.5 rounded-full text-xs font-medium text-white"
+        style={{ backgroundColor: giftMap.get(giftId)!.color }}
+      >
+        {giftMap.get(giftId)!.name}
+      </span>
+    )
+  }
+  return <span className="text-zinc-300">—</span>
+}
+
 export function EmployeeTable({
   campaignId,
   initialRows,
   isDraft,
   gifts = [],
+  canEditGift = false,
 }: {
   campaignId: string
   initialRows: TokenRow[]
   isDraft: boolean
   gifts?: { id: string; name: string }[]
+  canEditGift?: boolean
 }) {
   const t = useT()
   const [rows, setRows] = useState(initialRows)
@@ -114,6 +156,16 @@ export function EmployeeTable({
 
   const GIFT_COLORS = ['#6366f1', '#8b5cf6', '#f59e0b', '#14b8a6', '#f43f5e', '#f97316']
   const giftMap = new Map(gifts.map((g, i) => [g.id, { name: g.name, color: GIFT_COLORS[i % GIFT_COLORS.length] }]))
+
+  async function changeGift(tokenId: string, giftId: string) {
+    await fetch(`/api/campaigns/${campaignId}/tokens/${tokenId}/gift`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ giftId: giftId || null }),
+    })
+    // Realtime UPDATE subscription already refreshes the table rows.
+  }
+
   const showGiftCol = gifts.length > 0
   const [groupByDept, setGroupByDept] = useState(false)
   const [distributorNames, setDistributorNames] = useState<Record<string, string>>({})
@@ -306,17 +358,14 @@ export function EmployeeTable({
                         <td className="px-3 py-2.5 font-mono text-xs text-zinc-500" dir="ltr">{row.phone_number ? maskPhone(row.phone_number) : <span className="text-zinc-300">—</span>}</td>
                         <td className="px-3 py-2.5 text-zinc-500">{row.department ?? <span className="text-zinc-300">—</span>}</td>
                         {showGiftCol && (
-                          <td className="px-3 py-2.5">
-                            {row.gift_id && giftMap.get(row.gift_id) ? (
-                              <span
-                                className="text-white text-xs font-medium px-2 py-0.5 rounded-full"
-                                style={{ backgroundColor: giftMap.get(row.gift_id)!.color }}
-                              >
-                                {giftMap.get(row.gift_id)!.name}
-                              </span>
-                            ) : (
-                              <span className="text-zinc-300 text-xs">—</span>
-                            )}
+                          <td className="px-3 py-1.5">
+                            <GiftCell
+                              giftId={row.gift_id}
+                              gifts={gifts}
+                              giftMap={giftMap}
+                              editable={canEditGift}
+                              onChange={(giftId) => changeGift(row.id, giftId)}
+                            />
                           </td>
                         )}
                         <td className="px-3 py-2.5">
@@ -375,17 +424,14 @@ export function EmployeeTable({
                       <td className="px-3 py-2.5 font-mono text-xs text-zinc-500">{r.phone_number ? maskPhone(r.phone_number) : <span className="text-zinc-300">—</span>}</td>
                       <td className="px-3 py-2.5 text-zinc-500">{r.department ?? <span className="text-zinc-300">—</span>}</td>
                       {showGiftCol && (
-                        <td className="px-3 py-2.5">
-                          {r.gift_id && giftMap.get(r.gift_id) ? (
-                            <span
-                              className="text-white text-xs font-medium px-2 py-0.5 rounded-full"
-                              style={{ backgroundColor: giftMap.get(r.gift_id)!.color }}
-                            >
-                              {giftMap.get(r.gift_id)!.name}
-                            </span>
-                          ) : (
-                            <span className="text-zinc-300 text-xs">—</span>
-                          )}
+                        <td className="px-3 py-1.5">
+                          <GiftCell
+                            giftId={r.gift_id}
+                            gifts={gifts}
+                            giftMap={giftMap}
+                            editable={canEditGift}
+                            onChange={(giftId) => changeGift(r.id, giftId)}
+                          />
                         </td>
                       )}
                       <td className="px-3 py-2.5">

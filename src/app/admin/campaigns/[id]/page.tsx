@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
+import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { CampaignPopulator } from '@/components/admin/CampaignPopulator'
 import { LaunchButton } from '@/components/admin/LaunchButton'
 import { CloseCampaignButton } from '@/components/admin/CloseCampaignButton'
@@ -33,6 +34,8 @@ export default async function CampaignDetailPage({
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
   const appMeta = user.app_metadata as JwtAppMetadata
+  const permissions = await fetchPermissions(appMeta.role_id, appMeta.role_name)
+  const canEditGift = hasPermission(permissions, 'campaigns:launch')
 
   const companyId = await resolveCompanyId(appMeta)
   if (!companyId) redirect('/login')
@@ -166,6 +169,7 @@ export default async function CampaignDetailPage({
                 initialRows={allTokens}
                 isDraft={isDraft}
                 gifts={gifts}
+                canEditGift={canEditGift}
               />
             </div>
             <div>
@@ -199,6 +203,7 @@ export default async function CampaignDetailPage({
                 initialRows={allTokens}
                 isDraft={isDraft}
                 gifts={gifts}
+                canEditGift={canEditGift}
               />
             </div>
             <div className="lg:self-stretch">
