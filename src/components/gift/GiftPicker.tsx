@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useT } from '@/lib/i18n/useT'
 
 const GIFT_COLORS = ['#6366f1', '#8b5cf6', '#f59e0b', '#14b8a6', '#f43f5e', '#f97316']
 
@@ -9,6 +10,7 @@ type Gift = { id: string; name: string }
 
 export function GiftPicker({ token, gifts }: { token: string; gifts: Gift[] }) {
   const router = useRouter()
+  const t = useT()
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -24,21 +26,21 @@ export function GiftPicker({ token, gifts }: { token: string; gifts: Gift[] }) {
       })
       const data = await res.json()
       if (!data.ok) {
-        setError('Could not save your choice. Please try again.')
+        setError(t('Could not save your choice. Please try again.'))
         setBusy(false)
         return
       }
       // Re-render the server page, which now shows the locked choice + QR.
       router.refresh()
     } catch {
-      setError('Could not save your choice. Please try again.')
+      setError(t('Could not save your choice. Please try again.'))
       setBusy(false)
     }
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-sm text-zinc-500 mb-2">Choose your gift</p>
+      <p className="text-sm text-zinc-500 mb-2">{t('Choose your gift')}</p>
       {gifts.map((gift, i) => (
         <button
           key={gift.id}

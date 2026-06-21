@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/browser'
+import { useT } from '@/lib/i18n/useT'
 
 export default function ResetPasswordPage() {
+  const t = useT()
   const [ready, setReady] = useState(false)
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -30,11 +32,11 @@ export default function ResetPasswordPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (password !== confirm) {
-      setError('Passwords do not match')
+      setError(t('Passwords do not match'))
       return
     }
     if (password.length < 8) {
-      setError('Password must be at least 8 characters')
+      setError(t('Password must be at least 8 characters'))
       return
     }
     setLoading(true)
@@ -63,18 +65,18 @@ export default function ResetPasswordPage() {
         <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-8 flex flex-col gap-5">
           {!ready ? (
             <>
-              <h1 className="text-lg font-semibold text-zinc-900">Verifying link…</h1>
+              <h1 className="text-lg font-semibold text-zinc-900">{t('Verifying link…')}</h1>
               <p className="text-sm text-zinc-500">
-                If nothing happens, your link may have expired.{' '}
+                {t('If nothing happens, your link may have expired.')}{' '}
                 <a href="/login" className="text-indigo-600 hover:underline">
-                  Request a new one.
+                  {t('Request a new one.')}
                 </a>
               </p>
             </>
           ) : (
             <>
-              <h1 className="text-lg font-semibold text-zinc-900">Set your password</h1>
-              <p className="text-sm text-zinc-500 -mt-2">Choose a password to finish setting up your account.</p>
+              <h1 className="text-lg font-semibold text-zinc-900">{t('Set your password')}</h1>
+              <p className="text-sm text-zinc-500 -mt-2">{t('Choose a password to finish setting up your account.')}</p>
 
               {error && (
                 <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
@@ -84,11 +86,11 @@ export default function ResetPasswordPage() {
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="password" className="text-sm font-medium text-zinc-700">New password</label>
+                  <label htmlFor="password" className="text-sm font-medium text-zinc-700">{t('New password')}</label>
                   <input
                     id="password"
                     type="password"
-                    placeholder="Min. 8 characters"
+                    placeholder={t('Min. 8 characters')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -98,11 +100,11 @@ export default function ResetPasswordPage() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label htmlFor="confirm" className="text-sm font-medium text-zinc-700">Confirm password</label>
+                  <label htmlFor="confirm" className="text-sm font-medium text-zinc-700">{t('Confirm password')}</label>
                   <input
                     id="confirm"
                     type="password"
-                    placeholder="Repeat new password"
+                    placeholder={t('Repeat new password')}
                     value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
                     required
@@ -115,7 +117,7 @@ export default function ResetPasswordPage() {
                   disabled={loading}
                   className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
                 >
-                  {loading ? 'Saving…' : 'Set new password'}
+                  {loading ? t('Saving…') : t('Set new password')}
                 </button>
               </form>
             </>

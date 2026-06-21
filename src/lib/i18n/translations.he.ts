@@ -7,6 +7,16 @@ export const he: Record<string, string> = {
   'Check': 'בדוק',
   'No unclaimed gifts found for this number.': 'לא נמצאו מתנות שלא נדרשו למספר זה.',
   'You have an unclaimed gift. Find a gift distributor and show them this screen to claim it.': 'יש לך מתנה שלא נדרשה. מצא מפיץ ומצג לו מסך זה כדי לקבל את המתנה.',
+  'Hi': 'שלום',
+
+  // Gift QR / redemption page
+  'Already Claimed': 'כבר מומש',
+  'This gift has already been redeemed.': 'מתנה זו כבר מומשה.',
+  'Choose your gift': 'בחר את המתנה שלך',
+  'Could not save your choice. Please try again.': 'לא ניתן לשמור את הבחירה שלך. נסה שוב.',
+  'Your gift': 'המתנה שלך',
+  'QR code not available': 'קוד ה-QR אינו זמין',
+  'Show this QR code to a distributor to collect your gift.': 'הצג קוד QR זה למפיץ כדי לקבל את המתנה שלך.',
 
   // Verify result / ResultCard
   'Invalid QR code': 'קוד QR לא תקין',
@@ -533,4 +543,33 @@ export const he: Record<string, string> = {
   'Duplicated campaign': 'שכפל קמפיין',
   'Sent reminder': 'שלח תזכורת',
   'Redeemed gift': 'מימש מתנה',
+
+  // Previously-missed strings
+  'Not chosen yet': 'טרם נבחר',
+  'scanned': 'נסרקו',
+  'redeemed': 'מומשו',
+  'Grant': 'הענקה',
+  'e.g. Passover 2026': 'לדוגמה: פסח 2026',
+  'No matching columns found. Your columns:': 'לא נמצאו עמודות תואמות. העמודות שלך:',
+  'Expected: name/שם, phone_number/טלפון, department/מחלקה': 'צפוי: name/שם, phone_number/טלפון, department/מחלקה',
+
+  // Reset / set password page
+  'Passwords do not match': 'הסיסמאות אינן תואמות',
+  'Password must be at least 8 characters': 'הסיסמה חייבת להכיל לפחות 8 תווים',
+  'Verifying link…': 'מאמת קישור…',
+  'If nothing happens, your link may have expired.': 'אם דבר לא קורה, ייתכן שתוקף הקישור פג.',
+  'Request a new one.': 'בקש קישור חדש.',
+  'Set your password': 'הגדר את הסיסמה שלך',
+  'Choose a password to finish setting up your account.': 'בחר סיסמה כדי לסיים את הגדרת החשבון שלך.',
+  'New password': 'סיסמה חדשה',
+  'Min. 8 characters': 'לפחות 8 תווים',
+  'Confirm password': 'אימות סיסמה',
+  'Repeat new password': 'חזור על הסיסמה החדשה',
+  'Set new password': 'הגדר סיסמה חדשה',
+
+  // Admin QR codes page
+  'QR Codes': 'קודי QR',
+  'codes · share or print this page': 'קודים · שתף או הדפס דף זה',
+  'No QR codes found for this campaign.': 'לא נמצאו קודי QR לקמפיין זה.',
+  'QR generating…': 'יוצר QR…',
 }
