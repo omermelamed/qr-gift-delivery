@@ -89,6 +89,7 @@ jobs:
           );
           CREATE INDEX IF NOT EXISTS campaign_gifts_campaign_idx ON campaign_gifts (campaign_id, position);
           ALTER TABLE gift_tokens ADD COLUMN IF NOT EXISTS gift_id UUID REFERENCES campaign_gifts(id) ON DELETE SET NULL;
+          ALTER TABLE gift_tokens ADD COLUMN IF NOT EXISTS gift_chosen_at TIMESTAMPTZ;
           ALTER TABLE gift_tokens ALTER COLUMN phone_number DROP NOT NULL;
           CREATE TABLE IF NOT EXISTS audit_events (
             id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
