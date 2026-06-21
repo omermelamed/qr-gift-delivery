@@ -98,7 +98,9 @@ export async function GET(
       .map(csvEscape)
       .join(',')
   )
-  const csv = [header, ...rows].join('\n')
+  // Prepend a UTF-8 BOM so Excel decodes the file as UTF-8 (it otherwise falls
+  // back to the system codepage, e.g. Windows-1255, and mangles Hebrew names).
+  const csv = '﻿' + [header, ...rows].join('\n')
 
   return new NextResponse(csv, {
     headers: {

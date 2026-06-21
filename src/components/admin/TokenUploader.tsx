@@ -2,9 +2,8 @@
 
 import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { read, utils } from 'xlsx'
 import { normalizePhone } from '@/lib/phone'
-import { normalizeCSVRow } from '@/lib/csv'
+import { normalizeCSVRow, parseSheetRows } from '@/lib/csv'
 import { useT } from '@/lib/i18n/useT'
 
 type ParsedRow = { name: string; phone_number: string; department?: string }
@@ -29,10 +28,8 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
 
   async function processFile(file: File) {
     setMessage(null)
-    const text = await file.text()
-    const wb = read(text, { type: 'string' })
-    const sheet = wb.Sheets[wb.SheetNames[0]]
-    const raw: Record<string, string>[] = utils.sheet_to_json(sheet, { defval: '' })
+    const bytes = new Uint8Array(await file.arrayBuffer())
+    const raw = parseSheetRows(bytes)
     const parsed: ParsedRow[] = raw.map(normalizeCSVRow)
     setRows(validateRows(parsed))
   }

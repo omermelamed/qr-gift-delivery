@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
-import { read, utils } from 'xlsx'
-import { normalizeCSVRow } from '@/lib/csv'
+import { normalizeCSVRow, parseSheetRows } from '@/lib/csv'
 import { useT } from '@/lib/i18n/useT'
 import { useLocale } from '@/lib/i18n/LanguageContext'
 
@@ -29,10 +28,8 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
     setFileName(file.name)
     setRows([])
     try {
-      const text = await file.text()
-      const wb = read(text, { type: 'string' })
-      const sheet = wb.Sheets[wb.SheetNames[0]]
-      const raw: Record<string, unknown>[] = utils.sheet_to_json(sheet, { defval: '' })
+      const bytes = new Uint8Array(await file.arrayBuffer())
+      const raw = parseSheetRows(bytes)
       if (raw.length === 0) {
         setError(t('File is empty or has no data rows'))
         return
