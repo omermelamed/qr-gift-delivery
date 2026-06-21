@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
 import { ResultCard } from '@/components/verify/ResultCard'
+import { VerifyGiftPicker } from '@/components/verify/VerifyGiftPicker'
 
 export default async function VerifyPage({
   params,
@@ -101,6 +102,19 @@ export default async function VerifyPage({
         )
       }
     }
+  }
+
+  // Multi-gift campaign with no employee choice: let the distributor pick which
+  // gift was handed over (mirrors the camera scanner's fallback). Redemption
+  // happens via /api/verify/[token] when they tap a gift.
+  if (gifts.length >= 2 && !storedGiftId) {
+    return (
+      <VerifyGiftPicker
+        token={token}
+        employeeName={tokenRow.employee_name}
+        gifts={gifts.map((g) => ({ id: g.id, name: g.name, position: g.position }))}
+      />
+    )
   }
 
   // Keep the employee's stored choice; auto-stamp the only option for single-gift campaigns
