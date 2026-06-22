@@ -9,6 +9,7 @@ export default function NewCampaignPage() {
   const t = useT()
   const [name, setName] = useState('')
   const [campaignDate, setCampaignDate] = useState('')
+  const [supportsArrival, setSupportsArrival] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -24,6 +25,7 @@ export default function NewCampaignPage() {
         body: JSON.stringify({
           name,
           campaignDate,
+          supportsArrivalCertificates: supportsArrival,
         }),
       })
       const data = await res.json()
@@ -73,6 +75,19 @@ export default function NewCampaignPage() {
             className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
         </div>
+
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={supportsArrival}
+            onChange={(e) => setSupportsArrival(e.target.checked)}
+            className="mt-0.5 w-4 h-4 accent-indigo-500"
+          />
+          <span>
+            <span className="block text-sm font-medium text-zinc-700">{t('Supports Arrival Certificates')}</span>
+            <span className="block text-xs text-zinc-500">{t('Let people confirm attendance and how many are coming.')}</span>
+          </span>
+        </label>
 
         <button
           type="submit"

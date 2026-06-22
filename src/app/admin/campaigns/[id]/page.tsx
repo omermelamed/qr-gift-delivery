@@ -10,6 +10,7 @@ import { CloseCampaignButton } from '@/components/admin/CloseCampaignButton'
 import { RedemptionProgress } from '@/components/admin/RedemptionProgress'
 import { DistributorAssignment } from '@/components/admin/DistributorAssignment'
 import { GiftOptionsEditor } from '@/components/admin/GiftOptionsEditor'
+import { ArrivalCertToggle } from '@/components/admin/ArrivalCertToggle'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
@@ -45,7 +46,7 @@ export default async function CampaignDetailPage({
   const [campaignResult, creditsResult] = await Promise.all([
     service
       .from('campaigns')
-      .select('id, name, campaign_date, sent_at, closed_at')
+      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates')
       .eq('id', campaignId)
       .eq('company_id', companyId)
       .single(),
@@ -160,6 +161,7 @@ export default async function CampaignDetailPage({
             <div className="flex flex-col gap-4">
               <DistributorAssignment campaignId={campaign.id} />
               <GiftOptionsEditor campaignId={campaign.id} />
+              <ArrivalCertToggle campaignId={campaign.id} initial={campaign.supports_arrival_certificates} />
             </div>
 
             {/* Employee table (2 cols) + Notes (1 col) */}
