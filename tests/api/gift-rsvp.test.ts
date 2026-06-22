@@ -3,16 +3,17 @@ import { NextRequest } from 'next/server'
 
 const mockTokenSingle = vi.fn()
 const mockUpdateSingle = vi.fn()
+const mockUpdate = vi.fn(() => ({
+  eq: () => ({
+    eq: () => ({ select: () => ({ single: mockUpdateSingle }) }),
+  }),
+}))
 
 vi.mock('@/lib/supabase/server', () => ({
   createServiceClient: () => ({
     from: () => ({
       select: () => ({ eq: () => ({ single: mockTokenSingle }) }),
-      update: () => ({
-        eq: () => ({
-          eq: () => ({ select: () => ({ single: mockUpdateSingle }) }),
-        }),
-      }),
+      update: mockUpdate,
     }),
   }),
 }))
@@ -28,13 +29,16 @@ function makeRequest(token: string, body: unknown) {
 const supportedOpen = { redeemed: false, campaigns: { supports_arrival_certificates: true, closed_at: null } }
 
 describe('POST /api/gift/[token]/rsvp', () => {
-  beforeEach(() => vi.clearAllMocks())
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockUpdate.mockClear()
+  })
 
   it('400 when attending is not a boolean', async () => {
-    mockTokenSingle.mockResolvedValue({ data: supportedOpen })
     const { POST } = await import('@/app/api/gift/[token]/rsvp/route')
     const res = await POST(makeRequest('t', { attending: 'yes' }), { params: Promise.resolve({ token: 't' }) })
     expect(res.status).toBe(400)
+    expect(mockTokenSingle).not.toHaveBeenCalled()
   })
 
   it('404 when token does not exist', async () => {
@@ -94,6 +98,7 @@ describe('POST /api/gift/[token]/rsvp', () => {
     const res = await POST(makeRequest('t', { attending: true, attendeeCount: 2 }), { params: Promise.resolve({ token: 't' }) })
     const body = await res.json()
     expect(body).toEqual({ ok: true, attending: true, attendeeCount: 2 })
+    expect(mockUpdate).toHaveBeenCalledWith({ attending: true, attendee_count: 2, responded_at: expect.any(String) })
   })
 
   it('saves a not-coming response with a null count', async () => {
@@ -103,6 +108,7 @@ describe('POST /api/gift/[token]/rsvp', () => {
     const res = await POST(makeRequest('t', { attending: false, attendeeCount: 5 }), { params: Promise.resolve({ token: 't' }) })
     const body = await res.json()
     expect(body).toEqual({ ok: true, attending: false, attendeeCount: null })
+    expect(mockUpdate).toHaveBeenCalledWith({ attending: false, attendee_count: null, responded_at: expect.any(String) })
   })
 
   it('updates not-coming -> coming with a count', async () => {
