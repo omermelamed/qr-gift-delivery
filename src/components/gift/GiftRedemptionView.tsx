@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { useT } from '@/lib/i18n/useT'
 import { GiftPicker } from '@/components/gift/GiftPicker'
+import { ArrivalRsvp } from '@/components/gift/ArrivalRsvp'
 
 type Gift = { id: string; name: string }
 
@@ -14,6 +16,9 @@ type Props = {
   gifts: Gift[]
   needsChoice: boolean
   chosenGiftName: string | null
+  supportsArrival: boolean
+  attending: boolean | null
+  attendeeCount: number | null
 }
 
 export function GiftRedemptionView({
@@ -25,8 +30,12 @@ export function GiftRedemptionView({
   gifts,
   needsChoice,
   chosenGiftName,
+  supportsArrival,
+  attending,
+  attendeeCount,
 }: Props) {
   const t = useT()
+  const [editing, setEditing] = useState(false)
 
   if (redeemed) {
     return (
@@ -42,13 +51,35 @@ export function GiftRedemptionView({
     )
   }
 
+  // For arrival-certificate campaigns, the RSVP gates the gift QR.
+  const showRsvpForm = supportsArrival && (attending === null || editing)
+  const showNotComing = supportsArrival && attending === false && !editing
+
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-violet-50 px-6">
       <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-8 max-w-sm w-full text-center">
         <h1 className="text-2xl font-bold text-zinc-900 mb-1">{employeeName}</h1>
         {campaignName && <p className="text-sm text-zinc-500 mb-6">{campaignName}</p>}
 
-        {needsChoice ? (
+        {showRsvpForm ? (
+          <ArrivalRsvp
+            token={token}
+            initialAttending={attending}
+            initialCount={attendeeCount}
+            onSubmitted={() => setEditing(false)}
+          />
+        ) : showNotComing ? (
+          <>
+            <p className="text-sm font-medium text-zinc-700 mb-2">{t("You marked that you're not coming.")}</p>
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+            >
+              {t('Change my answer')}
+            </button>
+          </>
+        ) : needsChoice ? (
           <GiftPicker token={token} gifts={gifts} />
         ) : (
           <>
@@ -73,6 +104,15 @@ export function GiftRedemptionView({
             <p className="text-sm text-zinc-500 mt-6">
               {t('Show this QR code to a distributor to collect your gift.')}
             </p>
+            {supportsArrival && (
+              <button
+                type="button"
+                onClick={() => setEditing(true)}
+                className="mt-4 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+              >
+                {t('Change my answer')}
+              </button>
+            )}
           </>
         )}
       </div>
