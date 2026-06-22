@@ -159,8 +159,12 @@ on `src/app/admin/campaigns/[id]/page.tsx` (add `attending, attendee_count` to t
 - **Total arriving** (sum of `attendee_count`)
 - Not coming / No response counts for context.
 
-`EmployeeTable` shows an attendance status column (coming +N / not coming / no response)
-when the flag is on.
+The total math is extracted into a pure, unit-tested helper `summarizeArrival(rows)` in
+`src/lib/arrival.ts` so totals are testable without rendering.
+
+A per-row attendance column inside `EmployeeTable` is **deferred** (out of scope): that file
+is large with duplicated render branches, and the explicit reporting requirement is fully
+met by the summary card. It can be added as a follow-up.
 
 ## Types — `src/types/index.ts`
 - `Campaign` += `supports_arrival_certificates: boolean`
