@@ -20,6 +20,7 @@ import { DistributorStats } from '@/components/admin/DistributorStats'
 import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignButton'
 import { ReminderButton } from '@/components/admin/ReminderButton'
 import { GiftBreakdown } from '@/components/admin/GiftBreakdown'
+import { ArrivalSummary } from '@/components/admin/ArrivalSummary'
 import { CampaignDetailHeader } from '@/components/admin/CampaignDetailHeader'
 import { CreditIndicator } from '@/components/admin/CreditIndicator'
 import { ViewQrLink, ExportCsvLink } from '@/components/admin/CampaignActions'
@@ -65,7 +66,7 @@ export default async function CampaignDetailPage({
   const [tokensResult, employeesResult] = await Promise.all([
     service
       .from('gift_tokens')
-      .select('id, employee_name, phone_number, department, sms_sent_at, redeemed, redeemed_at, redeemed_by, gift_id, token, qr_image_url')
+      .select('id, employee_name, phone_number, department, sms_sent_at, redeemed, redeemed_at, redeemed_by, gift_id, token, qr_image_url, attending, attendee_count')
       .eq('campaign_id', campaignId)
       .order('redeemed', { ascending: true })
       .order('employee_name', { ascending: true }),
@@ -93,6 +94,8 @@ export default async function CampaignDetailPage({
       gift_id: t.gift_id,
       token: t.token,
       qr_image_url: t.qr_image_url,
+      attending: t.attending,
+      attendee_count: t.attendee_count,
     }
   })
 
@@ -185,6 +188,9 @@ export default async function CampaignDetailPage({
           <>
             {/* Row 1: Progress + GiftBreakdown (2 cols) | Distributor (1 col) */}
             <div className="lg:col-span-2 flex flex-col gap-4">
+              {campaign.supports_arrival_certificates && (
+                <ArrivalSummary tokens={allTokens} />
+              )}
               <RedemptionProgress
                 campaignId={campaign.id}
                 initialClaimed={claimedCount}
