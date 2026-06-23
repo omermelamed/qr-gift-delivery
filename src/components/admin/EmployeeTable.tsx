@@ -147,8 +147,6 @@ function AttendeeCountCell({
   onChange: (value: number | null) => void
 }) {
   const serverValue = attending === true && attendeeCount != null ? attendeeCount : null
-  const [draft, setDraft] = useState<string>(serverValue != null ? String(serverValue) : '')
-  useEffect(() => { setDraft(serverValue != null ? String(serverValue) : '') }, [serverValue])
 
   if (!editable) {
     return serverValue != null
@@ -156,29 +154,32 @@ function AttendeeCountCell({
       : <span className="text-zinc-300">—</span>
   }
 
-  function commit() {
-    const str = draft.trim()
+  function commit(el: HTMLInputElement) {
+    const str = el.value.trim()
     if (str === '') {
       if (serverValue != null) onChange(null)
       return
     }
     const n = Number(str)
     if (!Number.isInteger(n) || n < 1) {
-      setDraft(serverValue != null ? String(serverValue) : '')
+      el.value = serverValue != null ? String(serverValue) : ''
       return
     }
     if (n !== serverValue) onChange(n)
   }
 
+  // Uncontrolled input keyed on the server value: when the row updates
+  // (Realtime / refresh) the key changes and React remounts with the fresh
+  // defaultValue — no setState-in-effect sync needed.
   return (
     <input
+      key={serverValue ?? 'empty'}
       type="number"
       min={1}
-      value={draft}
+      defaultValue={serverValue ?? ''}
       placeholder="—"
-      onChange={(e) => setDraft(e.target.value)}
-      onBlur={commit}
-      onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
+      onBlur={(e) => commit(e.currentTarget)}
+      onKeyDown={(e) => { if (e.key === 'Enter') e.currentTarget.blur() }}
       className="w-16 text-xs border border-zinc-200 rounded-md px-1.5 py-1 bg-white"
     />
   )
