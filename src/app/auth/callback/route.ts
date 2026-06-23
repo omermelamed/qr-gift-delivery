@@ -1,4 +1,3 @@
-// src/app/auth/callback/route.ts
 import { type NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { defaultPathForRole } from '@/lib/auth/default-path'
@@ -29,10 +28,23 @@ export async function GET(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const meta = user?.app_metadata as JwtAppMetadata | undefined
 
-  // Invited-user gate.
+  // Invited-user gate. "Invited" == app_metadata.company_id present.
   if (!meta?.company_id) {
     if (user) {
-      await createServiceClient().auth.admin.deleteUser(user.id)
+      const service = createServiceClient()
+      // Defense in depth: only delete a genuinely fresh orphan (no company-role
+      // row). A user WITH a user_company_roles row was invited — their
+      // app_metadata is merely missing/stale, so we reject without destroying
+      // the account. This removes reliance on Supabase auto-linking being
+      // configured correctly.
+      const { data: roleRow } = await service
+        .from('user_company_roles')
+        .select('user_id')
+        .eq('user_id', user.id)
+        .maybeSingle()
+      if (!roleRow) {
+        await service.auth.admin.deleteUser(user.id)
+      }
     }
     await supabase.auth.signOut()
     return redirect('/login?error=not_invited')

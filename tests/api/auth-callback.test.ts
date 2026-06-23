@@ -1,4 +1,3 @@
-// tests/api/auth-callback.test.ts
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
 
@@ -6,6 +5,7 @@ const mockExchange = vi.fn()
 const mockGetUser = vi.fn()
 const mockSignOut = vi.fn()
 const mockDeleteUser = vi.fn()
+const mockRoleMaybeSingle = vi.fn()
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: async () => ({
@@ -17,6 +17,7 @@ vi.mock('@/lib/supabase/server', () => ({
   }),
   createServiceClient: () => ({
     auth: { admin: { deleteUser: mockDeleteUser } },
+    from: () => ({ select: () => ({ eq: () => ({ maybeSingle: mockRoleMaybeSingle }) }) }),
   }),
 }))
 
@@ -31,6 +32,7 @@ describe('GET /auth/callback', () => {
     mockExchange.mockResolvedValue({ error: null })
     mockSignOut.mockResolvedValue({ error: null })
     mockDeleteUser.mockResolvedValue({ error: null })
+    mockRoleMaybeSingle.mockResolvedValue({ data: null })
   })
 
   it('redirects to /login?error=oauth_failed when no code', async () => {
@@ -93,6 +95,38 @@ describe('GET /auth/callback', () => {
     const { GET } = await import('@/app/auth/callback/route')
     const res = await GET(makeRequest('?code=abc'))
     expect(mockDeleteUser).toHaveBeenCalledWith('orphan-1')
+    expect(mockSignOut).toHaveBeenCalled()
+    expect(res.status).toBe(303)
+    expect(res.headers.get('location')).toBe('http://localhost:3000/login?error=not_invited')
+  })
+
+  it('rejects WITHOUT deleting when the user has a company-role row (stale metadata)', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: 'invited-1', app_metadata: {} } },
+    })
+    mockRoleMaybeSingle.mockResolvedValue({ data: { user_id: 'invited-1' } })
+    const { GET } = await import('@/app/auth/callback/route')
+    const res = await GET(makeRequest('?code=abc'))
+    expect(mockDeleteUser).not.toHaveBeenCalled()
+    expect(mockSignOut).toHaveBeenCalled()
+    expect(res.status).toBe(303)
+    expect(res.headers.get('location')).toBe('http://localhost:3000/login?error=not_invited')
+  })
+
+  it('ignores a backslash open-redirect next param', async () => {
+    mockGetUser.mockResolvedValue({
+      data: { user: { id: 'u-5', app_metadata: { company_id: 'co-1', role_name: 'company_admin' } } },
+    })
+    const { GET } = await import('@/app/auth/callback/route')
+    const res = await GET(makeRequest('?code=abc&next=%2F%5Cevil.com'))
+    expect(res.headers.get('location')).toBe('http://localhost:3000/admin')
+  })
+
+  it('rejects without throwing when getUser returns a null user', async () => {
+    mockGetUser.mockResolvedValue({ data: { user: null } })
+    const { GET } = await import('@/app/auth/callback/route')
+    const res = await GET(makeRequest('?code=abc'))
+    expect(mockDeleteUser).not.toHaveBeenCalled()
     expect(mockSignOut).toHaveBeenCalled()
     expect(res.status).toBe(303)
     expect(res.headers.get('location')).toBe('http://localhost:3000/login?error=not_invited')
