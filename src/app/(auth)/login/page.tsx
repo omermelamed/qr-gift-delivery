@@ -3,6 +3,7 @@
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/browser'
+import { defaultPathForRole } from '@/lib/auth/default-path'
 import type { JwtAppMetadata } from '@/types'
 import { useT } from '@/lib/i18n/useT'
 
@@ -39,10 +40,7 @@ function LoginForm() {
         return
       }
       const meta = data.user.app_metadata as JwtAppMetadata | undefined
-      let defaultPath = '/admin'
-      if (meta?.role_name === 'scanner') defaultPath = '/scan/campaigns'
-      else if (meta?.role_name === 'platform_admin') defaultPath = '/platform'
-      router.push(nextPath ?? defaultPath)
+      router.push(nextPath ?? defaultPathForRole(meta?.role_name))
     } finally {
       setLoading(false)
     }
