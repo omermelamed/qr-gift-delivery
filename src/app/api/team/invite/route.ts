@@ -145,7 +145,12 @@ export async function POST(request: NextRequest) {
     metadata: { email, role_name: roleName, reinvite: isReInvite },
   })
 
-  if (phone) {
+  // Always attach an employees row to the member, keyed by user_id, so their
+  // invite name (and phone, if given) survive regardless of how they later sign
+  // in. Google OAuth overwrites user_metadata.full_name with the Google profile
+  // name, so user_metadata is not a durable home for the admin-entered name; the
+  // Team page reads employees.employee_name first, then falls back to it.
+  {
     const employeeName = name || email.split('@')[0].replace(/[._-]/g, ' ')
     const { data: existingEmployee } = await service
       .from('employees')
@@ -155,7 +160,11 @@ export async function POST(request: NextRequest) {
       .maybeSingle()
 
     if (existingEmployee) {
-      await service.from('employees').update({ phone }).eq('id', existingEmployee.id)
+      // Invite name always wins; only overwrite phone when a new one is given.
+      await service
+        .from('employees')
+        .update({ employee_name: employeeName, ...(phone ? { phone } : {}) })
+        .eq('id', existingEmployee.id)
     } else {
       await service.from('employees').insert({
         user_id: targetUserId,
