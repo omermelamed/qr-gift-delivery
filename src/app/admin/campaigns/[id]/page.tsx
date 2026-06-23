@@ -175,6 +175,8 @@ export default async function CampaignDetailPage({
                 isDraft={isDraft}
                 gifts={gifts}
                 canEditGift={canEditGift}
+                showAttendance={campaign.supports_arrival_certificates}
+                canEditAttendance={canEditGift}
               />
             </div>
             <div>
@@ -212,6 +214,8 @@ export default async function CampaignDetailPage({
                 isDraft={isDraft}
                 gifts={gifts}
                 canEditGift={canEditGift}
+                showAttendance={campaign.supports_arrival_certificates}
+                canEditAttendance={canEditGift}
               />
             </div>
             <div className="lg:self-stretch">

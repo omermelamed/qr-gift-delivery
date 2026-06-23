@@ -30,6 +30,7 @@ export const he: Record<string, string> = {
   'Could not save your response. Please try again.': 'לא ניתן לשמור את התשובה. נסו שוב.',
   "You marked that you're not coming.": 'סימנתם שאינכם מגיעים.',
   'Change my answer': 'שינוי התשובה',
+  'Arriving': 'מגיעים',
   'Arrival Certificates': 'אישורי הגעה',
   'Approved people': 'אישרו הגעה',
   'Total arriving people': 'סך כל המגיעים',

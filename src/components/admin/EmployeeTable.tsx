@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/browser'
 import { AddEmployeeModal } from '@/components/admin/AddEmployeeModal'
 import { useT } from '@/lib/i18n/useT'
@@ -17,6 +18,8 @@ type TokenRow = {
   gift_id: string | null
   token: string
   qr_image_url: string | null
+  attending: boolean | null
+  attendee_count: number | null
 }
 
 function maskPhone(phone: string): string {
@@ -132,20 +135,74 @@ function GiftCell({
   return <span className="text-zinc-300">—</span>
 }
 
+function AttendeeCountCell({
+  attending,
+  attendeeCount,
+  editable,
+  onChange,
+}: {
+  attending: boolean | null
+  attendeeCount: number | null
+  editable: boolean
+  onChange: (value: number | null) => void
+}) {
+  const serverValue = attending === true && attendeeCount != null ? attendeeCount : null
+  const [draft, setDraft] = useState<string>(serverValue != null ? String(serverValue) : '')
+  useEffect(() => { setDraft(serverValue != null ? String(serverValue) : '') }, [serverValue])
+
+  if (!editable) {
+    return serverValue != null
+      ? <span className="text-zinc-700">{serverValue}</span>
+      : <span className="text-zinc-300">—</span>
+  }
+
+  function commit() {
+    const str = draft.trim()
+    if (str === '') {
+      if (serverValue != null) onChange(null)
+      return
+    }
+    const n = Number(str)
+    if (!Number.isInteger(n) || n < 1) {
+      setDraft(serverValue != null ? String(serverValue) : '')
+      return
+    }
+    if (n !== serverValue) onChange(n)
+  }
+
+  return (
+    <input
+      type="number"
+      min={1}
+      value={draft}
+      placeholder="—"
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur() }}
+      className="w-16 text-xs border border-zinc-200 rounded-md px-1.5 py-1 bg-white"
+    />
+  )
+}
+
 export function EmployeeTable({
   campaignId,
   initialRows,
   isDraft,
   gifts = [],
   canEditGift = false,
+  showAttendance = false,
+  canEditAttendance = false,
 }: {
   campaignId: string
   initialRows: TokenRow[]
   isDraft: boolean
   gifts?: { id: string; name: string }[]
   canEditGift?: boolean
+  showAttendance?: boolean
+  canEditAttendance?: boolean
 }) {
   const t = useT()
+  const router = useRouter()
   const [rows, setRows] = useState(initialRows)
   // Sync rows when the server re-renders via router.refresh() (e.g. after populate)
   useEffect(() => { setRows(initialRows) }, [initialRows])
@@ -166,7 +223,18 @@ export function EmployeeTable({
     // Realtime UPDATE subscription already refreshes the table rows.
   }
 
+  async function changeAttendance(tokenId: string, value: number | null) {
+    await fetch(`/api/campaigns/${campaignId}/tokens/${tokenId}/attendance`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ attendeeCount: value }),
+    })
+    // Realtime UPDATE refreshes the row; refresh re-computes the ArrivalSummary totals.
+    router.refresh()
+  }
+
   const showGiftCol = gifts.length > 0
+  const colCount = 8 + (showGiftCol ? 1 : 0) + (showAttendance ? 1 : 0)
   const [groupByDept, setGroupByDept] = useState(false)
   const [distributorNames, setDistributorNames] = useState<Record<string, string>>({})
 
@@ -333,6 +401,7 @@ export function EmployeeTable({
                 <th className="px-3 py-2 font-medium text-start">{t('Phone')}</th>
                 <th className="px-3 py-2 font-medium text-start">{t('Department')}</th>
                 {showGiftCol && <th className="px-3 py-2 font-medium text-start">{t('Gift')}</th>}
+                {showAttendance && <th className="px-3 py-2 font-medium text-start">{t('Arriving')}</th>}
                 <th className="px-3 py-2 font-medium text-start">SMS</th>
                 <th className="px-3 py-2 font-medium text-start">{t('Claimed')}</th>
                 <th className="px-3 py-2 font-medium text-start">{t('Claimed At')}</th>
@@ -345,7 +414,7 @@ export function EmployeeTable({
                 ? buildGroupedRows().map((row) =>
                     '_type' in row ? (
                       <tr key={`header-${row.department}`} className="bg-zinc-50">
-                        <td colSpan={showGiftCol ? 9 : 8} className="px-3 py-1.5 text-xs font-semibold text-zinc-500">
+                        <td colSpan={colCount} className="px-3 py-1.5 text-xs font-semibold text-zinc-500">
                           {row.department} · {row.claimed}/{row.total} claimed
                         </td>
                       </tr>
@@ -365,6 +434,16 @@ export function EmployeeTable({
                               giftMap={giftMap}
                               editable={canEditGift}
                               onChange={(giftId) => changeGift(row.id, giftId)}
+                            />
+                          </td>
+                        )}
+                        {showAttendance && (
+                          <td className="px-3 py-1.5">
+                            <AttendeeCountCell
+                              attending={row.attending}
+                              attendeeCount={row.attendee_count}
+                              editable={canEditAttendance}
+                              onChange={(value) => changeAttendance(row.id, value)}
                             />
                           </td>
                         )}
@@ -434,6 +513,16 @@ export function EmployeeTable({
                           />
                         </td>
                       )}
+                      {showAttendance && (
+                        <td className="px-3 py-1.5">
+                          <AttendeeCountCell
+                            attending={r.attending}
+                            attendeeCount={r.attendee_count}
+                            editable={canEditAttendance}
+                            onChange={(value) => changeAttendance(r.id, value)}
+                          />
+                        </td>
+                      )}
                       <td className="px-3 py-2.5">
                         {!r.phone_number
                           ? <span className="text-zinc-400 text-xs font-medium">{t('QR only')}</span>
@@ -482,7 +571,7 @@ export function EmployeeTable({
                   ))}
               {filteredRows.length === 0 && (
                 <tr>
-                  <td colSpan={showGiftCol ? 9 : 8} className="px-3 py-12 text-center text-zinc-400 text-sm">
+                  <td colSpan={colCount} className="px-3 py-12 text-center text-zinc-400 text-sm">
                     {search.trim()
                       ? t('No employees match your search.')
                       : t('No employees yet. Upload a CSV or add one manually.')}
