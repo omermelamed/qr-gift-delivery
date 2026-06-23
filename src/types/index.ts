@@ -35,6 +35,7 @@ export type Campaign = {
   closed_at: string | null
   scheduled_at: string | null
   scheduled_confirmed_at: string | null
+  supports_arrival_certificates: boolean
 }
 
 export type GiftToken = {
@@ -51,6 +52,9 @@ export type GiftToken = {
   redeemed_by: string | null
   gift_id: string | null
   gift_chosen_at: string | null
+  attending: boolean | null
+  attendee_count: number | null
+  responded_at: string | null
 }
 
 export type GiftOption = {

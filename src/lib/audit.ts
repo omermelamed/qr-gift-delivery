@@ -4,6 +4,7 @@ type AuditAction =
   | 'campaign.created'
   | 'campaign.launched'
   | 'campaign.closed'
+  | 'campaign.updated'
   | 'campaign.deleted'
   | 'campaign.duplicated'
   | 'campaign.reminder_sent'

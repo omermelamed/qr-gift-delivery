@@ -10,6 +10,7 @@ import { CloseCampaignButton } from '@/components/admin/CloseCampaignButton'
 import { RedemptionProgress } from '@/components/admin/RedemptionProgress'
 import { DistributorAssignment } from '@/components/admin/DistributorAssignment'
 import { GiftOptionsEditor } from '@/components/admin/GiftOptionsEditor'
+import { ArrivalCertToggle } from '@/components/admin/ArrivalCertToggle'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
@@ -19,6 +20,7 @@ import { DistributorStats } from '@/components/admin/DistributorStats'
 import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignButton'
 import { ReminderButton } from '@/components/admin/ReminderButton'
 import { GiftBreakdown } from '@/components/admin/GiftBreakdown'
+import { ArrivalSummary } from '@/components/admin/ArrivalSummary'
 import { CampaignDetailHeader } from '@/components/admin/CampaignDetailHeader'
 import { CreditIndicator } from '@/components/admin/CreditIndicator'
 import { ViewQrLink, ExportCsvLink } from '@/components/admin/CampaignActions'
@@ -45,7 +47,7 @@ export default async function CampaignDetailPage({
   const [campaignResult, creditsResult] = await Promise.all([
     service
       .from('campaigns')
-      .select('id, name, campaign_date, sent_at, closed_at')
+      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates')
       .eq('id', campaignId)
       .eq('company_id', companyId)
       .single(),
@@ -64,7 +66,7 @@ export default async function CampaignDetailPage({
   const [tokensResult, employeesResult] = await Promise.all([
     service
       .from('gift_tokens')
-      .select('id, employee_name, phone_number, department, sms_sent_at, redeemed, redeemed_at, redeemed_by, gift_id, token, qr_image_url')
+      .select('id, employee_name, phone_number, department, sms_sent_at, redeemed, redeemed_at, redeemed_by, gift_id, token, qr_image_url, attending, attendee_count')
       .eq('campaign_id', campaignId)
       .order('redeemed', { ascending: true })
       .order('employee_name', { ascending: true }),
@@ -92,6 +94,8 @@ export default async function CampaignDetailPage({
       gift_id: t.gift_id,
       token: t.token,
       qr_image_url: t.qr_image_url,
+      attending: t.attending,
+      attendee_count: t.attendee_count,
     }
   })
 
@@ -160,6 +164,7 @@ export default async function CampaignDetailPage({
             <div className="flex flex-col gap-4">
               <DistributorAssignment campaignId={campaign.id} />
               <GiftOptionsEditor campaignId={campaign.id} />
+              <ArrivalCertToggle campaignId={campaign.id} initial={campaign.supports_arrival_certificates} />
             </div>
 
             {/* Employee table (2 cols) + Notes (1 col) */}
@@ -183,6 +188,9 @@ export default async function CampaignDetailPage({
           <>
             {/* Row 1: Progress + GiftBreakdown (2 cols) | Distributor (1 col) */}
             <div className="lg:col-span-2 flex flex-col gap-4">
+              {campaign.supports_arrival_certificates && (
+                <ArrivalSummary tokens={allTokens} />
+              )}
               <RedemptionProgress
                 campaignId={campaign.id}
                 initialClaimed={claimedCount}

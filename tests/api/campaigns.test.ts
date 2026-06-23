@@ -14,6 +14,8 @@ vi.mock('@/lib/permissions', () => ({
   hasPermission: vi.fn().mockReturnValue(true),
 }))
 
+vi.mock('@/lib/audit', () => ({ logAuditEvent: vi.fn() }))
+
 function makeRequest(body: object) {
   return new NextRequest('http://localhost/api/campaigns', {
     method: 'POST',
@@ -80,6 +82,15 @@ describe('POST /api/campaigns', () => {
     const res = await POST(makeRequest({ name: 'Passover 2026', campaignDate: '2026-04-30' }))
     expect(res.status).toBe(201)
     expect(await res.json()).toEqual({ id: 'campaign-new' })
+  })
+
+  it('persists supportsArrivalCertificates on create', async () => {
+    const insert = vi.fn(() => ({ select: () => ({ single: () => Promise.resolve({ data: { id: 'campaign-new' }, error: null }) }) }))
+    mockFromService.mockReturnValue({ insert })
+    const { POST } = await import('@/app/api/campaigns/route')
+    const res = await POST(makeRequest({ name: 'Gala 2026', campaignDate: '2026-04-30', supportsArrivalCertificates: true }))
+    expect(res.status).toBe(201)
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({ supports_arrival_certificates: true }))
   })
 })
 

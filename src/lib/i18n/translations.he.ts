@@ -18,6 +18,24 @@ export const he: Record<string, string> = {
   'QR code not available': 'קוד ה-QR אינו זמין',
   'Show this QR code to a distributor to collect your gift.': 'הצג קוד QR זה למפיץ כדי לקבל את המתנה שלך.',
 
+  // Arrival certificates (אישור הגעה)
+  'Supports Arrival Certificates': 'תומך באישורי הגעה',
+  'Let people confirm attendance and how many are coming.': 'אפשר למוזמנים לאשר הגעה ולציין כמה אנשים מגיעים.',
+  'Are you coming?': 'האם אתם מגיעים?',
+  "I'm coming": 'אני מגיע/ה',
+  "I'm not coming": 'אני לא מגיע/ה',
+  'How many people are coming? (including you)': 'כמה אנשים מגיעים? (כולל אותך)',
+  'Please enter how many people are coming (1 or more).': 'נא להזין כמה אנשים מגיעים (1 או יותר).',
+  'Save response': 'שמירת תשובה',
+  'Could not save your response. Please try again.': 'לא ניתן לשמור את התשובה. נסו שוב.',
+  "You marked that you're not coming.": 'סימנתם שאינכם מגיעים.',
+  'Change my answer': 'שינוי התשובה',
+  'Arrival Certificates': 'אישורי הגעה',
+  'Approved people': 'אישרו הגעה',
+  'Total arriving people': 'סך כל המגיעים',
+  'Not coming': 'לא מגיעים',
+  'No response': 'ללא תשובה',
+
   // Verify result / ResultCard
   'Invalid QR code': 'קוד QR לא תקין',
   "This code doesn't exist.": 'קוד זה אינו קיים.',

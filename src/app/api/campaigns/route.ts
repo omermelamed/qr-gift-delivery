@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json().catch(() => ({}))
-  const { name, campaignDate } = body
+  const { name, campaignDate, supportsArrivalCertificates } = body
 
   if (!name || typeof name !== 'string' || !name.trim()) {
     return NextResponse.json({ error: 'name is required' }, { status: 400 })
@@ -105,6 +105,7 @@ export async function POST(request: NextRequest) {
       campaign_date: campaignDate,
       company_id: companyId,
       created_by: user.id,
+      supports_arrival_certificates: supportsArrivalCertificates === true,
     })
     .select('id')
     .single()
