@@ -114,4 +114,36 @@ describe('POST /api/team/invite', () => {
       app_metadata: { company_id: 'co-1', role_id: 'role-scanner', role_name: 'scanner' },
     })
   })
+
+  it('always upserts an employees row with the invite name even when no phone is given', async () => {
+    let employeeInserted: Record<string, unknown> | null = null
+    mockFromService.mockImplementation((table: string) => {
+      if (table === 'roles') {
+        return { select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'role-scanner' }, error: null }) }) }) }) }
+      }
+      if (table === 'user_company_roles') {
+        return { upsert: () => Promise.resolve({ error: null }) }
+      }
+      if (table === 'employees') {
+        return {
+          select: () => ({ eq: () => ({ eq: () => ({ maybeSingle: () => Promise.resolve({ data: null }) }) }) }),
+          insert: (row: Record<string, unknown>) => { employeeInserted = row; return Promise.resolve({ error: null }) },
+        }
+      }
+      return { insert: () => Promise.resolve({ error: null }) }
+    })
+    mockInviteUser.mockResolvedValue({ data: { user: { id: 'new-user-1' } }, error: null })
+    mockUpdateUser.mockResolvedValue({ data: {}, error: null })
+
+    const { POST } = await import('@/app/api/team/invite/route')
+    const res = await POST(makeRequest({ name: 'Jane Cohen', email: 'jane@co.com', role_name: 'scanner' }))
+
+    expect(res.status).toBe(200)
+    expect(employeeInserted).toMatchObject({
+      user_id: 'new-user-1',
+      company_id: 'co-1',
+      employee_name: 'Jane Cohen',
+      phone: null,
+    })
+  })
 })
