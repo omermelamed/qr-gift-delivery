@@ -36,6 +36,7 @@ export type Campaign = {
   scheduled_at: string | null
   scheduled_confirmed_at: string | null
   supports_arrival_certificates: boolean
+  max_attendee_count: number | null
 }
 
 export type GiftToken = {
