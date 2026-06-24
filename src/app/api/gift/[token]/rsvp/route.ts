@@ -17,7 +17,7 @@ export async function POST(
 
   const { data: tokenRow } = await service
     .from('gift_tokens')
-    .select('redeemed, campaigns(supports_arrival_certificates, closed_at)')
+    .select('redeemed, campaigns(supports_arrival_certificates, closed_at, max_attendee_count)')
     .eq('token', token)
     .single()
 
@@ -26,7 +26,7 @@ export async function POST(
   }
 
   const campaign = tokenRow.campaigns as unknown as
-    { supports_arrival_certificates: boolean; closed_at: string | null } | null
+    { supports_arrival_certificates: boolean; closed_at: string | null; max_attendee_count: number | null } | null
 
   if (!campaign?.supports_arrival_certificates) {
     return NextResponse.json({ ok: false, error: 'not_supported' }, { status: 400 })
@@ -46,6 +46,10 @@ export async function POST(
       return NextResponse.json({ ok: false, error: 'invalid_count' }, { status: 400 })
     }
     attendeeCount = raw
+    const max = campaign.max_attendee_count
+    if (max !== null && raw > max) {
+      return NextResponse.json({ ok: false, error: 'over_limit', max }, { status: 400 })
+    }
   }
 
   // Idempotent overwrite: latest answer replaces the previous one.
