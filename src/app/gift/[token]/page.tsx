@@ -1,13 +1,19 @@
 import { notFound } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/server'
 import { GiftRedemptionView } from '@/components/gift/GiftRedemptionView'
+import { decodeToken } from '@/lib/short-token'
 
 export default async function GiftQrPage({
   params,
 }: {
   params: Promise<{ token: string }>
 }) {
-  const { token } = await params
+  const { token: param } = await params
+  // SMS links carry the short base64url form; older links carry the raw UUID.
+  // Decode once here and thread the canonical UUID through the rest of the flow.
+  const token = decodeToken(param)
+  if (!token) return notFound()
+
   const service = createServiceClient()
 
   const { data: tokenRow } = await service

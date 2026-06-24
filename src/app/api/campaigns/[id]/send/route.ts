@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { getSmsProvider, buildGiftSmsBody } from '@/lib/sms'
+import { encodeToken } from '@/lib/short-token'
 import { generateQrBuffer } from '@/lib/qr'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
@@ -150,7 +151,7 @@ export async function POST(
             .eq('id', token.id)
         }
 
-        const giftLink = `${process.env.NEXT_PUBLIC_APP_URL}/gift/${token.token}`
+        const giftLink = `${process.env.NEXT_PUBLIC_APP_URL}/gift/${encodeToken(token.token)}`
 
         if (smsSending && token.phone_number) {
           const body = effectiveTemplate

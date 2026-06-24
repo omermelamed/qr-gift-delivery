@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { getSmsProvider, buildGiftSmsBody } from '@/lib/sms'
+import { encodeToken } from '@/lib/short-token'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
@@ -116,7 +117,7 @@ export async function POST(
     const results = await Promise.allSettled(
       batch.map(async (token) => {
         if (token.phone_number) {
-          const giftLink = `${process.env.NEXT_PUBLIC_APP_URL}/gift/${token.token}`
+          const giftLink = `${process.env.NEXT_PUBLIC_APP_URL}/gift/${encodeToken(token.token)}`
           const body = effectiveTemplate
             ? renderSmsTemplate(effectiveTemplate, { name: token.employee_name, link: giftLink })
             : buildGiftSmsBody({
