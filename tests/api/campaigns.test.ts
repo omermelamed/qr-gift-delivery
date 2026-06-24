@@ -92,6 +92,43 @@ describe('POST /api/campaigns', () => {
     expect(res.status).toBe(201)
     expect(insert).toHaveBeenCalledWith(expect.objectContaining({ supports_arrival_certificates: true }))
   })
+
+  it('persists max_attendee_count when arrival certificates are on', async () => {
+    const insert = vi.fn(() => ({ select: () => ({ single: () => Promise.resolve({ data: { id: 'campaign-new' }, error: null }) }) }))
+    mockFromService.mockReturnValue({ insert })
+    const { POST } = await import('@/app/api/campaigns/route')
+    const res = await POST(makeRequest({ name: 'Gala 2026', campaignDate: '2026-04-30', supportsArrivalCertificates: true, maxAttendeeCount: 5 }))
+    expect(res.status).toBe(201)
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({ max_attendee_count: 5 }))
+  })
+
+  it('stores null max when arrival certificates are off, ignoring any count', async () => {
+    const insert = vi.fn(() => ({ select: () => ({ single: () => Promise.resolve({ data: { id: 'campaign-new' }, error: null }) }) }))
+    mockFromService.mockReturnValue({ insert })
+    const { POST } = await import('@/app/api/campaigns/route')
+    const res = await POST(makeRequest({ name: 'Gala 2026', campaignDate: '2026-04-30', supportsArrivalCertificates: false, maxAttendeeCount: 5 }))
+    expect(res.status).toBe(201)
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({ supports_arrival_certificates: false, max_attendee_count: null }))
+  })
+
+  it('stores null max when none is provided', async () => {
+    const insert = vi.fn(() => ({ select: () => ({ single: () => Promise.resolve({ data: { id: 'campaign-new' }, error: null }) }) }))
+    mockFromService.mockReturnValue({ insert })
+    const { POST } = await import('@/app/api/campaigns/route')
+    const res = await POST(makeRequest({ name: 'Gala 2026', campaignDate: '2026-04-30', supportsArrivalCertificates: true }))
+    expect(res.status).toBe(201)
+    expect(insert).toHaveBeenCalledWith(expect.objectContaining({ max_attendee_count: null }))
+  })
+
+  it('returns 400 invalid_max for a bad count', async () => {
+    mockFromService.mockReturnValue({ insert: vi.fn(() => ({ select: () => ({ single: () => Promise.resolve({ data: { id: 'x' }, error: null }) }) })) })
+    const { POST } = await import('@/app/api/campaigns/route')
+    for (const bad of [0, -2, 1.5]) {
+      const res = await POST(makeRequest({ name: 'Gala', campaignDate: '2026-04-30', supportsArrivalCertificates: true, maxAttendeeCount: bad }))
+      expect(res.status).toBe(400)
+      expect((await res.json()).error).toBe('invalid_max')
+    }
+  })
 })
 
 describe('GET /api/campaigns', () => {

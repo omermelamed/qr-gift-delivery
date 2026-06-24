@@ -10,6 +10,7 @@ export default function NewCampaignPage() {
   const [name, setName] = useState('')
   const [campaignDate, setCampaignDate] = useState('')
   const [supportsArrival, setSupportsArrival] = useState(false)
+  const [maxAttendees, setMaxAttendees] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -26,6 +27,7 @@ export default function NewCampaignPage() {
           name,
           campaignDate,
           supportsArrivalCertificates: supportsArrival,
+          maxAttendeeCount: supportsArrival && maxAttendees.trim() !== '' ? Number(maxAttendees) : null,
         }),
       })
       const data = await res.json()
@@ -88,6 +90,25 @@ export default function NewCampaignPage() {
             <span className="block text-xs text-zinc-500">{t('Let people confirm attendance and how many are coming.')}</span>
           </span>
         </label>
+
+        {supportsArrival && (
+          <div className="flex flex-col gap-1.5 ps-7">
+            <label htmlFor="max-attendees" className="text-sm font-medium text-zinc-700">
+              {t('Max people per invite (including the employee)')}
+            </label>
+            <input
+              id="max-attendees"
+              type="number"
+              min={1}
+              step={1}
+              value={maxAttendees}
+              placeholder={t('No limit')}
+              onChange={(e) => setMaxAttendees(e.target.value)}
+              className="w-32 border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+            <span className="text-xs text-zinc-500">{t('e.g. 5 = the person plus up to 4 guests.')}</span>
+          </div>
+        )}
 
         <button
           type="submit"
