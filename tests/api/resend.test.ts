@@ -3,7 +3,7 @@ import { NextRequest } from 'next/server'
 
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
-const mockSendGiftMMS = vi.fn().mockResolvedValue({ sid: 'mock' })
+const mockSend = vi.fn().mockResolvedValue({ sid: 'mock' })
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => ({ auth: { getUser: mockGetUser } }),
@@ -15,7 +15,7 @@ vi.mock('@/lib/permissions', () => ({
   hasPermission: vi.fn().mockReturnValue(true),
 }))
 
-vi.mock('@/lib/twilio', () => ({ sendGiftMMS: mockSendGiftMMS }))
+vi.mock('@/lib/twilio', () => ({ sendGiftMMS: mockSend }))
 
 function makeRequest(id: string) {
   return new NextRequest(`http://localhost/api/campaigns/${id}/resend`, { method: 'POST' })
@@ -24,10 +24,10 @@ function makeRequest(id: string) {
 describe('POST /api/campaigns/[id]/resend', () => {
   beforeEach(async () => {
     vi.resetAllMocks()
-    vi.stubEnv('TWILIO_MOCK', 'true')
+    vi.stubEnv('SMS_MOCK', 'true')
     const { hasPermission } = await import('@/lib/permissions')
     vi.mocked(hasPermission).mockReturnValue(true)
-    mockSendGiftMMS.mockResolvedValue({ sid: 'mock' })
+    mockSend.mockResolvedValue({ sid: 'mock' })
     mockGetUser.mockResolvedValue({
       data: {
         user: {
@@ -106,6 +106,6 @@ describe('POST /api/campaigns/[id]/resend', () => {
     expect(res.status).toBe(200)
     expect(body.dispatched).toBe(1)
     expect(body.failed).toBe(0)
-    expect(mockSendGiftMMS).not.toHaveBeenCalled()
+    expect(mockSend).not.toHaveBeenCalled()
   })
 })
