@@ -5,7 +5,7 @@ const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
 const mockUpload = vi.fn()
 const mockGetPublicUrl = vi.fn()
-const mockSendGiftMMS = vi.fn().mockResolvedValue({ sid: 'mock' })
+const mockSend = vi.fn().mockResolvedValue({ providerId: 'mock', status: 'sent' })
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => ({
@@ -27,8 +27,9 @@ vi.mock('@/lib/permissions', () => ({
   hasPermission: vi.fn().mockReturnValue(true),
 }))
 
-vi.mock('@/lib/twilio', () => ({
-  sendGiftMMS: mockSendGiftMMS,
+vi.mock('@/lib/sms', () => ({
+  getSmsProvider: () => ({ send: mockSend, isConfigured: () => true }),
+  buildGiftSmsBody: () => 'mock body',
 }))
 
 vi.mock('@/lib/qr', () => ({
@@ -44,13 +45,13 @@ function makeRequest(campaignId: string) {
 describe('POST /api/campaigns/[id]/send', () => {
   beforeEach(async () => {
     vi.resetAllMocks()
-    vi.stubEnv('TWILIO_MOCK', 'true')
+    vi.stubEnv('SMS_MOCK', 'true')
     vi.stubEnv('NEXT_PUBLIC_APP_URL', 'http://localhost:3000')
 
     const { hasPermission } = await import('@/lib/permissions')
     vi.mocked(hasPermission).mockReturnValue(true)
 
-    mockSendGiftMMS.mockResolvedValue({ sid: 'mock' })
+    mockSend.mockResolvedValue({ sid: 'mock' })
 
     mockGetUser.mockResolvedValue({
       data: {
@@ -280,7 +281,7 @@ describe('POST /api/campaigns/[id]/send', () => {
     expect(mockUpload).not.toHaveBeenCalled()
   })
 
-  it('does not call sendGiftMMS when TWILIO_MOCK=true', async () => {
+  it('does not call sendGiftMMS when SMS_MOCK=true', async () => {
     let fromCallCount = 0
     mockFromService.mockImplementation(() => {
       fromCallCount++
@@ -338,6 +339,6 @@ describe('POST /api/campaigns/[id]/send', () => {
       params: Promise.resolve({ id: 'campaign-1' }),
     })
 
-    expect(mockSendGiftMMS).not.toHaveBeenCalled()
+    expect(mockSend).not.toHaveBeenCalled()
   })
 })

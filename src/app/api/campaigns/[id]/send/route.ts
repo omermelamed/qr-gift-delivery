@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
-import { sendGiftSMS, isTwilioConfigured } from '@/lib/twilio'
+import { getSmsProvider, buildGiftSmsBody } from '@/lib/sms'
 import { generateQrBuffer } from '@/lib/qr'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
@@ -122,7 +122,8 @@ export async function POST(
     })
   }
 
-  const smsSending = isTwilioConfigured()
+  const smsProvider = getSmsProvider()
+  const smsSending = smsProvider.isConfigured()
   let dispatched = 0
   let failed = 0
 
@@ -152,15 +153,17 @@ export async function POST(
         const giftLink = `${process.env.NEXT_PUBLIC_APP_URL}/gift/${token.token}`
 
         if (smsSending && token.phone_number) {
-          await sendGiftSMS({
-            to: token.phone_number,
-            employeeName: token.employee_name,
-            holidayName: campaign.name,
-            giftLink,
-            body: effectiveTemplate
-              ? renderSmsTemplate(effectiveTemplate, { name: token.employee_name, link: giftLink })
-              : undefined,
-          })
+          const body = effectiveTemplate
+            ? renderSmsTemplate(effectiveTemplate, { name: token.employee_name, link: giftLink })
+            : buildGiftSmsBody({
+                employeeName: token.employee_name,
+                holidayName: campaign.name,
+                giftLink,
+              })
+          const result = await smsProvider.send({ to: token.phone_number, body })
+          if (result.status === 'failed') {
+            throw new Error(result.error ?? 'SMS send failed')
+          }
         }
 
         const { error: sentError } = await service
