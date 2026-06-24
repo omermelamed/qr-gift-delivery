@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useT } from '@/lib/i18n/useT'
+import { DatePicker } from '@/components/admin/DatePicker'
 
 export default function NewCampaignPage() {
   const t = useT()
@@ -17,6 +18,10 @@ export default function NewCampaignPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+    if (!campaignDate) {
+      setError(t('Please choose a campaign date.'))
+      return
+    }
     setLoading(true)
     setError(null)
     try {
@@ -68,14 +73,7 @@ export default function NewCampaignPage() {
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="date" className="text-sm font-medium text-zinc-700">{t('Campaign date')}</label>
-          <input
-            id="date"
-            type="date"
-            value={campaignDate}
-            onChange={(e) => setCampaignDate(e.target.value)}
-            required
-            className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-          />
+          <DatePicker id="date" value={campaignDate} onChange={setCampaignDate} />
         </div>
 
         <label className="flex items-start gap-3 cursor-pointer">
