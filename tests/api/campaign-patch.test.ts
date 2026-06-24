@@ -119,6 +119,41 @@ describe('PATCH /api/campaigns/[id]', () => {
     expect(res.status).toBe(404)
   })
 
+  it('persists a valid sms template containing {link}', async () => {
+    const update = vi.fn(() => ({ eq: () => ({ eq: () => Promise.resolve({ error: null }) }) }))
+    mockFromService.mockReturnValue({
+      select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null } }) }) }) }),
+      update,
+    })
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    const res = await PATCH(makeRequest({ smsTemplate: 'Hi {name} {link}' }), params)
+    expect(res.status).toBe(200)
+    expect(update).toHaveBeenCalledWith({ sms_template: 'Hi {name} {link}' })
+  })
+
+  it('returns 400 invalid_template when {link} is missing', async () => {
+    mockFromService.mockReturnValue({
+      select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null } }) }) }) }),
+      update: () => ({ eq: () => ({ eq: () => Promise.resolve({ error: null }) }) }),
+    })
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    const res = await PATCH(makeRequest({ smsTemplate: 'no link here' }), params)
+    expect(res.status).toBe(400)
+    expect((await res.json()).error).toBe('invalid_template')
+  })
+
+  it('clears the sms template when given an empty string', async () => {
+    const update = vi.fn(() => ({ eq: () => ({ eq: () => Promise.resolve({ error: null }) }) }))
+    mockFromService.mockReturnValue({
+      select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null } }) }) }) }),
+      update,
+    })
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    const res = await PATCH(makeRequest({ smsTemplate: '   ' }), params)
+    expect(res.status).toBe(200)
+    expect(update).toHaveBeenCalledWith({ sms_template: null })
+  })
+
   it('updates the flag on a draft campaign', async () => {
     const update = vi.fn(() => ({ eq: () => ({ eq: () => Promise.resolve({ error: null }) }) }))
     mockFromService.mockReturnValue({

@@ -76,7 +76,7 @@ export async function PATCH(
   }
 
   const body = await request.json().catch(() => ({}))
-  const update: { supports_arrival_certificates?: boolean; max_attendee_count?: number | null } = {}
+  const update: { supports_arrival_certificates?: boolean; max_attendee_count?: number | null; sms_template?: string | null } = {}
 
   if ('supportsArrivalCertificates' in body) {
     if (typeof body.supportsArrivalCertificates !== 'boolean') {
@@ -91,6 +91,20 @@ export async function PATCH(
       return NextResponse.json({ error: 'invalid_max' }, { status: 400 })
     }
     update.max_attendee_count = raw
+  }
+
+  if ('smsTemplate' in body) {
+    const raw = body.smsTemplate
+    if (raw === null || (typeof raw === 'string' && raw.trim() === '')) {
+      update.sms_template = null
+    } else if (typeof raw === 'string') {
+      if (!raw.includes('{link}')) {
+        return NextResponse.json({ error: 'invalid_template' }, { status: 400 })
+      }
+      update.sms_template = raw.trim()
+    } else {
+      return NextResponse.json({ error: 'invalid_template' }, { status: 400 })
+    }
   }
 
   if (Object.keys(update).length === 0) {

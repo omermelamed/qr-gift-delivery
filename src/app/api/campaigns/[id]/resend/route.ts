@@ -5,6 +5,7 @@ import { sendGiftSMS } from '@/lib/twilio'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
+import { resolveSmsTemplate, renderSmsTemplate } from '@/lib/sms-template'
 
 const BATCH_SIZE = 50
 const DELAY_MS = 1000
@@ -31,7 +32,7 @@ export async function POST(
 
   const { data: campaign } = await service
     .from('campaigns')
-    .select('id, name')
+    .select('id, name, sms_template')
     .eq('id', campaignId)
     .eq('company_id', companyId)
     .single()
@@ -44,7 +45,7 @@ export async function POST(
     .eq('id', companyId)
     .single()
 
-  const smsTemplate = company?.sms_template ?? null
+  const effectiveTemplate = resolveSmsTemplate(campaign.sms_template, company?.sms_template ?? null)
 
   const body = await _request.json().catch(() => ({}))
   const tokenIds: string[] | undefined = Array.isArray(body.tokenIds) ? body.tokenIds : undefined
@@ -120,10 +121,8 @@ export async function POST(
             employeeName: token.employee_name,
             holidayName: campaign.name,
             giftLink,
-            body: smsTemplate
-              ? smsTemplate
-                  .replace('{name}', token.employee_name)
-                  .replace('{link}', giftLink)
+            body: effectiveTemplate
+              ? renderSmsTemplate(effectiveTemplate, { name: token.employee_name, link: giftLink })
               : undefined,
           })
         }
