@@ -164,19 +164,11 @@ export default async function CampaignDetailPage({
 
         {isDraft ? (
           <>
-            {/* Draft: Populator (2 cols) + Distributor + GiftOptions (1 col) */}
-            <div className="lg:col-span-2">
+            {/* Main column (2 cols): populator → employee table → breakdown.
+                Kept as one stacking column so the sidebar's height never pushes
+                these apart (grid rows would otherwise couple their heights). */}
+            <div className="lg:col-span-2 flex flex-col gap-4">
               <CampaignPopulator campaignId={campaign.id} existingTokens={allTokens.map((t) => ({ employee_name: t.employee_name, phone_number: t.phone_number }))} />
-            </div>
-            <div className="flex flex-col gap-4">
-              <DistributorAssignment campaignId={campaign.id} />
-              <GiftOptionsEditor campaignId={campaign.id} />
-              <ArrivalCertToggle campaignId={campaign.id} initial={campaign.supports_arrival_certificates} initialMax={campaign.max_attendee_count} />
-              <CampaignSmsTemplate campaignId={campaign.id} initial={campaign.sms_template} companyDefault={companyDefaultTemplate} />
-            </div>
-
-            {/* Employee table (2 cols) + Notes (1 col) */}
-            <div className="lg:col-span-2">
               <EmployeeTable
                 campaignId={campaign.id}
                 initialRows={allTokens}
@@ -186,12 +178,16 @@ export default async function CampaignDetailPage({
                 showAttendance={campaign.supports_arrival_certificates}
                 canEditAttendance={canEditGift}
               />
-            </div>
-            <div>
-              <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
-            </div>
-            <div className="lg:col-span-2">
               <DepartmentBreakdown tokens={allTokens} />
+            </div>
+
+            {/* Sidebar (1 col): config cards + notes, stacked independently. */}
+            <div className="flex flex-col gap-4">
+              <DistributorAssignment campaignId={campaign.id} />
+              <GiftOptionsEditor campaignId={campaign.id} />
+              <ArrivalCertToggle campaignId={campaign.id} initial={campaign.supports_arrival_certificates} initialMax={campaign.max_attendee_count} />
+              <CampaignSmsTemplate campaignId={campaign.id} initial={campaign.sms_template} companyDefault={companyDefaultTemplate} />
+              <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
             </div>
           </>
         ) : (
