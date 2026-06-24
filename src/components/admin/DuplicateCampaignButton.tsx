@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useT } from '@/lib/i18n/useT'
+import { DatePicker } from '@/components/admin/DatePicker'
 
 type Props = {
   campaignId: string
@@ -85,13 +86,7 @@ export function DuplicateCampaignButton({ campaignId, sourceName, sourceDate }: 
 
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="dup-date" className="text-sm font-medium text-zinc-700">{t('Campaign date')}</label>
-                <input
-                  id="dup-date"
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                />
+                <DatePicker id="dup-date" value={date} onChange={setDate} />
               </div>
 
               <label className="flex items-center gap-3 cursor-pointer">
