@@ -11,6 +11,7 @@ import { RedemptionProgress } from '@/components/admin/RedemptionProgress'
 import { DistributorAssignment } from '@/components/admin/DistributorAssignment'
 import { GiftOptionsEditor } from '@/components/admin/GiftOptionsEditor'
 import { ArrivalCertToggle } from '@/components/admin/ArrivalCertToggle'
+import { CampaignSmsTemplate } from '@/components/admin/CampaignSmsTemplate'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
@@ -44,10 +45,10 @@ export default async function CampaignDetailPage({
 
   const service = createServiceClient()
 
-  const [campaignResult, creditsResult] = await Promise.all([
+  const [campaignResult, creditsResult, companyResult] = await Promise.all([
     service
       .from('campaigns')
-      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates, max_attendee_count')
+      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates, max_attendee_count, sms_template')
       .eq('id', campaignId)
       .eq('company_id', companyId)
       .single(),
@@ -56,12 +57,18 @@ export default async function CampaignDetailPage({
       .select('balance')
       .eq('company_id', companyId)
       .single(),
+    service
+      .from('companies')
+      .select('sms_template')
+      .eq('id', companyId)
+      .single(),
   ])
 
   const campaign = campaignResult.data
   if (!campaign) redirect('/admin')
 
   const creditBalance = creditsResult.data?.balance ?? 0
+  const companyDefaultTemplate = companyResult.data?.sms_template ?? null
 
   const [tokensResult, employeesResult] = await Promise.all([
     service
@@ -165,6 +172,7 @@ export default async function CampaignDetailPage({
               <DistributorAssignment campaignId={campaign.id} />
               <GiftOptionsEditor campaignId={campaign.id} />
               <ArrivalCertToggle campaignId={campaign.id} initial={campaign.supports_arrival_certificates} initialMax={campaign.max_attendee_count} />
+              <CampaignSmsTemplate campaignId={campaign.id} initial={campaign.sms_template} companyDefault={companyDefaultTemplate} />
             </div>
 
             {/* Employee table (2 cols) + Notes (1 col) */}
