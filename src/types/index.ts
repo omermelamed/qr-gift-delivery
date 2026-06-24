@@ -37,6 +37,7 @@ export type Campaign = {
   scheduled_confirmed_at: string | null
   supports_arrival_certificates: boolean
   max_attendee_count: number | null
+  sms_template: string | null
 }
 
 export type GiftToken = {
