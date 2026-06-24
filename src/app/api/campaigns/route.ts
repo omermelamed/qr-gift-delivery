@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json().catch(() => ({}))
-  const { name, campaignDate, supportsArrivalCertificates } = body
+  const { name, campaignDate, supportsArrivalCertificates, maxAttendeeCount } = body
 
   if (!name || typeof name !== 'string' || !name.trim()) {
     return NextResponse.json({ error: 'name is required' }, { status: 400 })
@@ -97,6 +97,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'campaignDate must be a valid date' }, { status: 400 })
   }
 
+  // Optional per-campaign attendee cap; integer >= 1 or null. Same rule as the PATCH route.
+  if (maxAttendeeCount !== undefined && maxAttendeeCount !== null &&
+      (typeof maxAttendeeCount !== 'number' || !Number.isInteger(maxAttendeeCount) || maxAttendeeCount < 1)) {
+    return NextResponse.json({ error: 'invalid_max' }, { status: 400 })
+  }
+  // The cap only applies when arrival certificates are on; otherwise store no limit.
+  const supportsArrival = supportsArrivalCertificates === true
+  const maxAttendee = supportsArrival && typeof maxAttendeeCount === 'number' ? maxAttendeeCount : null
+
   const service = createServiceClient()
   const { data, error } = await service
     .from('campaigns')
@@ -105,7 +114,8 @@ export async function POST(request: NextRequest) {
       campaign_date: campaignDate,
       company_id: companyId,
       created_by: user.id,
-      supports_arrival_certificates: supportsArrivalCertificates === true,
+      supports_arrival_certificates: supportsArrival,
+      max_attendee_count: maxAttendee,
     })
     .select('id')
     .single()
