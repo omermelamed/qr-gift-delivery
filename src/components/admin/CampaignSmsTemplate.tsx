@@ -32,12 +32,12 @@ export function CampaignSmsTemplate({ campaignId, initial, companyDefault }: Pro
         body: JSON.stringify({ smsTemplate: trimmed === '' ? null : trimmed }),
       })
       if (!res.ok) {
-        setError(t('The message must contain {link}.'))
+        setError(t('Could not save. Please try again.'))
       } else {
         router.refresh()
       }
     } catch {
-      setError(t('The message must contain {link}.'))
+      setError(t('Could not save. Please try again.'))
     } finally {
       setBusy(false)
     }

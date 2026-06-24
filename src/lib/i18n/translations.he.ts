@@ -38,6 +38,7 @@ export const he: Record<string, string> = {
   'Leave empty to use the default from Settings.': 'השאירו ריק כדי להשתמש בברירת המחדל מההגדרות.',
   'Use {name} for the recipient and {link} for the gift link.': 'השתמשו ב-{name} עבור שם הנמען וב-{link} עבור קישור המתנה.',
   'The message must contain {link}.': 'ההודעה חייבת לכלול {link}.',
+  'Could not save. Please try again.': 'לא ניתן לשמור. נסו שוב.',
   'Up to {n} people': 'עד {n} אנשים',
   'You can bring up to {n} people.': 'ניתן להגיע עד {n} אנשים.',
   'Could not save your response. Please try again.': 'לא ניתן לשמור את התשובה. נסו שוב.',
