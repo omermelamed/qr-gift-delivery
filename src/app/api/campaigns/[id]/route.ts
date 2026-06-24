@@ -76,9 +76,25 @@ export async function PATCH(
   }
 
   const body = await request.json().catch(() => ({}))
-  const { supportsArrivalCertificates } = body
-  if (typeof supportsArrivalCertificates !== 'boolean') {
-    return NextResponse.json({ error: 'supportsArrivalCertificates must be a boolean' }, { status: 400 })
+  const update: { supports_arrival_certificates?: boolean; max_attendee_count?: number | null } = {}
+
+  if ('supportsArrivalCertificates' in body) {
+    if (typeof body.supportsArrivalCertificates !== 'boolean') {
+      return NextResponse.json({ error: 'supportsArrivalCertificates must be a boolean' }, { status: 400 })
+    }
+    update.supports_arrival_certificates = body.supportsArrivalCertificates
+  }
+
+  if ('maxAttendeeCount' in body) {
+    const raw = body.maxAttendeeCount
+    if (raw !== null && (typeof raw !== 'number' || !Number.isInteger(raw) || raw < 1)) {
+      return NextResponse.json({ error: 'invalid_max' }, { status: 400 })
+    }
+    update.max_attendee_count = raw
+  }
+
+  if (Object.keys(update).length === 0) {
+    return NextResponse.json({ error: 'No recognized fields to update' }, { status: 400 })
   }
 
   const service = createServiceClient()
@@ -97,7 +113,7 @@ export async function PATCH(
 
   const { error: updateError } = await service
     .from('campaigns')
-    .update({ supports_arrival_certificates: supportsArrivalCertificates })
+    .update(update)
     .eq('id', campaignId)
     .eq('company_id', companyId)
 
@@ -111,7 +127,7 @@ export async function PATCH(
     action: 'campaign.updated',
     resourceType: 'campaign',
     resourceId: campaignId,
-    metadata: { supports_arrival_certificates: supportsArrivalCertificates },
+    metadata: update,
   })
 
   return NextResponse.json({ ok: true })
