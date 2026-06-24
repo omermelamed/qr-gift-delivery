@@ -12,14 +12,15 @@ export default async function GiftQrPage({
 
   const { data: tokenRow } = await service
     .from('gift_tokens')
-    .select('employee_name, redeemed, qr_image_url, gift_id, campaign_id, attending, attendee_count, campaigns(name, supports_arrival_certificates)')
+    .select('employee_name, redeemed, qr_image_url, gift_id, campaign_id, attending, attendee_count, campaigns(name, supports_arrival_certificates, max_attendee_count)')
     .eq('token', token)
     .single()
 
   if (!tokenRow) return notFound()
 
-  const campaign = tokenRow.campaigns as unknown as { name: string; supports_arrival_certificates: boolean } | null
+  const campaign = tokenRow.campaigns as unknown as { name: string; supports_arrival_certificates: boolean; max_attendee_count: number | null } | null
   const supportsArrival = campaign?.supports_arrival_certificates ?? false
+  const maxCount = campaign?.max_attendee_count ?? null
 
   if (tokenRow.redeemed) {
     return (
@@ -35,6 +36,7 @@ export default async function GiftQrPage({
         supportsArrival={supportsArrival}
         attending={tokenRow.attending}
         attendeeCount={tokenRow.attendee_count}
+        maxCount={maxCount}
       />
     )
   }
@@ -63,6 +65,7 @@ export default async function GiftQrPage({
       supportsArrival={supportsArrival}
       attending={tokenRow.attending}
       attendeeCount={tokenRow.attendee_count}
+      maxCount={maxCount}
     />
   )
 }
