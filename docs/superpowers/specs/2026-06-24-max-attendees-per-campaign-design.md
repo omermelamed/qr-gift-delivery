@@ -82,7 +82,9 @@ ALTER TABLE campaigns
 `src/components/admin/ArrivalCertToggle.tsx`:
 
 - When the toggle is **on**, render a compact number input (`min=1`, `step=1`) labelled
-  "Max people per invite" with an empty = "no limit" affordance.
+  **"Max people per invite (including the employee)"** with an empty = "no limit"
+  affordance, and helper text *"e.g. 5 = the person plus up to 4 guests."* The label must
+  make clear the count **includes the person** so an admin doesn't set 5 expecting 6.
 - Initial value comes from a new `initialMax: number | null` prop (passed from
   `src/app/admin/campaigns/[id]/page.tsx:167`, which already selects the campaign — extend
   its select to include `max_attendee_count`).
@@ -115,7 +117,8 @@ Threading (the campaign max must reach the form):
 
 Add to `src/lib/i18n/translations.he.ts`:
 
-- "Max people per invite" (toggle-area label)
+- "Max people per invite (including the employee)" (toggle-area label)
+- "e.g. 5 = the person plus up to 4 guests." (toggle-area helper)
 - "No limit" (placeholder/helper for empty)
 - "Up to {n} people" (RSVP helper) — implement with a parameterized helper if the i18n
   layer supports interpolation; otherwise split into static + number.
