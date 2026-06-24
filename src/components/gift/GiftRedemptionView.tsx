@@ -19,6 +19,7 @@ type Props = {
   supportsArrival: boolean
   attending: boolean | null
   attendeeCount: number | null
+  maxCount: number | null
 }
 
 export function GiftRedemptionView({
@@ -33,6 +34,7 @@ export function GiftRedemptionView({
   supportsArrival,
   attending,
   attendeeCount,
+  maxCount,
 }: Props) {
   const t = useT()
   const [editing, setEditing] = useState(false)
@@ -66,6 +68,7 @@ export function GiftRedemptionView({
             token={token}
             initialAttending={attending}
             initialCount={attendeeCount}
+            maxCount={maxCount}
             onSubmitted={() => setEditing(false)}
           />
         ) : showNotComing ? (

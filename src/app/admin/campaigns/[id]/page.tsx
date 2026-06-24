@@ -47,7 +47,7 @@ export default async function CampaignDetailPage({
   const [campaignResult, creditsResult] = await Promise.all([
     service
       .from('campaigns')
-      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates')
+      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates, max_attendee_count')
       .eq('id', campaignId)
       .eq('company_id', companyId)
       .single(),
@@ -164,7 +164,7 @@ export default async function CampaignDetailPage({
             <div className="flex flex-col gap-4">
               <DistributorAssignment campaignId={campaign.id} />
               <GiftOptionsEditor campaignId={campaign.id} />
-              <ArrivalCertToggle campaignId={campaign.id} initial={campaign.supports_arrival_certificates} />
+              <ArrivalCertToggle campaignId={campaign.id} initial={campaign.supports_arrival_certificates} initialMax={campaign.max_attendee_count} />
             </div>
 
             {/* Employee table (2 cols) + Notes (1 col) */}

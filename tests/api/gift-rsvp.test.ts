@@ -136,4 +136,47 @@ describe('POST /api/gift/[token]/rsvp', () => {
     expect(res.status).toBe(409)
     expect(body.error).toBe('locked')
   })
+
+  it('400 over_limit when coming with more than the campaign max', async () => {
+    mockTokenSingle.mockResolvedValue({
+      data: { redeemed: false, campaigns: { supports_arrival_certificates: true, closed_at: null, max_attendee_count: 4 } },
+    })
+    const { POST } = await import('@/app/api/gift/[token]/rsvp/route')
+    const res = await POST(makeRequest('t', { attending: true, attendeeCount: 5 }), { params: Promise.resolve({ token: 't' }) })
+    const body = await res.json()
+    expect(res.status).toBe(400)
+    expect(body.error).toBe('over_limit')
+    expect(body.max).toBe(4)
+    expect(mockUpdate).not.toHaveBeenCalled()
+  })
+
+  it('accepts a count exactly at the campaign max', async () => {
+    mockTokenSingle.mockResolvedValue({
+      data: { redeemed: false, campaigns: { supports_arrival_certificates: true, closed_at: null, max_attendee_count: 4 } },
+    })
+    mockUpdateSingle.mockResolvedValue({ data: { attending: true, attendee_count: 4 } })
+    const { POST } = await import('@/app/api/gift/[token]/rsvp/route')
+    const res = await POST(makeRequest('t', { attending: true, attendeeCount: 4 }), { params: Promise.resolve({ token: 't' }) })
+    expect(await res.json()).toEqual({ ok: true, attending: true, attendeeCount: 4 })
+  })
+
+  it('allows any count when the campaign max is null', async () => {
+    mockTokenSingle.mockResolvedValue({
+      data: { redeemed: false, campaigns: { supports_arrival_certificates: true, closed_at: null, max_attendee_count: null } },
+    })
+    mockUpdateSingle.mockResolvedValue({ data: { attending: true, attendee_count: 99 } })
+    const { POST } = await import('@/app/api/gift/[token]/rsvp/route')
+    const res = await POST(makeRequest('t', { attending: true, attendeeCount: 99 }), { params: Promise.resolve({ token: 't' }) })
+    expect(await res.json()).toEqual({ ok: true, attending: true, attendeeCount: 99 })
+  })
+
+  it('ignores the max when not coming', async () => {
+    mockTokenSingle.mockResolvedValue({
+      data: { redeemed: false, campaigns: { supports_arrival_certificates: true, closed_at: null, max_attendee_count: 1 } },
+    })
+    mockUpdateSingle.mockResolvedValue({ data: { attending: false, attendee_count: null } })
+    const { POST } = await import('@/app/api/gift/[token]/rsvp/route')
+    const res = await POST(makeRequest('t', { attending: false, attendeeCount: 9 }), { params: Promise.resolve({ token: 't' }) })
+    expect(await res.json()).toEqual({ ok: true, attending: false, attendeeCount: null })
+  })
 })

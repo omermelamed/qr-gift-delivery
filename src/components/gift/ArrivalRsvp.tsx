@@ -8,10 +8,11 @@ type Props = {
   token: string
   initialAttending: boolean | null
   initialCount: number | null
+  maxCount: number | null
   onSubmitted?: () => void
 }
 
-export function ArrivalRsvp({ token, initialAttending, initialCount, onSubmitted }: Props) {
+export function ArrivalRsvp({ token, initialAttending, initialCount, maxCount, onSubmitted }: Props) {
   const router = useRouter()
   const t = useT()
   const [attending, setAttending] = useState<boolean | null>(initialAttending)
@@ -29,6 +30,10 @@ export function ArrivalRsvp({ token, initialAttending, initialCount, onSubmitted
         return
       }
       attendeeCount = n
+      if (maxCount !== null && n > maxCount) {
+        setError(t('You can bring up to {n} people.').replace('{n}', String(maxCount)))
+        return
+      }
     }
     setBusy(true)
     setError(null)
@@ -40,7 +45,11 @@ export function ArrivalRsvp({ token, initialAttending, initialCount, onSubmitted
       })
       const data = await res.json()
       if (!data.ok) {
-        setError(t('Could not save your response. Please try again.'))
+        if (data.error === 'over_limit') {
+          setError(t('You can bring up to {n} people.').replace('{n}', String(data.max)))
+        } else {
+          setError(t('Could not save your response. Please try again.'))
+        }
         setBusy(false)
         return
       }
@@ -81,11 +90,17 @@ export function ArrivalRsvp({ token, initialAttending, initialCount, onSubmitted
             id="attendee-count"
             type="number"
             min={1}
+            max={maxCount ?? undefined}
             step={1}
             value={count}
             onChange={(e) => setCount(e.target.value)}
             className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
+          {maxCount !== null && (
+            <span className="text-xs text-zinc-500">
+              {t('Up to {n} people').replace('{n}', String(maxCount))}
+            </span>
+          )}
         </div>
       )}
 

@@ -51,10 +51,53 @@ describe('PATCH /api/campaigns/[id]', () => {
     expect(res.status).toBe(403)
   })
 
-  it('returns 400 when the flag is not a boolean', async () => {
+  it('returns 400 when the flag is present but not a boolean', async () => {
     const { PATCH } = await import('@/app/api/campaigns/[id]/route')
     const res = await PATCH(makeRequest({ supportsArrivalCertificates: 'yes' }), params)
     expect(res.status).toBe(400)
+  })
+
+  it('returns 400 when no recognized field is provided', async () => {
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    const res = await PATCH(makeRequest({ foo: 1 }), params)
+    expect(res.status).toBe(400)
+  })
+
+  it('returns 400 invalid_max for a non-integer max', async () => {
+    mockFromService.mockReturnValue({
+      select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null } }) }) }) }),
+      update: () => ({ eq: () => ({ eq: () => Promise.resolve({ error: null }) }) }),
+    })
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    for (const bad of [0, -1, 2.5, 'x']) {
+      const res = await PATCH(makeRequest({ maxAttendeeCount: bad }), params)
+      expect(res.status).toBe(400)
+      expect((await res.json()).error).toBe('invalid_max')
+    }
+  })
+
+  it('updates only the max on a draft campaign', async () => {
+    const update = vi.fn(() => ({ eq: () => ({ eq: () => Promise.resolve({ error: null }) }) }))
+    mockFromService.mockReturnValue({
+      select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null } }) }) }) }),
+      update,
+    })
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    const res = await PATCH(makeRequest({ maxAttendeeCount: 5 }), params)
+    expect(res.status).toBe(200)
+    expect(update).toHaveBeenCalledWith({ max_attendee_count: 5 })
+  })
+
+  it('clears the max when maxAttendeeCount is null', async () => {
+    const update = vi.fn(() => ({ eq: () => ({ eq: () => Promise.resolve({ error: null }) }) }))
+    mockFromService.mockReturnValue({
+      select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null } }) }) }) }),
+      update,
+    })
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    const res = await PATCH(makeRequest({ maxAttendeeCount: null }), params)
+    expect(res.status).toBe(200)
+    expect(update).toHaveBeenCalledWith({ max_attendee_count: null })
   })
 
   it('returns 409 when the campaign was already sent', async () => {
