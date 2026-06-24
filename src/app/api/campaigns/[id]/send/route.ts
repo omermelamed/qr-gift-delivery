@@ -6,6 +6,7 @@ import { generateQrBuffer } from '@/lib/qr'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
+import { resolveSmsTemplate, renderSmsTemplate } from '@/lib/sms-template'
 
 const BATCH_SIZE = 50
 const DELAY_MS = 1000
@@ -44,7 +45,7 @@ export async function POST(
   // the company from the campaign row itself — never trust a client header (H6).
   const baseQuery = service
     .from('campaigns')
-    .select('id, name, company_id, sent_at')
+    .select('id, name, company_id, sent_at, sms_template')
     .eq('id', campaignId)
   const { data: campaign, error: campaignError } = isCronCall
     ? await baseQuery.single()
@@ -67,7 +68,7 @@ export async function POST(
     .eq('id', campaign.company_id)
     .single()
 
-  const smsTemplate = company?.sms_template ?? null
+  const effectiveTemplate = resolveSmsTemplate(campaign.sms_template, company?.sms_template ?? null)
 
   const { data: tokens, error: tokensError } = await service
     .from('gift_tokens')
@@ -156,10 +157,8 @@ export async function POST(
             employeeName: token.employee_name,
             holidayName: campaign.name,
             giftLink,
-            body: smsTemplate
-              ? smsTemplate
-                  .replace('{name}', token.employee_name)
-                  .replace('{link}', giftLink)
+            body: effectiveTemplate
+              ? renderSmsTemplate(effectiveTemplate, { name: token.employee_name, link: giftLink })
               : undefined,
           })
         }
