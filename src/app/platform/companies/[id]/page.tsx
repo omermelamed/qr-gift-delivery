@@ -66,7 +66,7 @@ export default async function CompanyDetailPage({
   return (
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-6">
-        <Link href="/platform" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors">
+        <Link href="/platform" className="text-sm text-zinc-400 hover-brand-text transition-colors">
           <span className="inline-block rtl:rotate-180">←</span> Companies
         </Link>
       </div>
@@ -91,7 +91,7 @@ export default async function CompanyDetailPage({
               </thead>
               <tbody>
                 {members.map((m) => (
-                  <tr key={m.id} className="border-b border-zinc-50 hover:bg-zinc-50">
+                  <tr key={m.id} className="border-b border-zinc-50 hover-brand">
                     <td className="px-5 py-3">
                       <p className="font-medium text-zinc-900">{m.name}</p>
                       <p className="text-xs text-zinc-400">{m.email}</p>
@@ -151,7 +151,7 @@ export default async function CompanyDetailPage({
               </thead>
               <tbody>
                 {campaigns.map((c) => (
-                  <tr key={c.id} className="border-b border-zinc-50 hover:bg-zinc-50">
+                  <tr key={c.id} className="border-b border-zinc-50 hover-brand">
                     <td className="px-5 py-3 font-medium text-zinc-900">{c.name}</td>
                     <td className="px-5 py-3 text-zinc-500">{c.campaign_date ?? '—'}</td>
                     <td className="px-5 py-3">

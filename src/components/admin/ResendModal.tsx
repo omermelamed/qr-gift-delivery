@@ -82,7 +82,7 @@ export function ResendModal({ campaignId, tokens, creditBalance, onClose, onDone
     `px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
       mode === m
         ? 'text-white'
-        : 'text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100'
+        : 'text-zinc-500 hover-brand-text hover-brand'
     }`
 
   return (
@@ -130,7 +130,7 @@ export function ResendModal({ campaignId, tokens, creditBalance, onClose, onDone
                   <select
                     value={selectedDept}
                     onChange={(e) => setSelectedDept(e.target.value)}
-                    className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand"
                   >
                     <option value="">{t('Select a department…')}</option>
                     {departments.map((d) => {
@@ -161,12 +161,12 @@ export function ResendModal({ campaignId, tokens, creditBalance, onClose, onDone
                     </button>
                   </div>
                   {unredeemed.map((tok) => (
-                    <label key={tok.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-zinc-50 cursor-pointer">
+                    <label key={tok.id} className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover-brand cursor-pointer">
                       <input
                         type="checkbox"
                         checked={manualSelected.has(tok.id)}
                         onChange={() => toggleManual(tok.id)}
-                        className="w-4 h-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                        className="w-4 h-4 rounded border-zinc-300 text-brand ring-brand cursor-pointer"
                       />
                       <div className="min-w-0">
                         <p className="text-sm font-medium text-zinc-800 truncate">{tok.employee_name}</p>
@@ -195,7 +195,7 @@ export function ResendModal({ campaignId, tokens, creditBalance, onClose, onDone
             </div>
           )}
           <div className="flex gap-3">
-            <button onClick={onClose} disabled={loading} className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-50">
+            <button onClick={onClose} disabled={loading} className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 hover-brand transition-colors disabled:opacity-50">
               {t('Cancel')}
             </button>
             <button

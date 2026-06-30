@@ -91,7 +91,7 @@ export function TemplateEditor({ mode, templateId, initialName = '', initialBody
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Event Invitation"
-            className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+            className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm focus:ring-2 ring-brand focus:border-brand outline-none"
           />
         </div>
 
@@ -103,7 +103,7 @@ export function TemplateEditor({ mode, templateId, initialName = '', initialBody
                 key={v.key}
                 type="button"
                 onClick={() => insertVariable(v.key)}
-                className="text-xs px-2.5 py-1 rounded-full border border-zinc-200 text-zinc-600 hover:bg-indigo-50 hover:border-indigo-300 hover:text-indigo-700 transition-colors"
+                className="text-xs px-2.5 py-1 rounded-full border border-zinc-200 text-zinc-600 hover-brand hover:border-brand hover-brand-text transition-colors"
               >
                 {`{{${v.key}}}`}
               </button>
@@ -115,7 +115,7 @@ export function TemplateEditor({ mode, templateId, initialName = '', initialBody
             onChange={(e) => setBody(e.target.value)}
             rows={6}
             placeholder="Hi {{name}}, you're invited to our event on {{date}}! RSVP here: {{link}}"
-            className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-y"
+            className="w-full px-3 py-2 border border-zinc-300 rounded-lg text-sm font-mono focus:ring-2 ring-brand focus:border-brand outline-none resize-y"
           />
           <div className="flex justify-between text-xs text-zinc-400 mt-1">
             <span>{charCount} {t('characters')}</span>
@@ -128,7 +128,7 @@ export function TemplateEditor({ mode, templateId, initialName = '', initialBody
         <div className="flex gap-3">
           <button
             onClick={() => router.back()}
-            className="px-4 py-2.5 rounded-lg border border-zinc-200 text-zinc-600 font-medium hover:bg-zinc-50 transition-colors"
+            className="px-4 py-2.5 rounded-lg border border-zinc-200 text-zinc-600 font-medium hover-brand transition-colors"
           >
             {t('Cancel')}
           </button>

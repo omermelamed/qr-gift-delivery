@@ -103,7 +103,7 @@ export function QrGrid({ rows }: { rows: TokenRow[] }) {
               </div>
               <button
                 onClick={close}
-                className="text-zinc-400 hover:text-zinc-700 transition-colors p-1 rounded-lg hover:bg-zinc-100"
+                className="text-zinc-400 hover-brand-text transition-colors p-1 rounded-lg hover-brand"
                 aria-label={t('Close')}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

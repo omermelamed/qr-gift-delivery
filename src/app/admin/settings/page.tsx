@@ -16,11 +16,11 @@ export default async function SettingsPage() {
   if (!companyId) redirect('/admin')
 
   const service = createServiceClient()
-  let company: { id: string; name: string; logo_url: string | null; sms_template: string | null; theme_color: string | null } | null = null
+  let company: { id: string; name: string; logo_url: string | null; sms_template: string | null } | null = null
   try {
     const { data } = await service
       .from('companies')
-      .select('id, name, logo_url, sms_template, theme_color')
+      .select('id, name, logo_url, sms_template')
       .eq('id', companyId)
       .single()
     company = data
@@ -38,7 +38,6 @@ export default async function SettingsPage() {
         initialName={company.name}
         initialLogoUrl={company.logo_url}
         initialTemplate={company.sms_template}
-        initialThemeColor={company.theme_color}
       />
     </div>
   )

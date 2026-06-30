@@ -1,12 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { useT } from '@/lib/i18n/useT'
 
-type Props = { userId: string; name: string }
+type Props = { userId: string; name: string; className?: string }
 
-export function RemoveMemberButton({ userId, name }: Props) {
+export function RemoveMemberButton({ userId, name, className }: Props) {
   const t = useT()
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -41,17 +42,23 @@ export function RemoveMemberButton({ userId, name }: Props) {
   return (
     <>
       {error && <span className="text-xs text-red-500 me-1">{error}</span>}
-      <button
-        onClick={() => { setError(null); setShowModal(true) }}
-        aria-label={`Remove ${name}`}
-        className="text-zinc-300 hover:text-red-500 transition-colors"
-      >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-        </svg>
-      </button>
+      {className ? (
+        <button onClick={() => { setError(null); setShowModal(true) }} className={className}>
+          {t('Remove')}
+        </button>
+      ) : (
+        <button
+          onClick={() => { setError(null); setShowModal(true) }}
+          aria-label={`Remove ${name}`}
+          className="text-zinc-300 hover:text-red-500 transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
+      )}
 
-      {showModal && (
+      {showModal && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
             <h2 className="text-base font-semibold text-zinc-900 mb-1">{t('Remove')} {name} {t('from team?')}</h2>
@@ -63,7 +70,7 @@ export function RemoveMemberButton({ userId, name }: Props) {
               <button
                 onClick={() => handleRemove(true)}
                 disabled={loading}
-                className="w-full text-start px-4 py-3 rounded-xl border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors disabled:opacity-50"
+                className="w-full text-start px-4 py-3 rounded-xl border border-zinc-200 hover:border-zinc-300 hover-brand transition-colors disabled:opacity-50"
               >
                 <p className="text-sm font-medium text-zinc-800">{t('Remove from team only')}</p>
                 <p className="text-xs text-zinc-400 mt-0.5">{t('Keep in employee directory (phone, department stay intact)')}</p>
@@ -81,12 +88,13 @@ export function RemoveMemberButton({ userId, name }: Props) {
             <button
               onClick={() => setShowModal(false)}
               disabled={loading}
-              className="mt-4 w-full text-center text-sm text-zinc-400 hover:text-zinc-600 transition-colors disabled:opacity-50"
+              className="mt-4 w-full text-center text-sm text-zinc-400 hover-brand-text transition-colors disabled:opacity-50"
             >
               {t('Cancel')}
             </button>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   )

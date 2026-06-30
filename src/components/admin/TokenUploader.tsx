@@ -104,8 +104,8 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
         onDrop={handleDrop}
         className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
           isDragging
-            ? 'border-indigo-400 bg-indigo-50'
-            : 'border-zinc-200 hover:border-indigo-300 hover:bg-zinc-50'
+            ? 'border-brand bg-brand-soft'
+            : 'border-zinc-200 hover:border-brand hover-brand'
         }`}
       >
         <svg className="w-8 h-8 text-zinc-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,7 +113,7 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
             d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
         <p className="text-sm text-zinc-500">
-          <span className="font-medium text-indigo-600">{t('Click to browse')}</span> {t('or drag and drop')}
+          <span className="font-medium text-brand">{t('Click to browse')}</span> {t('or drag and drop')}
         </p>
         <p className="text-xs text-zinc-400 mt-1">.csv {t('or')} .xlsx</p>
         <input
@@ -179,7 +179,7 @@ export function TokenUploader({ campaignId }: { campaignId: string }) {
           <button
             onClick={handleConfirm}
             disabled={validRows.length === 0 || uploading}
-            className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
+            className="bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
           >
             {uploading ? t('Uploading…') : `${t('Confirm Upload')} (${validRows.length} ${t('employees')})`}
           </button>

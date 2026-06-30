@@ -42,9 +42,9 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance }: { cam
       <button
         onClick={() => setShowModal(true)}
         disabled={creditBalance < employeeCount}
-        className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-5 py-2.5 text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="bg-brand text-white rounded-lg px-5 h-[34px] inline-flex items-center justify-center text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {creditBalance < employeeCount ? t('Insufficient credits') : t('🚀 Launch Campaign')}
+        {t('🚀 Launch Campaign')}
       </button>
       {showModal && (
         <ConfirmModal

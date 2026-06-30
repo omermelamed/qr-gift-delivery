@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/browser'
 import { useT } from '@/lib/i18n/useT'
+import { PencilIcon, TrashIcon } from '@/components/icons'
 
 type Note = {
   id: string
@@ -38,7 +39,6 @@ export function CampaignNotes({
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editBody, setEditBody] = useState('')
   const [query, setQuery] = useState('')
-  const bottomRef = useRef<HTMLDivElement>(null)
 
   const q = query.trim().toLowerCase()
   const filtered = q
@@ -69,10 +69,6 @@ export function CampaignNotes({
       .subscribe()
     return () => { supabase.removeChannel(channel) }
   }, [campaignId])
-
-  useEffect(() => {
-    if (!loading) bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [notes.length, loading])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -130,7 +126,7 @@ export function CampaignNotes({
         )}
       </div>
 
-      <div className="flex flex-col gap-3 p-4 flex-1 overflow-y-auto min-h-0">
+      <div className="flex flex-col gap-3 p-4 max-h-[200px] overflow-y-scroll">
         {loading ? (
           <p className="text-xs text-zinc-400 text-center py-4">{t('Loading…')}</p>
         ) : notes.length === 0 ? (
@@ -139,41 +135,45 @@ export function CampaignNotes({
           <p className="text-xs text-zinc-400 text-center py-4">{t('No matching notes.')}</p>
         ) : (
           filtered.map((note) => (
-            <div key={note.id} className="flex flex-col gap-1">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-medium text-zinc-700">{note.author_name}</span>
-                <span className="text-xs text-zinc-400 flex-shrink-0">{timeAgo(note.created_at, t)}{note.updated_at !== note.created_at ? ` · ${t('edited')}` : ''}</span>
+            <div key={note.id} className="group flex items-center justify-between gap-2">
+              <div className="flex flex-col gap-1 min-w-0 flex-1">
+                <span className="text-xs font-bold text-zinc-800">{note.author_name}</span>
+
+                {editingId === note.id ? (
+                  <div className="flex flex-col gap-1.5">
+                    <textarea
+                      value={editBody}
+                      onChange={(e) => setEditBody(e.target.value)}
+                      rows={2}
+                      autoFocus
+                      className="border border-zinc-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 resize-none w-full"
+                    />
+                    <div className="flex gap-1.5">
+                      <button onClick={() => handleEdit(note.id)} className="text-xs text-white px-2 py-1 rounded" style={{ backgroundColor: 'var(--brand,#6366f1)' }}>{t('Save')}</button>
+                      <button onClick={() => setEditingId(null)} className="text-xs text-zinc-500 px-2 py-1 rounded hover-brand">{t('Cancel')}</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-xs text-zinc-700 whitespace-pre-wrap break-words">{note.body}</p>
+                    <span className="block text-xs text-zinc-400 mt-0.5">{timeAgo(note.created_at, t)}{note.updated_at !== note.created_at ? ` · ${t('edited')}` : ''}</span>
+                  </div>
+                )}
               </div>
 
-              {editingId === note.id ? (
-                <div className="flex flex-col gap-1.5">
-                  <textarea
-                    value={editBody}
-                    onChange={(e) => setEditBody(e.target.value)}
-                    rows={2}
-                    autoFocus
-                    className="border border-zinc-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 resize-none w-full"
-                  />
-                  <div className="flex gap-1.5">
-                    <button onClick={() => handleEdit(note.id)} className="text-xs text-white px-2 py-1 rounded" style={{ backgroundColor: 'var(--brand,#6366f1)' }}>{t('Save')}</button>
-                    <button onClick={() => setEditingId(null)} className="text-xs text-zinc-500 px-2 py-1 rounded hover:bg-zinc-100">{t('Cancel')}</button>
-                  </div>
-                </div>
-              ) : (
-                <div className="group relative">
-                  <p className="text-xs text-zinc-700 whitespace-pre-wrap break-words">{note.body}</p>
-                  {note.author_id === currentUserId && (
-                    <div className="flex gap-2 mt-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={() => { setEditingId(note.id); setEditBody(note.body) }} className="text-xs text-zinc-400 hover:text-zinc-600">{t('Edit')}</button>
-                      <button onClick={() => handleDelete(note.id)} className="text-xs text-zinc-400 hover:text-red-500">{t('Delete')}</button>
-                    </div>
-                  )}
+              {note.author_id === currentUserId && editingId !== note.id && (
+                <div className="flex gap-2 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => { setEditingId(note.id); setEditBody(note.body) }} aria-label={t('Edit')} title={t('Edit')} className="text-zinc-400 hover-brand-text transition-colors">
+                    <PencilIcon className="w-3.5 h-3.5" />
+                  </button>
+                  <button onClick={() => handleDelete(note.id)} aria-label={t('Delete')} title={t('Delete')} className="text-zinc-400 hover:text-red-500 transition-colors">
+                    <TrashIcon className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               )}
             </div>
           ))
         )}
-        <div ref={bottomRef} />
       </div>
 
       <form onSubmit={handleSubmit} className="flex gap-2 p-3 border-t border-zinc-100">

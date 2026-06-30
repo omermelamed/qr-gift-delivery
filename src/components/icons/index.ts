@@ -1,0 +1,5 @@
+export { PencilIcon } from './PencilIcon'
+export { TrashIcon } from './TrashIcon'
+export { InfoIcon } from './InfoIcon'
+export { ArrowLeftIcon } from './ArrowLeftIcon'
+export { DotsVerticalIcon } from './DotsVerticalIcon'

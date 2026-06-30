@@ -58,7 +58,7 @@ export default function ResetPasswordPage() {
     <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-8">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500" />
+          <div className="w-12 h-12 rounded-2xl bg-brand" />
           <span className="text-xl font-bold text-zinc-900">GiftFlow</span>
         </div>
 
@@ -68,7 +68,7 @@ export default function ResetPasswordPage() {
               <h1 className="text-lg font-semibold text-zinc-900">{t('Verifying link…')}</h1>
               <p className="text-sm text-zinc-500">
                 {t('If nothing happens, your link may have expired.')}{' '}
-                <a href="/login" className="text-indigo-600 hover:underline">
+                <a href="/login" className="text-brand hover:underline">
                   {t('Request a new one.')}
                 </a>
               </p>
@@ -95,7 +95,7 @@ export default function ResetPasswordPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={8}
-                    className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
                   />
                 </div>
 
@@ -108,14 +108,14 @@ export default function ResetPasswordPage() {
                     value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
                     required
-                    className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
+                  className="w-full bg-brand text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
                 >
                   {loading ? t('Saving…') : t('Set new password')}
                 </button>

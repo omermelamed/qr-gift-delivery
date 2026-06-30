@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { useT } from '@/lib/i18n/useT'
 import { DatePicker } from '@/components/admin/DatePicker'
@@ -9,9 +10,10 @@ type Props = {
   campaignId: string
   sourceName: string
   sourceDate: string | null
+  className?: string
 }
 
-export function DuplicateCampaignButton({ campaignId, sourceName, sourceDate }: Props) {
+export function DuplicateCampaignButton({ campaignId, sourceName, sourceDate, className }: Props) {
   const t = useT()
   const [showModal, setShowModal] = useState(false)
   const [name, setName] = useState(`${t('Copy of')} ${sourceName}`)
@@ -48,16 +50,12 @@ export function DuplicateCampaignButton({ campaignId, sourceName, sourceDate }: 
     <>
       <button
         onClick={(e) => { e.preventDefault(); setError(null); setShowModal(true) }}
-        aria-label="Duplicate campaign"
-        className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors opacity-0 group-hover:opacity-100"
+        className={className ?? 'border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover-brand transition-colors'}
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-        </svg>
+        {t('Duplicate campaign')}
       </button>
 
-      {showModal && (
+      {showModal && createPortal(
         <div
           className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
           onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false) }}
@@ -80,7 +78,7 @@ export function DuplicateCampaignButton({ campaignId, sourceName, sourceDate }: 
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
                 />
               </div>
 
@@ -94,7 +92,7 @@ export function DuplicateCampaignButton({ campaignId, sourceName, sourceDate }: 
                   type="checkbox"
                   checked={copyEmployees}
                   onChange={(e) => setCopyEmployees(e.target.checked)}
-                  className="w-4 h-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                  className="w-4 h-4 rounded border-zinc-300 text-brand ring-brand"
                 />
                 <span className="text-sm text-zinc-700">{t('Copy employees from this campaign')}</span>
               </label>
@@ -103,21 +101,22 @@ export function DuplicateCampaignButton({ campaignId, sourceName, sourceDate }: 
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
+                  className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 hover-brand transition-colors"
                 >
                   {t('Cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
+                  className="flex-1 bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
                 >
                   {loading ? t('Duplicating…') : t('Duplicate')}
                 </button>
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   )

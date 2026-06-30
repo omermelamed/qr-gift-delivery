@@ -45,7 +45,7 @@ export default function NewCampaignPage() {
 
   return (
     <div className="p-8 max-w-lg mx-auto">
-      <Link href="/admin" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors mb-6 inline-block">
+      <Link href="/admin" className="text-sm text-zinc-400 hover-brand-text transition-colors mb-6 inline-block">
         {t('← Campaigns')}
       </Link>
 
@@ -67,7 +67,7 @@ export default function NewCampaignPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
           />
         </div>
 
@@ -102,7 +102,7 @@ export default function NewCampaignPage() {
               value={maxAttendees}
               placeholder={t('No limit')}
               onChange={(e) => setMaxAttendees(e.target.value)}
-              className="w-32 border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-32 border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
             />
             <span className="text-xs text-zinc-500">{t('e.g. 5 = the person plus up to 4 guests.')}</span>
           </div>
@@ -111,7 +111,7 @@ export default function NewCampaignPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all mt-1"
+          className="w-full bg-brand text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all mt-1"
         >
           {loading ? t('Creating…') : t('Create Campaign')}
         </button>

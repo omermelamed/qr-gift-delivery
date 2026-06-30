@@ -69,9 +69,9 @@ export function VerifyArrivalCount({
       <div className="flex items-center justify-center gap-8 mb-10">
         <button onClick={() => setCount((c) => Math.max(1, c - 1))} disabled={busy || count <= 1} aria-label={t('Fewer')} className="w-16 h-16 rounded-full bg-zinc-800 text-white text-3xl flex items-center justify-center disabled:opacity-40 active:scale-95 transition-transform">−</button>
         <span className="text-white text-6xl font-bold tabular-nums w-24 text-center">{count}</span>
-        <button onClick={() => setCount((c) => c + 1)} disabled={busy} aria-label={t('More')} className="w-16 h-16 rounded-full bg-indigo-600 text-white text-3xl flex items-center justify-center disabled:opacity-40 active:scale-95 transition-transform">+</button>
+        <button onClick={() => setCount((c) => c + 1)} disabled={busy} aria-label={t('More')} className="w-16 h-16 rounded-full bg-brand text-white text-3xl flex items-center justify-center disabled:opacity-40 active:scale-95 transition-transform">+</button>
       </div>
-      <button onClick={confirm} disabled={busy} className="w-full max-w-sm py-4 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-lg font-semibold rounded-2xl disabled:opacity-50 active:scale-95 transition-transform">
+      <button onClick={confirm} disabled={busy} className="w-full max-w-sm py-4 bg-brand text-white text-lg font-semibold rounded-2xl disabled:opacity-50 active:scale-95 transition-transform">
         {busy ? t('Saving…') : t('Confirm handover')}
       </button>
     </main>

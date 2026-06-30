@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useT } from '@/lib/i18n/useT'
+import { InfoIcon } from '@/components/icons'
 
 type Distributor = { userId: string; name: string; email: string }
 type ScannerUser = { id: string; name: string; email: string }
@@ -56,7 +58,26 @@ export function DistributorAssignment({ campaignId }: { campaignId: string }) {
 
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-5">
-      <h2 className="font-semibold text-zinc-900 mb-1">{t('Distributors')}</h2>
+      <div className="flex items-center gap-1.5 mb-1">
+        <h2 className="font-semibold text-zinc-900">{t('Distributors')}</h2>
+        <span className="group relative inline-flex items-center">
+          <button
+            type="button"
+            aria-label={t('How to add a scanner')}
+            className="text-zinc-300 hover-brand-text transition-colors focus:outline-none cursor-pointer"
+          >
+            <InfoIcon className="w-4 h-4" />
+          </button>
+          {/* pt-1.5 bridges the gap to the icon so moving the cursor into the
+              bubble keeps it open (so the link stays clickable). */}
+          <span className="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition-opacity absolute left-1/2 top-full z-20 w-56 -translate-x-1/2 pt-1.5">
+            <span className="block rounded-lg bg-zinc-900 px-3 py-2 text-xs font-normal leading-relaxed text-white shadow-lg">
+              {t('To add a new scanner, go to the')}{' '}
+              <Link href={`/admin/team?back=${encodeURIComponent(`/admin/campaigns/${campaignId}`)}`} className="underline font-medium hover:text-white">{t('Team screen')}</Link>
+            </span>
+          </span>
+        </span>
+      </div>
       <p className="text-xs text-zinc-400 mb-4">
         {distributors.length === 0
           ? t('Any scanner can scan this campaign')
@@ -89,7 +110,7 @@ export function DistributorAssignment({ campaignId }: { campaignId: string }) {
         <button
           onClick={() => { setShowPicker(true); loadScanners() }}
           disabled={loading}
-          className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors disabled:opacity-50"
+          className="text-sm font-medium text-brand hover-brand-text transition-colors disabled:opacity-50"
         >
           {t('+ Add distributor')}
         </button>
@@ -103,7 +124,7 @@ export function DistributorAssignment({ campaignId }: { campaignId: string }) {
                 <button
                   key={s.id}
                   onClick={() => handleAdd(s)}
-                  className="w-full text-start px-3 py-2 rounded-lg hover:bg-zinc-50 transition-colors"
+                  className="w-full text-start px-3 py-2 rounded-lg hover-brand transition-colors"
                 >
                   <p className="text-sm font-medium text-zinc-800">{s.name}</p>
                   <p className="text-xs text-zinc-400">{s.email}</p>
@@ -112,7 +133,7 @@ export function DistributorAssignment({ campaignId }: { campaignId: string }) {
             )}
             <button
               onClick={() => setShowPicker(false)}
-              className="w-full text-center text-xs text-zinc-400 mt-1 pt-1 border-t border-zinc-100 hover:text-zinc-600"
+              className="w-full text-center text-xs text-zinc-400 mt-1 pt-1 border-t border-zinc-100 hover-brand-text"
             >
               {t('Cancel')}
             </button>

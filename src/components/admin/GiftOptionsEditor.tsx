@@ -89,7 +89,7 @@ export function GiftOptionsEditor({ campaignId, disabled = false }: Props) {
                       if (e.key === 'Enter') handleSaveEdit(g.id)
                       if (e.key === 'Escape') setEditingId(null)
                     }}
-                    className="flex-1 border border-zinc-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="flex-1 border border-zinc-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 ring-brand"
                   />
                   <button onClick={() => handleSaveEdit(g.id)} className="text-xs font-medium" style={{ color: 'var(--brand,#6366f1)' }}>{t('Save')}</button>
                   <button onClick={() => setEditingId(null)} className="text-xs text-zinc-400">{t('Cancel')}</button>
@@ -101,7 +101,7 @@ export function GiftOptionsEditor({ campaignId, disabled = false }: Props) {
                     <>
                       <button
                         onClick={() => { setEditingId(g.id); setEditName(g.name) }}
-                        className="text-zinc-400 hover:text-zinc-700 transition-colors"
+                        className="text-zinc-400 hover-brand-text transition-colors"
                       >
                         <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -132,7 +132,7 @@ export function GiftOptionsEditor({ campaignId, disabled = false }: Props) {
             placeholder={t('e.g. Spa Voucher')}
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            className="flex-1 border border-zinc-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="flex-1 border border-zinc-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
           />
           <button
             type="submit"

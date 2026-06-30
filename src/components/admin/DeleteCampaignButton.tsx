@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useT } from '@/lib/i18n/useT'
 
-export function DeleteCampaignButton({ campaignId, redirectAfter = false }: { campaignId: string; redirectAfter?: boolean }) {
+export function DeleteCampaignButton({ campaignId, redirectAfter = false, className }: { campaignId: string; redirectAfter?: boolean; className?: string }) {
   const [showConfirm, setShowConfirm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -39,7 +39,7 @@ export function DeleteCampaignButton({ campaignId, redirectAfter = false }: { ca
     <>
       <button
         onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowConfirm(true) }}
-        className="border border-red-200 rounded-lg px-3 py-1.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+        className={className ?? 'border border-red-200 rounded-lg px-3 py-1.5 text-sm font-medium text-red-500 hover:bg-red-50 transition-colors'}
       >
         {t('Delete')}
       </button>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { useT } from '@/lib/i18n/useT'
 
@@ -19,9 +20,10 @@ type Props = {
   isActive: boolean
   isPending: boolean
   isSelf: boolean
+  className?: string
 }
 
-export function EditMemberButton({ userId, name, email, phone, roleName, isActive, isPending, isSelf }: Props) {
+export function EditMemberButton({ userId, name, email, phone, roleName, isActive, isPending, isSelf, className }: Props) {
   const t = useT()
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -82,12 +84,12 @@ export function EditMemberButton({ userId, name, email, phone, roleName, isActiv
     <>
       <button
         onClick={() => setOpen(true)}
-        className="border border-zinc-200 rounded-lg px-3 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
+        className={className ?? 'border border-zinc-200 rounded-lg px-3 py-1 text-xs font-medium text-zinc-600 hover-brand transition-colors'}
       >
         {t('Edit')}
       </button>
 
-      {open && (
+      {open && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={resetAndClose}>
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md" onClick={(e) => e.stopPropagation()}>
             <div className="px-6 pt-6 pb-4 border-b border-zinc-100">
@@ -175,7 +177,7 @@ export function EditMemberButton({ userId, name, email, phone, roleName, isActiv
                     type="button"
                     onClick={() => sendEmail('reinvite')}
                     disabled={emailAction === 'loading'}
-                    className="text-xs border border-zinc-200 rounded-lg px-3 py-1.5 text-zinc-600 hover:bg-zinc-50 disabled:opacity-50 transition-colors"
+                    className="text-xs border border-zinc-200 rounded-lg px-3 py-1.5 text-zinc-600 hover-brand disabled:opacity-50 transition-colors"
                   >
                     {emailAction === 'done' ? t('✓ Invite sent') : emailAction === 'error' ? t('Failed') : emailAction === 'loading' ? t('Sending…') : t('Resend invite')}
                   </button>
@@ -185,7 +187,7 @@ export function EditMemberButton({ userId, name, email, phone, roleName, isActiv
                     type="button"
                     onClick={() => sendEmail('reset')}
                     disabled={emailAction === 'loading'}
-                    className="text-xs border border-zinc-200 rounded-lg px-3 py-1.5 text-zinc-600 hover:bg-zinc-50 disabled:opacity-50 transition-colors"
+                    className="text-xs border border-zinc-200 rounded-lg px-3 py-1.5 text-zinc-600 hover-brand disabled:opacity-50 transition-colors"
                   >
                     {emailAction === 'done' ? t('✓ Email sent') : emailAction === 'error' ? t('Failed') : emailAction === 'loading' ? t('Sending…') : t('Send password reset')}
                   </button>
@@ -198,7 +200,7 @@ export function EditMemberButton({ userId, name, email, phone, roleName, isActiv
             <div className="px-6 pb-6 flex justify-end gap-3">
               <button
                 onClick={resetAndClose}
-                className="border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
+                className="border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover-brand transition-colors"
               >
                 {t('Cancel')}
               </button>
@@ -212,7 +214,8 @@ export function EditMemberButton({ userId, name, email, phone, roleName, isActiv
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   )

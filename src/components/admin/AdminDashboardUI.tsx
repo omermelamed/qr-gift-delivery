@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignButton'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { StatusBadge } from '@/components/admin/StatusBadge'
+import { KebabMenu } from '@/components/admin/KebabMenu'
+import { MENU_ITEM, MENU_ITEM_DANGER } from '@/components/admin/menuItemStyles'
 import { useT } from '@/lib/i18n/useT'
 
 type CampaignRow = {
@@ -58,7 +60,7 @@ export function AdminDashboardUI({ campaigns, totalGifts, totalRedeemed }: Props
 
       {campaigns.length === 0 ? (
         <div className="text-center py-24 bg-white rounded-2xl border border-zinc-200">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 mx-auto mb-4" />
+          <div className="w-12 h-12 rounded-2xl bg-brand mx-auto mb-4" />
           <p className="text-zinc-900 font-semibold mb-1">{t('No campaigns yet')}</p>
           <p className="text-sm text-zinc-500 mb-6">{t('Create your first campaign to get started')}</p>
           <Link
@@ -82,19 +84,22 @@ export function AdminDashboardUI({ campaigns, totalGifts, totalRedeemed }: Props
               >
                 <div className="flex items-center justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors truncate">
+                    <p className="font-semibold text-zinc-900 group-hover-brand-text transition-colors truncate">
                       {c.name}
                     </p>
                     <p className="text-sm text-zinc-400 mt-0.5">{c.campaign_date ?? '—'}</p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    {!c.sent_at && <DeleteCampaignButton campaignId={c.id} />}
-                    <DuplicateCampaignButton
-                      campaignId={c.id}
-                      sourceName={c.name}
-                      sourceDate={c.campaign_date}
-                    />
                     <StatusBadge sentAt={c.sent_at} closedAt={c.closed_at} />
+                    <KebabMenu>
+                      <DuplicateCampaignButton
+                        campaignId={c.id}
+                        sourceName={c.name}
+                        sourceDate={c.campaign_date}
+                        className={MENU_ITEM}
+                      />
+                      {!c.sent_at && <DeleteCampaignButton campaignId={c.id} className={MENU_ITEM_DANGER} />}
+                    </KebabMenu>
                   </div>
                 </div>
 

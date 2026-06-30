@@ -56,7 +56,7 @@ export function NewCompanyModal({ onClose }: Props) {
           </div>
           <p className="font-semibold text-zinc-900 mb-1">Company created</p>
           <p className="text-sm text-zinc-500 mb-4">An invite was sent to {adminEmail}.</p>
-          <button onClick={onClose} className="text-sm font-medium text-indigo-600 hover:underline">Close</button>
+          <button onClick={onClose} className="text-sm font-medium text-brand hover:underline">Close</button>
         </div>
       </div>
     )
@@ -82,7 +82,7 @@ export function NewCompanyModal({ onClose }: Props) {
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
               required
-              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
             />
           </div>
 
@@ -94,7 +94,7 @@ export function NewCompanyModal({ onClose }: Props) {
               value={slug}
               onChange={(e) => setSlug(e.target.value)}
               required
-              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
             />
             <p className="text-xs text-zinc-400">Used in URLs. Auto-generated from name.</p>
           </div>
@@ -108,17 +108,17 @@ export function NewCompanyModal({ onClose }: Props) {
               value={adminEmail}
               onChange={(e) => setAdminEmail(e.target.value)}
               required
-              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
             />
           </div>
 
           <div className="flex gap-3 justify-end mt-2">
             <button type="button" onClick={onClose} disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-zinc-700 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors disabled:opacity-50">
+              className="px-4 py-2 text-sm font-medium text-zinc-700 border border-zinc-200 rounded-lg hover-brand transition-colors disabled:opacity-50">
               Cancel
             </button>
             <button type="submit" disabled={loading || !name.trim() || !adminEmail.trim()}
-              className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-violet-500 rounded-lg hover:brightness-110 transition-all disabled:opacity-50">
+              className="px-4 py-2 text-sm font-semibold text-white bg-brand rounded-lg hover:brightness-110 transition-all disabled:opacity-50">
               {loading ? 'Creating…' : 'Create company'}
             </button>
           </div>

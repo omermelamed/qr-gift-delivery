@@ -9,7 +9,7 @@ export function NewCompanyButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all"
+        className="bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all"
       >
         + New Company
       </button>

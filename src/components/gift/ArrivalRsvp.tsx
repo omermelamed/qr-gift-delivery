@@ -68,7 +68,7 @@ export function ArrivalRsvp({ token, initialAttending, initialCount, maxCount, o
         <button
           type="button"
           onClick={() => setAttending(true)}
-          className={`flex-1 py-3 rounded-xl text-sm font-semibold border transition-colors ${attending === true ? 'bg-indigo-500 text-white border-indigo-500' : 'border-zinc-200 text-zinc-700'}`}
+          className={`flex-1 py-3 rounded-xl text-sm font-semibold border transition-colors ${attending === true ? 'bg-brand text-white border-brand' : 'border-zinc-200 text-zinc-700'}`}
         >
           {t("I'm coming")}
         </button>
@@ -94,7 +94,7 @@ export function ArrivalRsvp({ token, initialAttending, initialCount, maxCount, o
             step={1}
             value={count}
             onChange={(e) => setCount(e.target.value)}
-            className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand"
           />
           {maxCount !== null && (
             <span className="text-xs text-zinc-500">
@@ -109,7 +109,7 @@ export function ArrivalRsvp({ token, initialAttending, initialCount, maxCount, o
           type="button"
           disabled={busy}
           onClick={submit}
-          className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50"
+          className="w-full bg-brand text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50"
         >
           {busy ? t('Saving…') : t('Save response')}
         </button>

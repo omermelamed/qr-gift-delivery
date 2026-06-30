@@ -13,10 +13,8 @@ import { GiftOptionsEditor } from '@/components/admin/GiftOptionsEditor'
 import { ArrivalCertToggle } from '@/components/admin/ArrivalCertToggle'
 import { CampaignSmsTemplate } from '@/components/admin/CampaignSmsTemplate'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
-import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { CampaignNotes } from '@/components/admin/CampaignNotes'
-import { DepartmentBreakdown } from '@/components/admin/DepartmentBreakdown'
 import { DistributorStats } from '@/components/admin/DistributorStats'
 import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignButton'
 import { ReminderButton } from '@/components/admin/ReminderButton'
@@ -25,6 +23,8 @@ import { ArrivalSummary } from '@/components/admin/ArrivalSummary'
 import { CampaignDetailHeader } from '@/components/admin/CampaignDetailHeader'
 import { CreditIndicator } from '@/components/admin/CreditIndicator'
 import { ViewQrLink, ExportCsvLink } from '@/components/admin/CampaignActions'
+import { KebabMenu } from '@/components/admin/KebabMenu'
+import { MENU_ITEM, MENU_ITEM_DANGER } from '@/components/admin/menuItemStyles'
 
 export default async function CampaignDetailPage({
   params,
@@ -140,27 +140,31 @@ export default async function CampaignDetailPage({
       <CampaignDetailHeader
         campaignName={campaign.name}
         campaignDate={campaign.campaign_date}
+        sentAt={campaign.sent_at}
+        closedAt={campaign.closed_at}
       />
 
       <div className="flex items-start justify-between gap-4 mb-6">
         <div />
-        <div className="group flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
-          <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} />
-          {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter />}
-          <DuplicateCampaignButton
-            campaignId={campaign.id}
-            sourceName={campaign.name}
-            sourceDate={campaign.campaign_date}
-          />
-          {campaign.sent_at && <ViewQrLink campaignId={campaign.id} />}
-          {campaign.sent_at && <ExportCsvLink campaignId={campaign.id} />}
-          {campaign.sent_at && !campaign.closed_at && (
-            <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} />
-          )}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
           {canLaunch && (
             <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} creditBalance={creditBalance} />
           )}
+          <KebabMenu>
+            <DuplicateCampaignButton
+              campaignId={campaign.id}
+              sourceName={campaign.name}
+              sourceDate={campaign.campaign_date}
+              className={MENU_ITEM}
+            />
+            {campaign.sent_at && !campaign.closed_at && (
+              <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} className={MENU_ITEM} />
+            )}
+            {campaign.sent_at && <ViewQrLink campaignId={campaign.id} className={MENU_ITEM} />}
+            {campaign.sent_at && <ExportCsvLink campaignId={campaign.id} className={MENU_ITEM} />}
+            {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter className={MENU_ITEM_DANGER} />}
+          </KebabMenu>
         </div>
       </div>
 
@@ -179,7 +183,7 @@ export default async function CampaignDetailPage({
 
         {isDraft ? (
           <>
-            {/* Main column (2 cols): populator → employee table → breakdown.
+            {/* Main column (2 cols): populator → employee table.
                 Kept as one stacking column so the sidebar's height never pushes
                 these apart (grid rows would otherwise couple their heights). */}
             <div className="lg:col-span-2 flex flex-col gap-4">
@@ -193,7 +197,6 @@ export default async function CampaignDetailPage({
                 showAttendance={campaign.supports_arrival_certificates}
                 canEditAttendance={canEditGift}
               />
-              <DepartmentBreakdown tokens={allTokens} />
             </div>
 
             {/* Sidebar (1 col): config cards + notes, stacked independently. */}
@@ -207,7 +210,10 @@ export default async function CampaignDetailPage({
           </>
         ) : (
           <>
-            {/* Row 1: Progress + GiftBreakdown (2 cols) | Distributor (1 col) */}
+            {/* Main column (2 cols): arrival → progress → gifts → employees.
+                One stacking column (matching the draft view) so the sidebar's
+                height never interleaves with these via grid auto-flow, which
+                previously pushed the cards out of place. */}
             <div className="lg:col-span-2 flex flex-col gap-4">
               {campaign.supports_arrival_certificates && (
                 <ArrivalSummary tokens={allTokens} />
@@ -220,13 +226,6 @@ export default async function CampaignDetailPage({
               {gifts.length >= 2 && (
                 <GiftBreakdown gifts={gifts} tokens={allTokens} />
               )}
-            </div>
-            <div>
-              <DistributorAssignment campaignId={campaign.id} />
-            </div>
-
-            {/* Row 2: Employee table (2 cols) | Notes (1 col) */}
-            <div className="lg:col-span-2">
               <EmployeeTable
                 campaignId={campaign.id}
                 initialRows={allTokens}
@@ -237,15 +236,12 @@ export default async function CampaignDetailPage({
                 canEditAttendance={canEditGift}
               />
             </div>
-            <div className="lg:self-stretch">
+
+            {/* Sidebar (1 col): config + notes + stats, stacked independently. */}
+            <div className="flex flex-col gap-4">
+              <DistributorAssignment campaignId={campaign.id} />
               <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
-            </div>
-            <div>
               <DistributorStats campaignId={campaign.id} total={allTokens.length} />
-            </div>
-            {/* Row 3: Department breakdown (2 cols) */}
-            <div className="lg:col-span-2">
-              <DepartmentBreakdown tokens={allTokens} />
             </div>
           </>
         )}
