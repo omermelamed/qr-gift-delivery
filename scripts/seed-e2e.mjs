@@ -104,7 +104,7 @@ async function main() {
     arrCampaign = data
   }
   await admin.from('gift_tokens').delete().eq('campaign_id', arrCampaign.id)
-  await admin.from('gift_tokens').insert({ campaign_id: arrCampaign.id, employee_name: 'Dana Cohen', phone_number: '+972500000010', redeemed: false })
+  await admin.from('gift_tokens').insert({ campaign_id: arrCampaign.id, employee_name: 'Dana Cohen', phone_number: '+972500000010', redeemed: false, attending: true, attendee_count: 3 })
   const { data: arrTok } = await admin.from('gift_tokens').select('token').eq('campaign_id', arrCampaign.id).single()
 
   // --- Multi-gift campaign → "choose your gift" flow ---

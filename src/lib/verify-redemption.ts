@@ -12,6 +12,7 @@ export type VerifyCaller = { id: string; app_metadata?: JwtAppMetadata }
 export type VerifyOutcome =
   | { valid: true; employeeName: string; giftName: string | null }
   | { valid: true; needsGiftSelection: true; employeeName: string; gifts: GiftOption[] }
+  | { valid: true; needsArrivalCount: true; employeeName: string; plannedCount: number; giftName: string | null }
   | { valid: false; reason: 'invalid' }
   | { valid: false; reason: 'error' }
   | { valid: false; reason: 'campaign_closed' }
@@ -21,7 +22,8 @@ export type VerifyOutcome =
 export async function verifyAndRedeem(
   token: string,
   caller: VerifyCaller,
-  giftId: string | null = null
+  giftId: string | null = null,
+  arrivedCount: number | null = null
 ): Promise<VerifyOutcome> {
   const distributorId = caller.id
   const supabase = createServiceClient()
@@ -29,13 +31,13 @@ export async function verifyAndRedeem(
   // Fetch token row with campaign info in one query
   const { data: tokenRow } = await supabase
     .from('gift_tokens')
-    .select('id, employee_name, redeemed, campaign_id, gift_id, campaigns(closed_at, company_id, name)')
+    .select('id, employee_name, redeemed, campaign_id, gift_id, attending, attendee_count, campaigns(closed_at, company_id, name, supports_arrival_certificates)')
     .eq('token', token)
     .single()
 
   if (!tokenRow) return { valid: false, reason: 'invalid' }
 
-  const campaign = tokenRow.campaigns as unknown as { closed_at: string | null; company_id: string; name?: string } | null
+  const campaign = tokenRow.campaigns as unknown as { closed_at: string | null; company_id: string; name?: string; supports_arrival_certificates?: boolean } | null
   if (campaign?.closed_at) return { valid: false, reason: 'campaign_closed' }
 
   // Distributor restriction check — admins bypass it
@@ -102,18 +104,35 @@ export async function verifyAndRedeem(
   // Resolution order: employee's stored choice > scanner pick > single auto-stamp > none
   const resolvedGiftId = storedGiftId ?? giftId ?? (gifts.length === 1 ? gifts[0].id : null)
 
+  // Arrival-certificate campaigns: the distributor records how many people
+  // actually showed up before the token is redeemed. Defer like gift selection.
+  if (campaign?.supports_arrival_certificates && arrivedCount == null) {
+    const tr = tokenRow as unknown as { attending: boolean | null; attendee_count: number | null }
+    const plannedCount = tr.attending === true && tr.attendee_count ? tr.attendee_count : 1
+    return {
+      valid: true,
+      needsArrivalCount: true,
+      employeeName: tokenRow.employee_name,
+      plannedCount,
+      giftName: giftNameFor(resolvedGiftId),
+    }
+  }
+
   const updatePayload: {
     redeemed: true
     redeemed_at: string
     redeemed_by: string
     gift_id: string | null
     gift_chosen_at?: string
+    arrived_count?: number | null
   } = {
     redeemed: true,
     redeemed_at: new Date().toISOString(),
     redeemed_by: distributorId,
     gift_id: resolvedGiftId,
   }
+  // Record the actual headcount the distributor entered (arrival campaigns only).
+  if (arrivedCount != null) updatePayload.arrived_count = arrivedCount
   // Stamp choice time only when recording a gift the employee hadn't pre-chosen
   if (!storedGiftId && resolvedGiftId) {
     updatePayload.gift_chosen_at = new Date().toISOString()

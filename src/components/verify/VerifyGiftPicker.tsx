@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { ResultCard } from '@/components/verify/ResultCard'
+import { VerifyArrivalCount } from '@/components/verify/VerifyArrivalCount'
 import { useT } from '@/lib/i18n/useT'
 import type { GiftOption } from '@/types'
 
@@ -27,6 +28,8 @@ export function VerifyGiftPicker({
   const t = useT()
   const [busy, setBusy] = useState(false)
   const [result, setResult] = useState<RedeemResult | null>(null)
+  // Arrival campaign that's also multi-gift: after the gift, hand off to the count step.
+  const [arrival, setArrival] = useState<{ plannedCount: number; giftId: string } | null>(null)
 
   async function pick(giftId: string) {
     if (busy) return
@@ -38,7 +41,9 @@ export function VerifyGiftPicker({
         body: JSON.stringify({ giftId }),
       })
       const r = await res.json()
-      if (r.valid) {
+      if (r.valid && r.needsArrivalCount) {
+        setArrival({ plannedCount: r.plannedCount, giftId })
+      } else if (r.valid) {
         setResult({ ok: true, employeeName: r.employeeName, giftName: r.giftName ?? null })
       } else {
         setResult({ ok: false, reason: r.reason, employeeName: r.employeeName })
@@ -48,6 +53,17 @@ export function VerifyGiftPicker({
       setResult({ ok: false, reason: 'invalid' })
       setBusy(false)
     }
+  }
+
+  if (arrival) {
+    return (
+      <VerifyArrivalCount
+        token={token}
+        employeeName={employeeName}
+        plannedCount={arrival.plannedCount}
+        giftId={arrival.giftId}
+      />
+    )
   }
 
   if (result?.ok) {

@@ -8,7 +8,7 @@ describe('summarizeArrival', () => {
       { attending: true, attendee_count: 2 },
       { attending: true, attendee_count: 4 },
     ]
-    expect(summarizeArrival(rows)).toEqual({ approved: 3, totalArriving: 7, notComing: 0, noResponse: 0 })
+    expect(summarizeArrival(rows)).toEqual({ approved: 3, totalArriving: 7, notComing: 0, noResponse: 0, actualArrived: 0 })
   })
 
   it('separates not-coming and no-response, ignoring their counts', () => {
@@ -17,16 +17,25 @@ describe('summarizeArrival', () => {
       { attending: false, attendee_count: null },
       { attending: null, attendee_count: null },
     ]
-    expect(summarizeArrival(rows)).toEqual({ approved: 1, totalArriving: 2, notComing: 1, noResponse: 1 })
+    expect(summarizeArrival(rows)).toEqual({ approved: 1, totalArriving: 2, notComing: 1, noResponse: 1, actualArrived: 0 })
   })
 
   it('reflects an updated answer (not-coming -> coming with 2) in the totals', () => {
     // Same person after update: row now coming with 2.
     const afterUpdate = [{ attending: true, attendee_count: 2 }]
-    expect(summarizeArrival(afterUpdate)).toEqual({ approved: 1, totalArriving: 2, notComing: 0, noResponse: 0 })
+    expect(summarizeArrival(afterUpdate)).toEqual({ approved: 1, totalArriving: 2, notComing: 0, noResponse: 0, actualArrived: 0 })
+  })
+
+  it('sums actual headcounts recorded at pickup (planned 7, arrived 5)', () => {
+    const rows = [
+      { attending: true, attendee_count: 3, arrived_count: 2 },
+      { attending: true, attendee_count: 4, arrived_count: 3 },
+      { attending: true, attendee_count: 1, arrived_count: null }, // not yet handed over
+    ]
+    expect(summarizeArrival(rows)).toEqual({ approved: 3, totalArriving: 8, notComing: 0, noResponse: 0, actualArrived: 5 })
   })
 
   it('returns zeros for an empty campaign', () => {
-    expect(summarizeArrival([])).toEqual({ approved: 0, totalArriving: 0, notComing: 0, noResponse: 0 })
+    expect(summarizeArrival([])).toEqual({ approved: 0, totalArriving: 0, notComing: 0, noResponse: 0, actualArrived: 0 })
   })
 })

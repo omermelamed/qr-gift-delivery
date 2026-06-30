@@ -56,6 +56,7 @@ export type GiftToken = {
   gift_chosen_at: string | null
   attending: boolean | null
   attendee_count: number | null
+  arrived_count: number | null
   responded_at: string | null
 }
 
@@ -66,8 +67,9 @@ export type GiftOption = {
 }
 
 export type TokenVerifyResult =
-  | { valid: true; employeeName: string; needsGiftSelection?: false; giftName?: string | null }
-  | { valid: true; employeeName: string; needsGiftSelection: true; gifts: GiftOption[]; giftName?: string | null }
+  | { valid: true; employeeName: string; needsGiftSelection?: false; needsArrivalCount?: false; giftName?: string | null }
+  | { valid: true; employeeName: string; needsGiftSelection: true; needsArrivalCount?: false; gifts: GiftOption[]; giftName?: string | null }
+  | { valid: true; employeeName: string; needsGiftSelection?: false; needsArrivalCount: true; plannedCount: number; giftName?: string | null }
   | { valid: false; reason: 'already_used'; employeeName: string; giftName?: string | null }
   | { valid: false; reason: 'invalid' }
   | { valid: false; reason: 'campaign_closed' }

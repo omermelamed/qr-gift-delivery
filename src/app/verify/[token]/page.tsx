@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { ResultCard } from '@/components/verify/ResultCard'
 import { VerifyGiftPicker } from '@/components/verify/VerifyGiftPicker'
+import { VerifyArrivalCount } from '@/components/verify/VerifyArrivalCount'
 import { verifyAndRedeem } from '@/lib/verify-redemption'
 import type { JwtAppMetadata } from '@/types'
 
@@ -33,6 +34,16 @@ export default async function VerifyPage({
         token={token}
         employeeName={outcome.employeeName}
         gifts={outcome.gifts}
+      />
+    )
+  }
+
+  if (outcome.valid && 'needsArrivalCount' in outcome) {
+    return (
+      <VerifyArrivalCount
+        token={token}
+        employeeName={outcome.employeeName}
+        plannedCount={outcome.plannedCount}
       />
     )
   }
