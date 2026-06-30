@@ -1,4 +1,14 @@
 export const he: Record<string, string> = {
+  // Arrival headcount (scanner records who actually arrived)
+  'Handing over to': 'מוסרים ל',
+  'Planned': 'מתוכנן',
+  'How many people arrived?': 'כמה אנשים הגיעו?',
+  'Confirm handover': 'אישור מסירה',
+  'Fewer': 'פחות',
+  'More': 'עוד',
+  'Planned to arrive': 'תכננו להגיע',
+  'Actually arrived': 'הגיעו בפועל',
+  'Batch mode paused — headcount required': 'מצב אצווה הושהה — נדרש מספר משתתפים',
   // Pagination
   'Showing': 'מציג',
   'Prev': 'הקודם',

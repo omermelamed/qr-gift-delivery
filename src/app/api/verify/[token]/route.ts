@@ -18,11 +18,17 @@ export async function POST(
 
   const body = await request.json().catch(() => ({}))
   const giftId: string | null = body.giftId ?? null
+  // Actual arrived headcount (arrival-certificate campaigns). Clamp to a sane
+  // integer ≥ 1 when provided; null means "not entered yet".
+  const rawCount = Number(body.arrivedCount)
+  const arrivedCount: number | null =
+    body.arrivedCount != null && Number.isInteger(rawCount) && rawCount >= 1 ? rawCount : null
 
   const outcome = await verifyAndRedeem(
     token,
     { id: caller.id, app_metadata: caller.app_metadata as JwtAppMetadata | undefined },
-    giftId
+    giftId,
+    arrivedCount
   )
 
   // Preserve the prior 500 contract for a distributor-lookup DB failure

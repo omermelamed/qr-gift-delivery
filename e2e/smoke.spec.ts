@@ -80,4 +80,25 @@ test.describe('scanner (distributor)', () => {
   for (const path of ['/scan', '/scan/campaigns']) {
     test(`loads ${path}`, async ({ page }) => { await expectOk(page, path) })
   }
+
+  test('arrival campaign: records how many people actually arrived', async ({ page }) => {
+    let token: string | null = null
+    try { token = JSON.parse(readFileSync('e2e/.seed.json', 'utf8')).arrivalToken } catch { /* not seeded */ }
+    test.skip(!token, 'no arrival token — run npm run e2e:seed')
+
+    await page.goto(`/verify/${token}`)
+    // Deferred redemption: an arrival-cert campaign asks for a headcount first.
+    await expect(page.getByText('How many people arrived?')).toBeVisible()
+    // Dana Cohen RSVP'd attending +3, so the stepper pre-fills the planned count.
+    await expect(page.getByText('Planned: 3')).toBeVisible()
+    const count = page.locator('span.tabular-nums')
+    await expect(count).toHaveText('3')
+    // Only 2 of the 3 planned actually showed up.
+    await page.getByRole('button', { name: 'Fewer' }).click()
+    await expect(count).toHaveText('2')
+    await page.getByRole('button', { name: 'Confirm handover' }).click()
+    // Atomic redemption succeeds and the result card shows the recipient.
+    await expect(page.getByText('Gift collected!')).toBeVisible()
+    await expect(page.getByText('Dana Cohen')).toBeVisible()
+  })
 })

@@ -20,6 +20,7 @@ type TokenRow = {
   qr_image_url: string | null
   attending: boolean | null
   attendee_count: number | null
+  arrived_count: number | null
 }
 
 function maskPhone(phone: string): string {
@@ -449,12 +450,15 @@ export function EmployeeTable({
                         )}
                         {showAttendance && (
                           <td className="px-3 py-1.5">
-                            <AttendeeCountCell
-                              attending={row.attending}
-                              attendeeCount={row.attendee_count}
-                              editable={canEditAttendance}
-                              onChange={(value) => changeAttendance(row.id, value)}
-                            />
+                            <div className="flex items-center gap-1.5">
+                              <AttendeeCountCell
+                                attending={row.attending}
+                                attendeeCount={row.attendee_count}
+                                editable={canEditAttendance}
+                                onChange={(value) => changeAttendance(row.id, value)}
+                              />
+                              {row.arrived_count != null && <span className="text-xs text-green-600 font-medium">→ {row.arrived_count}</span>}
+                            </div>
                           </td>
                         )}
                         <td className="px-3 py-2.5">
@@ -525,12 +529,15 @@ export function EmployeeTable({
                       )}
                       {showAttendance && (
                         <td className="px-3 py-1.5">
-                          <AttendeeCountCell
-                            attending={r.attending}
-                            attendeeCount={r.attendee_count}
-                            editable={canEditAttendance}
-                            onChange={(value) => changeAttendance(r.id, value)}
-                          />
+                          <div className="flex items-center gap-1.5">
+                            <AttendeeCountCell
+                              attending={r.attending}
+                              attendeeCount={r.attendee_count}
+                              editable={canEditAttendance}
+                              onChange={(value) => changeAttendance(r.id, value)}
+                            />
+                            {r.arrived_count != null && <span className="text-xs text-green-600 font-medium">→ {r.arrived_count}</span>}
+                          </div>
                         </td>
                       )}
                       <td className="px-3 py-2.5">

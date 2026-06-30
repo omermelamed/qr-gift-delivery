@@ -73,7 +73,7 @@ export default async function CampaignDetailPage({
   const [tokensResult, employeesResult] = await Promise.all([
     service
       .from('gift_tokens')
-      .select('id, employee_name, phone_number, department, sms_sent_at, redeemed, redeemed_at, redeemed_by, gift_id, token, qr_image_url, attending, attendee_count')
+      .select('id, employee_name, phone_number, department, sms_sent_at, redeemed, redeemed_at, redeemed_by, gift_id, token, qr_image_url, attending, attendee_count, arrived_count')
       .eq('campaign_id', campaignId)
       .order('redeemed', { ascending: true })
       .order('employee_name', { ascending: true }),
@@ -103,6 +103,7 @@ export default async function CampaignDetailPage({
       qr_image_url: t.qr_image_url,
       attending: t.attending,
       attendee_count: t.attendee_count,
+      arrived_count: t.arrived_count,
     }
   })
 

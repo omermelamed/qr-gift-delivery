@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/browser'
 import { useT } from '@/lib/i18n/useT'
 import type { TokenVerifyResult, GiftOption, ScanOutcome, ScanHistoryEntry } from '@/types'
 
-type ScanState = 'scanning' | 'loading' | 'gift_selection' | 'result'
+type ScanState = 'scanning' | 'loading' | 'gift_selection' | 'arrival_count' | 'result'
 
 const TOKEN_PATTERN = /\/verify\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i
 
@@ -156,6 +156,10 @@ export default function ScanPage() {
   const [pendingEmployee, setPendingEmployee] = useState<string | null>(null)
   const [giftOptions, setGiftOptions] = useState<GiftOption[]>([])
   const [giftLoading, setGiftLoading] = useState(false)
+  // Arrival-count state (distributor records who actually arrived)
+  const [pendingGiftId, setPendingGiftId] = useState<string | null>(null)
+  const [plannedCount, setPlannedCount] = useState(1)
+  const [arrivedCount, setArrivedCount] = useState(1)
   const [isBatchMode, setIsBatchMode] = useState(false)
   const [showBatchSummary, setShowBatchSummary] = useState(false)
   const [batchToast, setBatchToast] = useState<string | null>(null)
@@ -226,6 +230,22 @@ export default function ScanPage() {
         return
       }
 
+      // Arrival campaign: distributor records the actual headcount before redeeming.
+      if (r.valid && r.needsArrivalCount) {
+        if (isBatchMode) {
+          setIsBatchMode(false)
+          setBatchToast(t('Batch mode paused — headcount required'))
+          setTimeout(() => setBatchToast(null), 3000)
+        }
+        setPendingToken(token)
+        setPendingEmployee(r.employeeName)
+        setPendingGiftId(null)
+        setPlannedCount(r.plannedCount)
+        setArrivedCount(r.plannedCount)
+        setScanState('arrival_count')
+        return
+      }
+
       const employeeName = r.valid
         ? r.employeeName
         : r.reason === 'already_used'
@@ -263,6 +283,15 @@ export default function ScanPage() {
       r = { valid: false, reason: 'invalid' }
     }
     setGiftLoading(false)
+    // Arrival campaign that's also multi-gift: after the gift, ask for headcount.
+    if (r.valid && r.needsArrivalCount) {
+      setPendingGiftId(giftId)
+      setPlannedCount(r.plannedCount)
+      setArrivedCount(r.plannedCount)
+      setGiftOptions([])
+      setScanState('arrival_count')
+      return
+    }
     const employeeName = r.valid ? r.employeeName : (r.reason === 'already_used' ? r.employeeName : null)
     setScanHistory((prev) => [{
       employeeName: employeeName ?? pendingEmployee,
@@ -274,6 +303,41 @@ export default function ScanPage() {
     setGiftOptions([])
     setResult(r)
     setScanState('result')
+  }
+
+  async function handleArrivalConfirm() {
+    if (!pendingToken) return
+    setGiftLoading(true)
+    let r: TokenVerifyResult = { valid: false, reason: 'invalid' }
+    try {
+      const res = await fetch(`/api/verify/${pendingToken}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ arrivedCount, ...(pendingGiftId ? { giftId: pendingGiftId } : {}) }),
+      })
+      r = await res.json()
+    } catch {
+      r = { valid: false, reason: 'invalid' }
+    }
+    setGiftLoading(false)
+    const employeeName = r.valid ? r.employeeName : (r.reason === 'already_used' ? r.employeeName : null)
+    setScanHistory((prev) => [{
+      employeeName: employeeName ?? pendingEmployee,
+      outcome: outcomeFromResult(r),
+      timestamp: new Date(),
+    }, ...prev].slice(0, 10))
+    setPendingToken(null)
+    setPendingEmployee(null)
+    setPendingGiftId(null)
+    setResult(r)
+    setScanState('result')
+  }
+
+  function handleCancelArrival() {
+    setPendingToken(null)
+    setPendingEmployee(null)
+    setPendingGiftId(null)
+    setScanState('scanning')
   }
 
   function handleDismiss() {
@@ -399,6 +463,45 @@ export default function ScanPage() {
               </div>
             )}
 
+            {/* Arrival headcount step */}
+            {scanState === 'arrival_count' && (
+              <div className="absolute inset-0 flex flex-col bg-zinc-900 px-6 pt-12 pb-8">
+                <p className="text-white/60 text-sm text-center mb-1">{t('Handing over to')}</p>
+                <p className="text-white text-2xl font-bold text-center mb-2">{pendingEmployee}</p>
+                <p className="text-white/50 text-xs text-center mb-8">{t('Planned')}: {plannedCount}</p>
+                <p className="text-white/80 text-sm font-medium text-center mb-6">{t('How many people arrived?')}</p>
+                <div className="flex items-center justify-center gap-8 flex-1">
+                  <button
+                    onClick={() => setArrivedCount((c) => Math.max(1, c - 1))}
+                    disabled={giftLoading || arrivedCount <= 1}
+                    aria-label={t('Fewer')}
+                    className="w-16 h-16 rounded-full bg-zinc-800 text-white text-3xl flex items-center justify-center disabled:opacity-40 active:scale-95 transition-transform"
+                  >−</button>
+                  <span className="text-white text-6xl font-bold tabular-nums w-24 text-center">{arrivedCount}</span>
+                  <button
+                    onClick={() => setArrivedCount((c) => c + 1)}
+                    disabled={giftLoading}
+                    aria-label={t('More')}
+                    className="w-16 h-16 rounded-full bg-indigo-600 text-white text-3xl flex items-center justify-center disabled:opacity-40 active:scale-95 transition-transform"
+                  >+</button>
+                </div>
+                <button
+                  onClick={handleArrivalConfirm}
+                  disabled={giftLoading}
+                  className="w-full py-4 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-lg font-semibold rounded-2xl disabled:opacity-50 active:scale-95 transition-transform"
+                >
+                  {giftLoading ? t('Saving…') : t('Confirm handover')}
+                </button>
+                <button
+                  onClick={handleCancelArrival}
+                  disabled={giftLoading}
+                  className="mt-4 text-white/40 text-sm text-center w-full"
+                >
+                  {t('Cancel scan')}
+                </button>
+              </div>
+            )}
+
             {/* Result takeover */}
             {scanState === 'result' && result && (
               <div
@@ -455,7 +558,7 @@ export default function ScanPage() {
             )}
 
             {/* Back to admin + Batch Mode button + History */}
-            {scanState !== 'result' && scanState !== 'gift_selection' && (
+            {scanState !== 'result' && scanState !== 'gift_selection' && scanState !== 'arrival_count' && (
               <>
                 <a
                   href={role === 'scanner' ? '/scan/campaigns' : '/admin'}
