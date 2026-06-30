@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
-import { getSmsProvider, buildGiftSmsBody } from '@/lib/sms'
-import { encodeToken } from '@/lib/short-token'
+import { getSmsProvider } from '@/lib/sms'
+import { planTokenMessages } from '@/lib/sms/dispatch'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
-import { resolveSmsTemplate, renderSmsTemplate } from '@/lib/sms-template'
+import { resolveSmsTemplate } from '@/lib/sms-template'
 
 const BATCH_SIZE = 50
 const DELAY_MS = 1000
@@ -67,20 +67,23 @@ export async function POST(
     return NextResponse.json({ dispatched: 0, failed: 0 })
   }
 
-  // Credit check for resend
-  const smsTokens = tokens.filter((t) => !!t.phone_number)
-  const smsCount = smsTokens.length
+  // Credit check for resend — charge by InforU segment, not per recipient.
+  const { plan, totalCredits, recipientCount } = planTokenMessages(tokens, {
+    campaignName: campaign.name,
+    effectiveTemplate,
+    appUrl: process.env.NEXT_PUBLIC_APP_URL ?? '',
+  })
 
-  if (smsCount > 0) {
+  if (totalCredits > 0) {
     const { data: credits } = await service
       .from('credits')
       .select('id, balance, total_used')
       .eq('company_id', companyId)
       .single()
 
-    if (!credits || credits.balance < smsCount) {
+    if (!credits || credits.balance < totalCredits) {
       return NextResponse.json(
-        { error: `Insufficient SMS credits: need ${smsCount}, have ${credits?.balance ?? 0}` },
+        { error: `Insufficient SMS credits: need ${totalCredits}, have ${credits?.balance ?? 0}` },
         { status: 402 }
       )
     }
@@ -88,12 +91,12 @@ export async function POST(
     const { error: reserveError } = await service
       .from('credits')
       .update({
-        total_used: credits.total_used + smsCount,
-        balance: credits.balance - smsCount,
+        total_used: credits.total_used + totalCredits,
+        balance: credits.balance - totalCredits,
         updated_at: new Date().toISOString(),
       })
       .eq('company_id', companyId)
-      .gte('balance', smsCount)
+      .gte('balance', totalCredits)
 
     if (reserveError) {
       return NextResponse.json({ error: 'Failed to reserve credits' }, { status: 402 })
@@ -101,9 +104,9 @@ export async function POST(
 
     await service.from('credit_transactions').insert({
       company_id: companyId,
-      amount: smsCount,
+      amount: totalCredits,
       type: 'use' as const,
-      description: `Campaign "${campaign.name}" resend — ${smsCount} SMS`,
+      description: `Campaign "${campaign.name}" resend — ${totalCredits} SMS to ${recipientCount} recipients`,
       created_by: user.id,
     })
   }
@@ -111,20 +114,14 @@ export async function POST(
   const smsProvider = getSmsProvider()
   let dispatched = 0
   let failed = 0
+  let failedCredits = 0
 
   for (let i = 0; i < tokens.length; i += BATCH_SIZE) {
     const batch = tokens.slice(i, i + BATCH_SIZE)
     const results = await Promise.allSettled(
       batch.map(async (token) => {
         if (token.phone_number) {
-          const giftLink = `${process.env.NEXT_PUBLIC_APP_URL}/gift/${encodeToken(token.token)}`
-          const body = effectiveTemplate
-            ? renderSmsTemplate(effectiveTemplate, { name: token.employee_name, link: giftLink })
-            : buildGiftSmsBody({
-                employeeName: token.employee_name,
-                holidayName: campaign.name,
-                giftLink,
-              })
+          const body = plan.get(token.id)?.body ?? ''
           const result = await smsProvider.send({ to: token.phone_number, body })
           if (result.status === 'failed') {
             throw new Error(result.error ?? 'SMS send failed')
@@ -137,17 +134,21 @@ export async function POST(
         if (sentError) throw new Error(sentError.message)
       })
     )
-    for (const r of results) {
+    results.forEach((r, j) => {
       if (r.status === 'fulfilled') dispatched++
-      else { failed++; console.error('[resend] token failed:', r.reason) }
-    }
+      else {
+        failed++
+        failedCredits += plan.get(batch[j].id)?.segments ?? 0
+        console.error('[resend] token failed:', r.reason)
+      }
+    })
     if (i + BATCH_SIZE < tokens.length) {
       await new Promise((r) => setTimeout(r, DELAY_MS))
     }
   }
 
-  // Refund credits for failed resends
-  if (failed > 0 && smsCount > 0) {
+  // Refund credits for failed resends (by segment count, mirroring the charge)
+  if (failedCredits > 0) {
     const { data: currentCredits } = await service
       .from('credits')
       .select('total_used, balance')
@@ -158,17 +159,17 @@ export async function POST(
       await service
         .from('credits')
         .update({
-          total_used: currentCredits.total_used - failed,
-          balance: currentCredits.balance + failed,
+          total_used: currentCredits.total_used - failedCredits,
+          balance: currentCredits.balance + failedCredits,
           updated_at: new Date().toISOString(),
         })
         .eq('company_id', companyId)
 
       await service.from('credit_transactions').insert({
         company_id: companyId,
-        amount: failed,
+        amount: failedCredits,
         type: 'refund' as const,
-        description: `Campaign "${campaign.name}" resend — ${failed} failed SMS refunded`,
+        description: `Campaign "${campaign.name}" resend — ${failed} failed SMS (${failedCredits} credits) refunded`,
         created_by: user.id,
       })
     }

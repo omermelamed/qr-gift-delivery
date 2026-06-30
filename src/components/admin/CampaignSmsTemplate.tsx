@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useT } from '@/lib/i18n/useT'
+import { SmsLengthHint } from '@/components/admin/SmsLengthHint'
 
 type Props = {
   campaignId: string
@@ -61,6 +62,7 @@ export function CampaignSmsTemplate({ campaignId, initial, companyDefault }: Pro
         {t('Use {name} for the recipient and {link} for the gift link.')}{' '}
         {t('Leave empty to use the default from Settings.')}
       </span>
+      <SmsLengthHint template={value} />
       {error && <span className="text-xs text-red-500">{error}</span>}
       <button
         type="button"
