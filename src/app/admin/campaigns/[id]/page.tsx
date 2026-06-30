@@ -83,6 +83,20 @@ export default async function CampaignDetailPage({
       .eq('company_id', companyId),
   ])
 
+  // Fail loudly: a broken gift_tokens query (e.g. a column added in code but not
+  // yet migrated to the DB) must surface as an error, not silently render an
+  // empty employee table that looks like data loss. PostgREST messages name the
+  // offending column, not any token value, so they are safe to log.
+  if (tokensResult.error) {
+    console.error(`[campaign ${campaignId}] failed to load gift_tokens:`, tokensResult.error.message)
+    throw new Error(`Failed to load campaign employees: ${tokensResult.error.message}`)
+  }
+  if (employeesResult.error) {
+    // Non-fatal: employees only enrich name/phone/department; tokens carry their
+    // own copy. Log it so the degraded enrichment is visible.
+    console.error(`[campaign ${campaignId}] failed to load employees:`, employeesResult.error.message)
+  }
+
   const employees = employeesResult.data ?? []
   const empByName = new Map(employees.map((e) => [e.employee_name, e]))
   const empByPhone = new Map(employees.filter((e) => e.phone).map((e) => [e.phone!, e]))
