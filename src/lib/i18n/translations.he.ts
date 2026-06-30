@@ -181,6 +181,11 @@ export const he: Record<string, string> = {
   'Saving…': 'שומר…',
   'Save': 'שמור',
   'Template must contain {link}': 'תבנית חייבת להכיל {link}',
+  // SMS length / billing hint
+  'Est.': 'בערך',
+  '1 SMS': 'הודעת SMS אחת',
+  'SMS messages': 'הודעות SMS',
+  'charged as multiple messages': 'מחויב כמספר הודעות',
 
   // Admin campaigns/new
   '← Campaigns': '→ קמפיינים',
