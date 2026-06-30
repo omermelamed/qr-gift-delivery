@@ -16,7 +16,6 @@ import { EmployeeTable } from '@/components/admin/EmployeeTable'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { CampaignNotes } from '@/components/admin/CampaignNotes'
-import { DepartmentBreakdown } from '@/components/admin/DepartmentBreakdown'
 import { DistributorStats } from '@/components/admin/DistributorStats'
 import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignButton'
 import { ReminderButton } from '@/components/admin/ReminderButton'
@@ -179,7 +178,7 @@ export default async function CampaignDetailPage({
 
         {isDraft ? (
           <>
-            {/* Main column (2 cols): populator → employee table → breakdown.
+            {/* Main column (2 cols): populator → employee table.
                 Kept as one stacking column so the sidebar's height never pushes
                 these apart (grid rows would otherwise couple their heights). */}
             <div className="lg:col-span-2 flex flex-col gap-4">
@@ -193,7 +192,6 @@ export default async function CampaignDetailPage({
                 showAttendance={campaign.supports_arrival_certificates}
                 canEditAttendance={canEditGift}
               />
-              <DepartmentBreakdown tokens={allTokens} />
             </div>
 
             {/* Sidebar (1 col): config cards + notes, stacked independently. */}
@@ -207,10 +205,10 @@ export default async function CampaignDetailPage({
           </>
         ) : (
           <>
-            {/* Main column (2 cols): arrival → progress → gifts → employees →
-                breakdown. One stacking column (matching the draft view) so the
-                sidebar's height never interleaves with these via grid auto-flow,
-                which previously pushed the breakdown and stats out of place. */}
+            {/* Main column (2 cols): arrival → progress → gifts → employees.
+                One stacking column (matching the draft view) so the sidebar's
+                height never interleaves with these via grid auto-flow, which
+                previously pushed the cards out of place. */}
             <div className="lg:col-span-2 flex flex-col gap-4">
               {campaign.supports_arrival_certificates && (
                 <ArrivalSummary tokens={allTokens} />
@@ -232,7 +230,6 @@ export default async function CampaignDetailPage({
                 showAttendance={campaign.supports_arrival_certificates}
                 canEditAttendance={canEditGift}
               />
-              <DepartmentBreakdown tokens={allTokens} />
             </div>
 
             {/* Sidebar (1 col): config + notes + stats, stacked independently. */}
