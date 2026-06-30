@@ -207,7 +207,10 @@ export default async function CampaignDetailPage({
           </>
         ) : (
           <>
-            {/* Row 1: Progress + GiftBreakdown (2 cols) | Distributor (1 col) */}
+            {/* Main column (2 cols): arrival → progress → gifts → employees →
+                breakdown. One stacking column (matching the draft view) so the
+                sidebar's height never interleaves with these via grid auto-flow,
+                which previously pushed the breakdown and stats out of place. */}
             <div className="lg:col-span-2 flex flex-col gap-4">
               {campaign.supports_arrival_certificates && (
                 <ArrivalSummary tokens={allTokens} />
@@ -220,13 +223,6 @@ export default async function CampaignDetailPage({
               {gifts.length >= 2 && (
                 <GiftBreakdown gifts={gifts} tokens={allTokens} />
               )}
-            </div>
-            <div>
-              <DistributorAssignment campaignId={campaign.id} />
-            </div>
-
-            {/* Row 2: Employee table (2 cols) | Notes (1 col) */}
-            <div className="lg:col-span-2">
               <EmployeeTable
                 campaignId={campaign.id}
                 initialRows={allTokens}
@@ -236,16 +232,14 @@ export default async function CampaignDetailPage({
                 showAttendance={campaign.supports_arrival_certificates}
                 canEditAttendance={canEditGift}
               />
-            </div>
-            <div className="lg:self-stretch">
-              <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
-            </div>
-            <div>
-              <DistributorStats campaignId={campaign.id} total={allTokens.length} />
-            </div>
-            {/* Row 3: Department breakdown (2 cols) */}
-            <div className="lg:col-span-2">
               <DepartmentBreakdown tokens={allTokens} />
+            </div>
+
+            {/* Sidebar (1 col): config + notes + stats, stacked independently. */}
+            <div className="flex flex-col gap-4">
+              <DistributorAssignment campaignId={campaign.id} />
+              <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
+              <DistributorStats campaignId={campaign.id} total={allTokens.length} />
             </div>
           </>
         )}
