@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { makeServiceFrom } from '../helpers/supabase-mock'
 
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
@@ -78,30 +79,29 @@ describe('POST /api/team/invite', () => {
     expect(res.status).toBe(401)
   })
 
-  it('asserts user_company_roles insert is called on success', async () => {
-    let ucrInserted: unknown = null
-    mockFromService.mockImplementation((table: string) => {
-      if (table === 'roles') {
-        return { select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'role-scanner' }, error: null }) }) }) }) }
-      }
-      return { insert: (row: unknown) => { ucrInserted = row; return Promise.resolve({ error: null }) } }
+  it('upserts the user_company_roles row on success', async () => {
+    const from = makeServiceFrom({
+      roles: { data: { id: 'role-scanner' }, error: null },
+      user_company_roles: { error: null },
+      employees: { data: null, error: null },
     })
+    mockFromService.mockImplementation(from)
     mockInviteUser.mockResolvedValue({ data: { user: { id: 'new-user-1' } }, error: null })
     mockUpdateUser.mockResolvedValue({ data: {}, error: null })
 
     const { POST } = await import('@/app/api/team/invite/route')
     await POST(makeRequest({ email: 'scanner@co.com', role_name: 'scanner' }))
 
+    const ucrInserted = (from.builders.user_company_roles.upsert as ReturnType<typeof vi.fn>).mock.calls[0][0]
     expect(ucrInserted).toMatchObject({ user_id: 'new-user-1', company_id: 'co-1', role_id: 'role-scanner' })
   })
 
   it('invites user, sets app_metadata, inserts user_company_roles', async () => {
-    mockFromService.mockImplementation((table: string) => {
-      if (table === 'roles') {
-        return { select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'role-scanner' }, error: null }) }) }) }) }
-      }
-      return { insert: () => Promise.resolve({ error: null }) }
-    })
+    mockFromService.mockImplementation(makeServiceFrom({
+      roles: { data: { id: 'role-scanner' }, error: null },
+      user_company_roles: { error: null },
+      employees: { data: null, error: null },
+    }))
     mockInviteUser.mockResolvedValue({ data: { user: { id: 'new-user-1' } }, error: null })
     mockUpdateUser.mockResolvedValue({ data: {}, error: null })
 

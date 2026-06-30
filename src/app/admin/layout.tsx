@@ -60,7 +60,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             href="/platform"
             className="text-white/90 hover:text-white font-medium underline underline-offset-2 transition-colors"
           >
-            ← Back to Platform
+            <span className="inline-block rtl:rotate-180">←</span> Back to Platform
           </a>
         </div>
       )}

@@ -152,9 +152,9 @@ export default function EmployeesPage() {
                   ) : (
                     <>
                       <td className="px-5 py-3 font-medium text-zinc-900">{e.employee_name}</td>
-                      <td className="px-5 py-3 font-mono text-xs text-zinc-500" dir="ltr">
+                      <td className="px-5 py-3 font-mono text-xs text-zinc-500">
                         {e.phone
-                          ? maskPhone(e.phone)
+                          ? <span dir="ltr">{maskPhone(e.phone)}</span>
                           : <button onClick={() => startEdit(e)} className="text-xs text-amber-500 hover:text-amber-600 font-medium">{t('+ Add phone')}</button>
                         }
                       </td>

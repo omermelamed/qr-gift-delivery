@@ -57,3 +57,12 @@ next-env.d.ts
 
 # Supabase temp
 supabase/.temp/
+
+# E2E / Playwright
+e2e/.auth/
+test-results/
+playwright-report/
+supabase/.migrations-hold/
+supabase/.branches/
+supabase/.temp/
+e2e/.seed.json

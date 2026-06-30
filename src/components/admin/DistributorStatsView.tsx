@@ -16,7 +16,7 @@ export function DistributorStatsView({ rows, total }: Props) {
         {rows.map(({ userId, name, count }) => (
           <div key={userId} className="flex items-center justify-between text-sm">
             <span className="text-zinc-700 truncate">{name}</span>
-            <span className="text-zinc-500 flex-shrink-0 ml-2">
+            <span className="text-zinc-500 flex-shrink-0 ms-2">
               {count} {count !== 1 ? t('gifts') : t('gift')} · {total > 0 ? Math.round((count / total) * 100) : 0}%
             </span>
           </div>

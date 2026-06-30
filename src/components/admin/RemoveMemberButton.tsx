@@ -40,7 +40,7 @@ export function RemoveMemberButton({ userId, name }: Props) {
 
   return (
     <>
-      {error && <span className="text-xs text-red-500 mr-1">{error}</span>}
+      {error && <span className="text-xs text-red-500 me-1">{error}</span>}
       <button
         onClick={() => { setError(null); setShowModal(true) }}
         aria-label={`Remove ${name}`}

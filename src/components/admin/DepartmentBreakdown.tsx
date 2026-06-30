@@ -32,7 +32,7 @@ export function DepartmentBreakdown({ tokens }: Props) {
           <div key={dept}>
             <div className="flex items-center justify-between text-sm mb-1">
               <span className="text-zinc-700 font-medium truncate">{dept}</span>
-              <span className="text-zinc-400 text-xs flex-shrink-0 ml-2">{claimed}/{total} · {pct}%</span>
+              <span className="text-zinc-400 text-xs flex-shrink-0 ms-2">{claimed}/{total} · {pct}%</span>
             </div>
             <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
               <div

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { makeServiceFrom } from '../helpers/supabase-mock'
 
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
@@ -57,18 +58,12 @@ describe('POST /api/campaigns/[id]/resend', () => {
   })
 
   it('returns dispatched=0 when no unclaimed tokens', async () => {
-    let callCount = 0
-    mockFromService.mockImplementation(() => {
-      callCount++
-      if (callCount === 1) {
-        return {
-          select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', name: 'Test' }, error: null }) }) }) }),
-        }
-      }
-      return {
-        select: () => ({ eq: () => ({ eq: () => Promise.resolve({ data: [], error: null }) }) }),
-      }
-    })
+    mockFromService.mockImplementation(makeServiceFrom({
+      campaigns: { data: { id: 'c-1', name: 'Test', company_id: 'company-1' }, error: null },
+      companies: { data: { sms_template: null }, error: null },
+      gift_tokens: { data: [], error: null },
+      credits: { data: { id: 'cr-1', balance: 1000, total_used: 0 }, error: null },
+    }))
     const { POST } = await import('@/app/api/campaigns/[id]/resend/route')
     const res = await POST(makeRequest('c-1'), { params: Promise.resolve({ id: 'c-1' }) })
     const body = await res.json()
@@ -77,28 +72,13 @@ describe('POST /api/campaigns/[id]/resend', () => {
   })
 
   it('dispatches to unclaimed tokens in mock mode and does not call sendGiftMMS', async () => {
-    let callCount = 0
-    mockFromService.mockImplementation(() => {
-      callCount++
-      if (callCount === 1) {
-        return {
-          select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', name: 'Passover 2026' }, error: null }) }) }) }),
-        }
-      }
-      if (callCount === 2) {
-        return {
-          select: () => ({
-            eq: () => ({
-              eq: () => Promise.resolve({
-                data: [{ id: 't-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: 'https://example.com/qr.png' }],
-                error: null,
-              }),
-            }),
-          }),
-        }
-      }
-      return { update: () => ({ eq: () => Promise.resolve({ error: null }) }) }
-    })
+    mockFromService.mockImplementation(makeServiceFrom({
+      campaigns: { data: { id: 'c-1', name: 'Passover 2026', company_id: 'company-1' }, error: null },
+      companies: { data: { sms_template: null }, error: null },
+      gift_tokens: { data: [{ id: 't-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: 'https://example.com/qr.png' }], error: null },
+      credits: { data: { id: 'cr-1', balance: 1000, total_used: 0 }, error: null },
+      credit_transactions: { data: null, error: null },
+    }))
 
     const { POST } = await import('@/app/api/campaigns/[id]/resend/route')
     const res = await POST(makeRequest('c-1'), { params: Promise.resolve({ id: 'c-1' }) })

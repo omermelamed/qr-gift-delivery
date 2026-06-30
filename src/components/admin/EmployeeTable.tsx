@@ -78,8 +78,8 @@ function EmployeeQrModal({
         />
 
         {target.phone_number && (
-          <p className="text-sm text-zinc-400 font-mono" dir="ltr">
-            {maskPhone(target.phone_number)}
+          <p className="text-sm text-zinc-400 font-mono">
+            <span dir="ltr">{maskPhone(target.phone_number)}</span>
           </p>
         )}
 
@@ -185,6 +185,8 @@ function AttendeeCountCell({
   )
 }
 
+const PAGE_SIZE = 30
+
 export function EmployeeTable({
   campaignId,
   initialRows,
@@ -208,6 +210,7 @@ export function EmployeeTable({
   // Sync rows when the server re-renders via router.refresh() (e.g. after populate)
   useEffect(() => { setRows(initialRows) }, [initialRows])
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
   const [showAddModal, setShowAddModal] = useState(false)
   const [enlarged, setEnlarged] = useState<(TokenRow & { qr_image_url: string }) | null>(null)
   const closeQr = useCallback(() => setEnlarged(null), [])
@@ -333,6 +336,12 @@ export function EmployeeTable({
       })
     : rows
 
+  // Client-side pagination of the flat view so 1000+ tokens render ~30 at a time.
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE))
+  const currentPage = Math.min(page, totalPages)
+  const pageStart = (currentPage - 1) * PAGE_SIZE
+  const pageRows = filteredRows.slice(pageStart, pageStart + PAGE_SIZE)
+
   type GroupHeader = { _type: 'header'; department: string; claimed: number; total: number }
   type TableRow = TokenRow | GroupHeader
 
@@ -370,7 +379,7 @@ export function EmployeeTable({
               type="text"
               placeholder={t('Search employees…')}
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(1) }}
               className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm w-full sm:w-48 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
             />
             <button
@@ -425,7 +434,7 @@ export function EmployeeTable({
                         className={`border-b border-zinc-50 transition-colors duration-500 ${row.redeemed ? 'bg-green-50' : 'hover:bg-zinc-50'}`}
                       >
                         <td className="px-3 py-2.5 font-medium text-zinc-800">{row.employee_name}</td>
-                        <td className="px-3 py-2.5 font-mono text-xs text-zinc-500" dir="ltr">{row.phone_number ? maskPhone(row.phone_number) : <span className="text-zinc-300">—</span>}</td>
+                        <td className="px-3 py-2.5 font-mono text-xs text-zinc-500">{row.phone_number ? <span dir="ltr">{maskPhone(row.phone_number)}</span> : <span className="text-zinc-300">—</span>}</td>
                         <td className="px-3 py-2.5 text-zinc-500">{row.department ?? <span className="text-zinc-300">—</span>}</td>
                         {showGiftCol && (
                           <td className="px-3 py-1.5">
@@ -495,7 +504,7 @@ export function EmployeeTable({
                       </tr>
                     )
                   )
-                : filteredRows.map((r) => (
+                : pageRows.map((r) => (
                     <tr
                       key={r.id}
                       className={`border-b border-zinc-50 transition-colors duration-500 ${r.redeemed ? 'bg-green-50' : 'hover:bg-zinc-50'}`}
@@ -582,6 +591,29 @@ export function EmployeeTable({
             </tbody>
           </table>
         </div>
+
+        {!groupByDept && filteredRows.length > PAGE_SIZE && (
+          <div className="flex items-center justify-between gap-3 pt-4 mt-1 border-t border-zinc-100 text-sm text-zinc-500">
+            <span>{t('Showing')} {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filteredRows.length)} {t('of')} {filteredRows.length}</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage <= 1}
+                className="border border-zinc-200 rounded-lg px-3 py-1 font-medium text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-40"
+              >
+                {t('Prev')}
+              </button>
+              <span className="tabular-nums">{currentPage} / {totalPages}</span>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage >= totalPages}
+                className="border border-zinc-200 rounded-lg px-3 py-1 font-medium text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-40"
+              >
+                {t('Next')}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {showAddModal && (

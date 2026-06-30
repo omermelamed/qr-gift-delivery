@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { makeServiceFrom } from '../helpers/supabase-mock'
 
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
@@ -95,22 +96,12 @@ describe('POST /api/campaigns/[id]/employees', () => {
   })
 
   it('inserts single employee and returns token id', async () => {
-    let inserted: unknown = null
-    let callCount = 0
-    mockFromService.mockImplementation(() => {
-      callCount++
-      if (callCount === 1) {
-        return {
-          select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null }, error: null }) }) }) }),
-        }
-      }
-      return {
-        insert: (row: unknown) => {
-          inserted = row
-          return { select: () => ({ single: () => Promise.resolve({ data: { id: 'token-1' }, error: null }) }) }
-        },
-      }
+    const from = makeServiceFrom({
+      campaigns: { data: { id: 'c-1', sent_at: null }, error: null },
+      employees: { data: null, error: null },
+      gift_tokens: { data: { id: 'token-1' }, error: null },
     })
+    mockFromService.mockImplementation(from)
 
     const { POST } = await import('@/app/api/campaigns/[id]/employees/route')
     const res = await POST(
@@ -121,31 +112,23 @@ describe('POST /api/campaigns/[id]/employees', () => {
     expect(res.status).toBe(201)
     const body = await res.json()
     expect(body.id).toBe('token-1')
-    expect((inserted as { employee_name: string }).employee_name).toBe('Omer')
-    expect((inserted as { phone_number: string }).phone_number).toBe('+972501234567')
-    expect((inserted as { department: string }).department).toBe('Engineering')
+    const inserted = (from.builders.gift_tokens.insert as ReturnType<typeof vi.fn>).mock.calls[0][0] as Record<string, string>
+    expect(inserted.employee_name).toBe('Omer')
+    expect(inserted.phone_number).toBe('+972501234567')
+    expect(inserted.department).toBe('Engineering')
   })
 
   it('normalises Israeli local phone to E.164', async () => {
-    let inserted: unknown = null
-    let callCount = 0
-    mockFromService.mockImplementation(() => {
-      callCount++
-      if (callCount === 1) {
-        return {
-          select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null }, error: null }) }) }) }),
-        }
-      }
-      return {
-        insert: (row: unknown) => {
-          inserted = row
-          return { select: () => ({ single: () => Promise.resolve({ data: { id: 'token-1' }, error: null }) }) }
-        },
-      }
+    const from = makeServiceFrom({
+      campaigns: { data: { id: 'c-1', sent_at: null }, error: null },
+      employees: { data: null, error: null },
+      gift_tokens: { data: { id: 'token-1' }, error: null },
     })
+    mockFromService.mockImplementation(from)
 
     const { POST } = await import('@/app/api/campaigns/[id]/employees/route')
     await POST(makeRequest('c-1', { name: 'Dana', phone_number: '050-123-4567' }), { params: Promise.resolve({ id: 'c-1' }) })
-    expect((inserted as { phone_number: string }).phone_number).toBe('+972501234567')
+    const inserted = (from.builders.gift_tokens.insert as ReturnType<typeof vi.fn>).mock.calls[0][0] as Record<string, string>
+    expect(inserted.phone_number).toBe('+972501234567')
   })
 })

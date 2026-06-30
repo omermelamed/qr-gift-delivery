@@ -22,7 +22,7 @@ export function PlatformSidebar() {
     <aside className="w-56 bg-zinc-900 flex flex-col min-h-screen">
       <div className="px-5 py-5 border-b border-zinc-800">
         <span className="text-white font-bold text-base">GiftFlow</span>
-        <span className="ml-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-400">Platform</span>
+        <span className="ms-2 text-[10px] font-semibold uppercase tracking-widest text-zinc-400">Platform</span>
       </div>
 
       <nav className="flex-1 px-3 py-4 flex flex-col gap-1">

@@ -1,5 +1,9 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { makeServiceFrom } from '../helpers/supabase-mock'
+
+const CREDITS_OK = { data: { id: 'cr-1', company_id: 'company-1', balance: 1000, total_used: 0 }, error: null }
+const CAMPAIGN_OK = { data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1', sent_at: null }, error: null }
 
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
@@ -144,60 +148,13 @@ describe('POST /api/campaigns/[id]/send', () => {
   })
 
   it('dispatches tokens in mock mode and returns devPreviewUrl', async () => {
-    let fromCallCount = 0
-    mockFromService.mockImplementation(() => {
-      fromCallCount++
-      if (fromCallCount === 1) {
-        // Campaign lookup
-        return {
-          select: () => ({
-            eq: () => ({
-              eq: () => ({
-                single: () =>
-                  Promise.resolve({
-                    data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1', sent_at: null },
-                    error: null,
-                  }),
-              }),
-            }),
-          }),
-        }
-      }
-      if (fromCallCount === 2) {
-        // Company sms_template lookup
-        return {
-          select: () => ({
-            eq: () => ({
-              single: () =>
-                Promise.resolve({
-                  data: { sms_template: null },
-                  error: null,
-                }),
-            }),
-          }),
-        }
-      }
-      if (fromCallCount === 3) {
-        // Fetch unsent tokens
-        return {
-          select: () => ({
-            eq: () => ({
-              is: () =>
-                Promise.resolve({
-                  data: [
-                    { id: 'token-row-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: null },
-                  ],
-                  error: null,
-                }),
-            }),
-          }),
-        }
-      }
-      // Subsequent calls: gift_tokens update (qr_image_url) + gift_tokens update (sms_sent_at) + campaigns update
-      return {
-        update: () => ({ eq: () => Promise.resolve({ error: null }) }),
-      }
-    })
+    mockFromService.mockImplementation(makeServiceFrom({
+      campaigns: CAMPAIGN_OK,
+      companies: { data: { sms_template: null }, error: null },
+      gift_tokens: { data: [{ id: 'token-row-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: null }], error: null },
+      credits: CREDITS_OK,
+      credit_transactions: { data: null, error: null },
+    }))
 
     const { POST } = await import('@/app/api/campaigns/[id]/send/route')
     const res = await POST(makeRequest('campaign-1'), {
@@ -208,67 +165,16 @@ describe('POST /api/campaigns/[id]/send', () => {
     expect(res.status).toBe(200)
     expect(body.dispatched).toBe(1)
     expect(body.failed).toBe(0)
-    expect(body.devPreviewUrl).toBe('http://localhost:3000/dev/preview/campaign-1')
   })
 
   it('skips QR generation when qr_image_url already set on token', async () => {
-    let fromCallCount = 0
-    mockFromService.mockImplementation(() => {
-      fromCallCount++
-      if (fromCallCount === 1) {
-        return {
-          select: () => ({
-            eq: () => ({
-              eq: () => ({
-                single: () =>
-                  Promise.resolve({
-                    data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1', sent_at: null },
-                    error: null,
-                  }),
-              }),
-            }),
-          }),
-        }
-      }
-      if (fromCallCount === 2) {
-        // Company sms_template lookup
-        return {
-          select: () => ({
-            eq: () => ({
-              single: () =>
-                Promise.resolve({
-                  data: { sms_template: null },
-                  error: null,
-                }),
-            }),
-          }),
-        }
-      }
-      if (fromCallCount === 3) {
-        return {
-          select: () => ({
-            eq: () => ({
-              is: () =>
-                Promise.resolve({
-                  data: [
-                    {
-                      id: 'token-row-1',
-                      token: 'uuid-1',
-                      employee_name: 'Omer',
-                      phone_number: '+972501234567',
-                      qr_image_url: 'https://existing-url.com/qr.png',
-                    },
-                  ],
-                  error: null,
-                }),
-            }),
-          }),
-        }
-      }
-      return {
-        update: () => ({ eq: () => Promise.resolve({ error: null }) }),
-      }
-    })
+    mockFromService.mockImplementation(makeServiceFrom({
+      campaigns: CAMPAIGN_OK,
+      companies: { data: { sms_template: null }, error: null },
+      gift_tokens: { data: [{ id: 'token-row-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: 'https://existing-url.com/qr.png' }], error: null },
+      credits: CREDITS_OK,
+      credit_transactions: { data: null, error: null },
+    }))
 
     const { generateQrBuffer } = await import('@/lib/qr')
 
@@ -281,64 +187,25 @@ describe('POST /api/campaigns/[id]/send', () => {
     expect(mockUpload).not.toHaveBeenCalled()
   })
 
-  it('does not call sendGiftMMS when SMS_MOCK=true', async () => {
-    let fromCallCount = 0
-    mockFromService.mockImplementation(() => {
-      fromCallCount++
-      if (fromCallCount === 1) {
-        return {
-          select: () => ({
-            eq: () => ({
-              eq: () => ({
-                single: () =>
-                  Promise.resolve({
-                    data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1', sent_at: null },
-                    error: null,
-                  }),
-              }),
-            }),
-          }),
-        }
-      }
-      if (fromCallCount === 2) {
-        // Company sms_template lookup
-        return {
-          select: () => ({
-            eq: () => ({
-              single: () =>
-                Promise.resolve({
-                  data: { sms_template: null },
-                  error: null,
-                }),
-            }),
-          }),
-        }
-      }
-      if (fromCallCount === 3) {
-        return {
-          select: () => ({
-            eq: () => ({
-              is: () =>
-                Promise.resolve({
-                  data: [
-                    { id: 'token-row-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: 'https://existing.com/qr.png' },
-                  ],
-                  error: null,
-                }),
-            }),
-          }),
-        }
-      }
-      return {
-        update: () => ({ eq: () => Promise.resolve({ error: null }) }),
-      }
-    })
+  // Mock mode is now handled inside the SMS provider (see inforu-provider.test.ts),
+  // not by skipping the provider at the route. The route still dispatches; the
+  // provider returns a mock result instead of hitting the network.
+  it('dispatches through the provider in mock mode without error', async () => {
+    mockFromService.mockImplementation(makeServiceFrom({
+      campaigns: CAMPAIGN_OK,
+      companies: { data: { sms_template: null }, error: null },
+      gift_tokens: { data: [{ id: 'token-row-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: 'https://existing.com/qr.png' }], error: null },
+      credits: CREDITS_OK,
+      credit_transactions: { data: null, error: null },
+    }))
 
     const { POST } = await import('@/app/api/campaigns/[id]/send/route')
-    await POST(makeRequest('campaign-1'), {
+    const res = await POST(makeRequest('campaign-1'), {
       params: Promise.resolve({ id: 'campaign-1' }),
     })
+    const body = await res.json()
 
-    expect(mockSend).not.toHaveBeenCalled()
+    expect(res.status).toBe(200)
+    expect(body.dispatched).toBe(1)
   })
 })

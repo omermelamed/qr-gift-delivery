@@ -95,7 +95,7 @@ export function DistributorAssignment({ campaignId }: { campaignId: string }) {
         </button>
 
         {showPicker && (
-          <div className="absolute top-6 left-0 z-20 bg-white border border-zinc-200 rounded-xl shadow-lg p-2 w-64">
+          <div className="absolute top-6 start-0 z-20 bg-white border border-zinc-200 rounded-xl shadow-lg p-2 w-64">
             {availableScanners.length === 0 ? (
               <p className="text-sm text-zinc-400 px-2 py-1">{t('No available scanners')}</p>
             ) : (

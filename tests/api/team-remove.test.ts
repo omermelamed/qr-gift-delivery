@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { makeServiceFrom } from '../helpers/supabase-mock'
 
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
@@ -70,24 +71,26 @@ describe('DELETE /api/team/members/[userId]', () => {
   })
 
   it('returns 500 when delete from user_company_roles fails', async () => {
-    mockFromService.mockReturnValue({
-      delete: () => ({ eq: () => ({ eq: () => Promise.resolve({ error: { message: 'db error' } }) }) }),
-    })
+    mockFromService.mockImplementation(makeServiceFrom({
+      user_company_roles: { data: null, error: { message: 'db error' } },
+    }))
     const { DELETE } = await import('@/app/api/team/members/[userId]/route')
     const res = await DELETE(makeRequest('u-2'), { params: Promise.resolve({ userId: 'u-2' }) })
     expect(res.status).toBe(500)
   })
 
   it('removes user from user_company_roles and clears app_metadata', async () => {
-    mockFromService.mockReturnValue({
-      delete: () => ({ eq: () => ({ eq: () => Promise.resolve({ error: null }) }) }),
-    })
+    mockFromService.mockImplementation(makeServiceFrom({
+      user_company_roles: { data: [{ user_id: 'u-2' }], error: null },
+      employees: { error: null },
+    }))
     mockUpdateUser.mockResolvedValue({ data: {}, error: null })
 
     const { DELETE } = await import('@/app/api/team/members/[userId]/route')
     const res = await DELETE(makeRequest('u-2'), { params: Promise.resolve({ userId: 'u-2' }) })
 
     expect(res.status).toBe(200)
-    expect(mockUpdateUser).toHaveBeenCalledWith('u-2', { app_metadata: {} })
+    // Route now clears app_metadata with explicit nulls (was an empty object before).
+    expect(mockUpdateUser).toHaveBeenCalledWith('u-2', { app_metadata: { company_id: null, role_id: null, role_name: null } })
   })
 })

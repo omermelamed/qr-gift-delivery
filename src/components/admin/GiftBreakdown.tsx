@@ -31,7 +31,7 @@ export function GiftBreakdown({ gifts, tokens }: Props) {
             />
             <span className="flex-1 text-sm text-zinc-700 truncate">{row.name}</span>
             <span className="text-sm font-medium text-zinc-900 tabular-nums">{row.count}</span>
-            <span className="text-xs text-zinc-400 w-10 text-right tabular-nums">{row.pct}%</span>
+            <span className="text-xs text-zinc-400 w-10 text-end tabular-nums">{row.pct}%</span>
           </div>
         ))}
         {unchosen > 0 && (
@@ -39,7 +39,7 @@ export function GiftBreakdown({ gifts, tokens }: Props) {
             <span className="w-2.5 h-2.5 rounded-full bg-zinc-300 flex-shrink-0" />
             <span className="flex-1 text-sm text-zinc-400">{t('Not chosen yet')}</span>
             <span className="text-sm font-medium text-zinc-400 tabular-nums">{unchosen}</span>
-            <span className="text-xs text-zinc-300 w-10 text-right tabular-nums">
+            <span className="text-xs text-zinc-300 w-10 text-end tabular-nums">
               {total > 0 ? Math.round((unchosen / total) * 100) : 0}%
             </span>
           </div>

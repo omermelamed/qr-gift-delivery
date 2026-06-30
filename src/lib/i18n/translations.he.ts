@@ -1,4 +1,8 @@
 export const he: Record<string, string> = {
+  // Pagination
+  'Showing': 'מציג',
+  'Prev': 'הקודם',
+  'Next': 'הבא',
   // Gift lookup page
   'Check Your Gift': 'בדוק את המתנה שלך',
   'Enter your phone number to see if you have an unclaimed gift.': 'הזן את מספר הטלפון שלך כדי לראות אם יש לך מתנה שלא נדרשה.',
@@ -76,7 +80,7 @@ export const he: Record<string, string> = {
   'Could not verify': 'לא ניתן לאמת',
   'Try again': 'נסה שוב',
   'Tap anywhere to scan next': 'הקש בכל מקום לסריקה הבאה',
-  '← Admin': '← ניהול',
+  '← Admin': '→ ניהול',
   'History': 'היסטוריה',
   'Recent scans': 'סריקות אחרונות',
   'No scans yet this session': 'אין סריקות בסשן זה',
@@ -110,7 +114,7 @@ export const he: Record<string, string> = {
   "Enter your email and we'll send a reset link.": 'הזן את האימייל שלך ונשלח קישור לאיפוס.',
   'Sending…': 'שולח…',
   'Send reset link': 'שלח קישור לאיפוס',
-  '← Back to sign in': '← חזרה לכניסה',
+  '← Back to sign in': '→ חזרה לכניסה',
   'Check your email': 'בדוק את האימייל שלך',
   'Click the link in the email to set a new password.': 'לחץ על הקישור באימייל כדי לקבוע סיסמה חדשה.',
   'We sent a reset link to': 'שלחנו קישור לאיפוס אל',
@@ -169,7 +173,7 @@ export const he: Record<string, string> = {
   'Template must contain {link}': 'תבנית חייבת להכיל {link}',
 
   // Admin campaigns/new
-  '← Campaigns': '← קמפיינים',
+  '← Campaigns': '→ קמפיינים',
   'New Campaign': 'קמפיין חדש',
   'Campaign name': 'שם קמפיין',
   'Campaign date': 'תאריך קמפיין',

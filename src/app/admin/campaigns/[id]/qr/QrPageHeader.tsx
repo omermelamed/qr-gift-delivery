@@ -21,7 +21,7 @@ export function QrPageHeader({
           href={`/admin/campaigns/${campaignId}`}
           className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors"
         >
-          ← {campaignName}
+          <span className="inline-block rtl:rotate-180">←</span> {campaignName}
         </Link>
         <h1 className="text-2xl font-bold text-zinc-900 mt-2">{t('QR Codes')}</h1>
         <p className="text-sm text-zinc-500 mt-0.5">

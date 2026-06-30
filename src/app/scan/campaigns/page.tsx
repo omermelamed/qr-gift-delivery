@@ -73,7 +73,7 @@ export default function ScannerCampaignsPage() {
                     </div>
                   )}
                 </div>
-                <span className="text-sm font-medium text-indigo-600 flex-shrink-0 ms-3" aria-hidden>→</span>
+                <span className="text-sm font-medium text-indigo-600 flex-shrink-0 ms-3" aria-hidden><span className="inline-block rtl:rotate-180">→</span></span>
               </Link>
             ))}
           </div>
