@@ -13,7 +13,6 @@ import { GiftOptionsEditor } from '@/components/admin/GiftOptionsEditor'
 import { ArrivalCertToggle } from '@/components/admin/ArrivalCertToggle'
 import { CampaignSmsTemplate } from '@/components/admin/CampaignSmsTemplate'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
-import { StatusBadge } from '@/components/admin/StatusBadge'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { CampaignNotes } from '@/components/admin/CampaignNotes'
 import { DistributorStats } from '@/components/admin/DistributorStats'
@@ -24,6 +23,11 @@ import { ArrivalSummary } from '@/components/admin/ArrivalSummary'
 import { CampaignDetailHeader } from '@/components/admin/CampaignDetailHeader'
 import { CreditIndicator } from '@/components/admin/CreditIndicator'
 import { ViewQrLink, ExportCsvLink } from '@/components/admin/CampaignActions'
+import { KebabMenu } from '@/components/admin/KebabMenu'
+
+// Shared styling for rows inside the kebab actions menu.
+const MENU_ITEM = 'w-full text-start px-3 py-2 rounded-lg text-sm font-medium text-zinc-700 hover-brand transition-colors'
+const MENU_ITEM_DANGER = 'w-full text-start px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors'
 
 export default async function CampaignDetailPage({
   params,
@@ -139,27 +143,31 @@ export default async function CampaignDetailPage({
       <CampaignDetailHeader
         campaignName={campaign.name}
         campaignDate={campaign.campaign_date}
+        sentAt={campaign.sent_at}
+        closedAt={campaign.closed_at}
       />
 
       <div className="flex items-start justify-between gap-4 mb-6">
         <div />
-        <div className="group flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
-          <StatusBadge sentAt={campaign.sent_at} closedAt={campaign.closed_at} />
-          {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter />}
-          <DuplicateCampaignButton
-            campaignId={campaign.id}
-            sourceName={campaign.name}
-            sourceDate={campaign.campaign_date}
-          />
-          {campaign.sent_at && <ViewQrLink campaignId={campaign.id} />}
-          {campaign.sent_at && <ExportCsvLink campaignId={campaign.id} />}
-          {campaign.sent_at && !campaign.closed_at && (
-            <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} />
-          )}
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
           {canLaunch && (
             <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} creditBalance={creditBalance} />
           )}
+          <KebabMenu>
+            <DuplicateCampaignButton
+              campaignId={campaign.id}
+              sourceName={campaign.name}
+              sourceDate={campaign.campaign_date}
+              className={MENU_ITEM}
+            />
+            {campaign.sent_at && !campaign.closed_at && (
+              <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} className={MENU_ITEM} />
+            )}
+            {campaign.sent_at && <ViewQrLink campaignId={campaign.id} className={MENU_ITEM} />}
+            {campaign.sent_at && <ExportCsvLink campaignId={campaign.id} className={MENU_ITEM} />}
+            {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter className={MENU_ITEM_DANGER} />}
+          </KebabMenu>
         </div>
       </div>
 

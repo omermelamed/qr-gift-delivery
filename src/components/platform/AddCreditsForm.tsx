@@ -52,13 +52,13 @@ export function AddCreditsForm({
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           placeholder="e.g. 500"
-          className="border border-zinc-200 rounded-lg px-3 py-2 text-sm w-40 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          className="border border-zinc-200 rounded-lg px-3 py-2 text-sm w-40 focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
         />
       </div>
       <button
         type="submit"
         disabled={loading || !amount}
-        className="bg-indigo-600 text-white rounded-lg px-4 py-2 text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50"
+        className="bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50"
       >
         {loading ? 'Adding…' : 'Add'}
       </button>

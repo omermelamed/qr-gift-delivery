@@ -36,7 +36,7 @@ export function TemplateList({ templates }: Props) {
   if (templates.length === 0) {
     return (
       <div className="text-center py-16 bg-white rounded-2xl border border-zinc-200">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 mx-auto mb-4 flex items-center justify-center">
+        <div className="w-12 h-12 rounded-2xl bg-brand mx-auto mb-4 flex items-center justify-center">
           <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
@@ -67,7 +67,7 @@ export function TemplateList({ templates }: Props) {
               <p className="text-sm text-zinc-400 mt-1 line-clamp-2 font-mono">{tmpl.body_template}</p>
               <div className="flex items-center gap-2 mt-2">
                 {tmpl.variables.map((v) => (
-                  <span key={v} className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-600 font-medium">
+                  <span key={v} className="text-[10px] px-2 py-0.5 rounded-full bg-brand-soft text-brand font-medium">
                     {`{{${v}}}`}
                   </span>
                 ))}
@@ -80,7 +80,7 @@ export function TemplateList({ templates }: Props) {
             <div className="flex items-center gap-2 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
               <Link
                 href={`/admin/sms/templates/${tmpl.id}/edit`}
-                className="text-xs px-3 py-1.5 rounded-lg border border-zinc-200 text-zinc-600 hover:bg-zinc-50 transition-colors"
+                className="text-xs px-3 py-1.5 rounded-lg border border-zinc-200 text-zinc-600 hover-brand transition-colors"
               >
                 {t('Edit')}
               </Link>

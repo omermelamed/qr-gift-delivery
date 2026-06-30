@@ -6,7 +6,6 @@ import { Sidebar } from '@/components/admin/Sidebar'
 import { IMPERSONATE_COOKIE } from '@/app/api/platform/impersonate/route'
 
 const ADMIN_ROLES: JwtAppMetadata['role_name'][] = ['company_admin', 'campaign_manager']
-const DEFAULT_BRAND = '#6366f1'
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -31,11 +30,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   const service = createServiceClient()
-  let company: { name?: string | null; logo_url?: string | null; theme_color?: string | null } | null = null
+  let company: { name?: string | null; logo_url?: string | null } | null = null
   try {
     const { data } = await service
       .from('companies')
-      .select('name, logo_url, theme_color')
+      .select('name, logo_url')
       .eq('id', companyId)
       .single()
     company = data
@@ -43,12 +42,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     // columns not yet present — ignore
   }
 
-  const brand = company?.theme_color ?? DEFAULT_BRAND
-
   return (
-    <div className="flex flex-col h-screen overflow-hidden" style={{ '--brand': brand } as React.CSSProperties}>
+    <div className="flex flex-col h-screen overflow-hidden">
       <style>{`
-        :root { --brand: ${brand}; }
         html, body { overflow: hidden; height: 100%; }
       `}</style>
       {isPlatformAdmin && (

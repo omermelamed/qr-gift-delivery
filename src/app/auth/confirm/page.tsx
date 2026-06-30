@@ -17,7 +17,7 @@ export default async function ConfirmPage({
     <main className="flex min-h-screen items-center justify-center bg-zinc-50 p-8" dir="rtl">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500" />
+          <div className="w-12 h-12 rounded-2xl bg-brand" />
           <span className="text-xl font-bold text-zinc-900">GiftFlow</span>
         </div>
 
@@ -37,7 +37,7 @@ export default async function ConfirmPage({
                 <input type="hidden" name="next" value={next ?? '/'} />
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:brightness-110 transition-all"
+                  className="w-full bg-brand text-white rounded-lg px-4 py-2.5 text-sm font-semibold hover:brightness-110 transition-all"
                 >
                   המשך · Continue
                 </button>
@@ -48,7 +48,7 @@ export default async function ConfirmPage({
               <h1 className="text-lg font-semibold text-zinc-900">קישור לא תקין</h1>
               <p className="text-sm text-zinc-500">
                 הקישור חסר או שפג תוקפו.{' '}
-                <a href="/login" className="text-indigo-600 hover:underline">
+                <a href="/login" className="text-brand hover:underline">
                   חזרה להתחברות
                 </a>
               </p>

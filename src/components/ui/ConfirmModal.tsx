@@ -1,5 +1,6 @@
 'use client'
 
+import { createPortal } from 'react-dom'
 import { useT } from '@/lib/i18n/useT'
 
 type Props = {
@@ -22,7 +23,8 @@ export function ConfirmModal({
   onCancel,
 }: Props) {
   const t = useT()
-  return (
+  if (typeof document === 'undefined') return null
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
@@ -38,19 +40,20 @@ export function ConfirmModal({
           <button
             onClick={onCancel}
             disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-zinc-700 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-zinc-700 border border-zinc-200 rounded-lg hover-brand transition-colors disabled:opacity-50"
           >
             {t('Cancel')}
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-violet-500 rounded-lg hover:brightness-110 transition-all disabled:opacity-50"
+            className="px-4 py-2 text-sm font-semibold text-white bg-brand rounded-lg hover:brightness-110 transition-all disabled:opacity-50"
           >
             {loading ? `${confirmLabel}…` : confirmLabel}
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

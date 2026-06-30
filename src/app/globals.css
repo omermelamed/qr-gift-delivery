@@ -4,6 +4,12 @@
   --font-sans: var(--font-inter);
 }
 
+/* Single global brand color. All .bg-brand / .text-brand / .hover-brand* /
+   .border-brand / .ring-brand utilities read this. Change it here to rebrand. */
+:root {
+  --brand: #6366f1;
+}
+
 body {
   background: #fafafa;
   color: #18181b;
@@ -45,4 +51,51 @@ button[disabled],
 [role="button"][aria-disabled="true"],
 [aria-disabled="true"] {
   cursor: not-allowed;
+}
+
+/* Global hover tint: a light, translucent wash of the brand color, used in place
+   of grey for interactive rows, list items, and ghost/secondary buttons. Tune
+   the percentage to make the wash lighter/darker. */
+.hover-brand {
+  transition: background-color 0.15s ease;
+}
+.hover-brand:hover {
+  background-color: color-mix(in srgb, var(--brand, #6366f1) 5%, transparent);
+}
+
+/* Brand-colored text on hover. `.hover-brand-text` reacts to hovering the element
+   itself; `.group-hover-brand-text` reacts to hovering an ancestor `.group`
+   (Tailwind's group pattern, e.g. a card whose title highlights on row hover). */
+.hover-brand-text,
+.group-hover-brand-text {
+  transition: color 0.15s ease;
+}
+.hover-brand-text:hover,
+.group:hover .group-hover-brand-text {
+  color: var(--brand, #6366f1);
+}
+
+/* Brand-colored text (clickable accents: links, "+ Add…", "browse", etc.). */
+.text-brand {
+  color: var(--brand, #6366f1);
+}
+
+/* Solid brand background (primary buttons), with a subtle darken on hover. */
+.bg-brand {
+  background-color: var(--brand, #6366f1);
+}
+.bg-brand:hover {
+  background-color: color-mix(in srgb, var(--brand, #6366f1) 88%, #000);
+}
+/* Light brand fill (selected pills, dropzone backgrounds). */
+.bg-brand-soft {
+  background-color: color-mix(in srgb, var(--brand, #6366f1) 10%, transparent);
+}
+/* Brand border (drag-and-drop zones, selected states). */
+.border-brand {
+  border-color: var(--brand, #6366f1);
+}
+/* Brand focus ring — sets Tailwind's ring color variable. */
+.ring-brand {
+  --tw-ring-color: var(--brand, #6366f1);
 }

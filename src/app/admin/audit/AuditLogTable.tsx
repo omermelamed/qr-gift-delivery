@@ -59,7 +59,7 @@ export function AuditLogPage({ events }: { events: AuditEvent[] }) {
           const label = t(ACTION_KEY[e.action] ?? e.action)
           const resource = resourceLabel(e.action, e.metadata)
           return (
-            <tr key={e.id} className="border-b border-zinc-50 hover:bg-zinc-50">
+            <tr key={e.id} className="border-b border-zinc-50 hover-brand">
               <td className="px-5 py-3 text-zinc-400 text-xs whitespace-nowrap">
                 {formatDate(e.created_at)}
               </td>

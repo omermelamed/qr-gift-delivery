@@ -20,7 +20,7 @@ export const he: Record<string, string> = {
   'Looking up…': 'מחפש…',
   'Check': 'בדוק',
   'No unclaimed gifts found for this number.': 'לא נמצאו מתנות שלא נדרשו למספר זה.',
-  'You have an unclaimed gift. Find a gift distributor and show them this screen to claim it.': 'יש לך מתנה שלא נדרשה. מצא מפיץ ומצג לו מסך זה כדי לקבל את המתנה.',
+  'You have an unclaimed gift. Find a gift distributor and show them this screen to claim it.': 'יש לך מתנה שלא נדרשה. מצא סורק ומצג לו מסך זה כדי לקבל את המתנה.',
   'Hi': 'שלום',
 
   // Gift QR / redemption page
@@ -30,7 +30,7 @@ export const he: Record<string, string> = {
   'Could not save your choice. Please try again.': 'לא ניתן לשמור את הבחירה שלך. נסה שוב.',
   'Your gift': 'המתנה שלך',
   'QR code not available': 'קוד ה-QR אינו זמין',
-  'Show this QR code to a distributor to collect your gift.': 'הצג קוד QR זה למפיץ כדי לקבל את המתנה שלך.',
+  'Show this QR code to a distributor to collect your gift.': 'הצג קוד QR זה לסורק כדי לקבל את המתנה שלך.',
 
   // Arrival certificates (אישור הגעה)
   'Supports Arrival Certificates': 'תומך באישורי הגעה',
@@ -239,7 +239,7 @@ export const he: Record<string, string> = {
   'Search…': 'חפש…',
   'All depts': 'כל המחלקות',
   'Gift': 'מתנה',
-  'Distributor': 'מפיץ',
+  'Distributor': 'סורק',
   'Claimed At': 'מומש בתאריך',
   'By department': 'לפי מחלקה',
   'By Department': 'לפי מחלקה',
@@ -287,9 +287,13 @@ export const he: Record<string, string> = {
   'No gift recorded': 'לא נרשמה מתנה',
 
   // DistributorAssignment
-  'Distributors': 'מפיצים',
+  'Distributors': 'מי סורק?',
   'Any scanner can scan this campaign': 'כל סורק יכול לסרוק קמפיין זה',
-  '+ Add distributor': '+ הוסף מפיץ',
+  'How to add a scanner': 'איך מוסיפים סורק',
+  'To add a new scanner, go to the': 'על מנת להוסיף סורק חדש, היכנס',
+  'Team screen': 'לדף הצוות',
+  'Back': 'חזרה',
+  '+ Add distributor': '+ הוסף סורק',
   'No available scanners': 'אין סורקים זמינים',
   'assigned': 'מוקצים',
 
@@ -317,10 +321,12 @@ export const he: Record<string, string> = {
   'Full name': 'שם מלא',
   'Jane Cohen': 'ישראל ישראלי',
   'Send invite': 'שלח הזמנה',
-  'Scanner (Distributor)': 'סורק (מפיץ)',
+  'Scanner (Distributor)': 'סורק',
 
   // DuplicateCampaignButton
   'Duplicate campaign': 'שכפל קמפיין',
+  'More actions': 'פעולות נוספות',
+  'Remove from Team to delete': 'יש להסיר מהצוות כדי למחוק',
   'Copy employees from this campaign': 'העתק עובדים מקמפיין זה',
   'Duplicating…': 'משכפל…',
   'Duplicate': 'שכפל',
@@ -419,7 +425,7 @@ export const he: Record<string, string> = {
   'Invalid phone': 'טלפון לא תקין',
 
   // DistributorStats
-  'Distributor Stats': 'סטטיסטיקות מפיצים',
+  'Distributor Stats': 'סטטיסטיקות סורקים',
   'gift': 'מתנה',
   'gifts': 'מתנות',
 

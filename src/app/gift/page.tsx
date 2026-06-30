@@ -45,7 +45,7 @@ export default function GiftPage() {
     <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-start pt-16 px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 mx-auto mb-4" />
+          <div className="w-14 h-14 rounded-2xl bg-brand mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-zinc-900">{t('Check Your Gift')}</h1>
           <p className="text-sm text-zinc-500 mt-1">{t('Enter your phone number to see if you have an unclaimed gift.')}</p>
         </div>
@@ -60,7 +60,7 @@ export default function GiftPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               required
-              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono"
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent font-mono"
             />
           </div>
 
@@ -71,7 +71,7 @@ export default function GiftPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
+            className="w-full bg-brand text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
           >
             {loading ? t('Looking up…') : t('Check')}
           </button>
@@ -92,9 +92,9 @@ export default function GiftPage() {
                     {gift.campaignDate && (
                       <p className="text-sm text-zinc-400 mt-0.5">{gift.campaignDate}</p>
                     )}
-                    <div className="mt-4 p-3 bg-indigo-50 rounded-lg">
+                    <div className="mt-4 p-3 bg-brand-soft rounded-lg">
                       <p className="text-sm text-indigo-700 font-medium">{t('Hi')} {gift.employeeName}!</p>
-                      <p className="text-sm text-indigo-600 mt-0.5">
+                      <p className="text-sm text-brand mt-0.5">
                         {t('You have an unclaimed gift. Find a gift distributor and show them this screen to claim it.')}
                       </p>
                     </div>

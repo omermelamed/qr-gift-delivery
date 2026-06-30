@@ -35,7 +35,7 @@ export function CloseCampaignButton({ campaignId }: { campaignId: string }) {
     <>
       <button
         onClick={() => setShowConfirm(true)}
-        className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
+        className="border border-red-200 rounded-lg px-3 h-[34px] inline-flex items-center text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
       >
         {t('End campaign')}
       </button>

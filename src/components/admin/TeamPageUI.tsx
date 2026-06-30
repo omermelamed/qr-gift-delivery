@@ -3,7 +3,12 @@
 import { RemoveMemberButton } from '@/components/admin/RemoveMemberButton'
 import { InviteButton } from '@/components/admin/InviteButton'
 import { EditMemberButton } from '@/components/admin/EditMemberButton'
+import { KebabMenu } from '@/components/admin/KebabMenu'
+import { BackButton } from '@/components/BackButton'
 import { useT } from '@/lib/i18n/useT'
+
+const MENU_ITEM = 'w-full text-start px-3 py-2 rounded-lg text-sm font-medium text-zinc-700 hover-brand transition-colors'
+const MENU_ITEM_DANGER = 'w-full text-start px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors'
 
 export type Member = {
   id: string
@@ -31,6 +36,7 @@ export function TeamPageUI({ members }: Props) {
 
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto">
+      <BackButton className="mb-4" />
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900">{t('Team')}</h1>
@@ -59,7 +65,7 @@ export function TeamPageUI({ members }: Props) {
             </thead>
             <tbody>
               {members.map((m) => (
-                <tr key={m.id} className="border-b border-zinc-50 hover:bg-zinc-50">
+                <tr key={m.id} className="border-b border-zinc-50 hover-brand">
                   <td className="px-5 py-3">
                     <p className="font-medium text-zinc-900">{m.name}</p>
                     <p className="text-xs text-zinc-400">{m.email}</p>
@@ -79,14 +85,17 @@ export function TeamPageUI({ members }: Props) {
                     </span>
                   </td>
                   <td className="px-5 py-3 text-end">
-                    <div className="flex items-center justify-end gap-2">
-                      <EditMemberButton
-                        userId={m.id} name={m.name} email={m.email}
-                        phone={m.phone} roleName={m.role_name}
-                        isActive={!m.isDeactivated}
-                        isPending={m.isPending} isSelf={m.isSelf}
-                      />
-                      {!m.isSelf && <RemoveMemberButton userId={m.id} name={m.name} />}
+                    <div className="flex items-center justify-end">
+                      <KebabMenu>
+                        <EditMemberButton
+                          userId={m.id} name={m.name} email={m.email}
+                          phone={m.phone} roleName={m.role_name}
+                          isActive={!m.isDeactivated}
+                          isPending={m.isPending} isSelf={m.isSelf}
+                          className={MENU_ITEM}
+                        />
+                        {!m.isSelf && <RemoveMemberButton userId={m.id} name={m.name} className={MENU_ITEM_DANGER} />}
+                      </KebabMenu>
                     </div>
                   </td>
                 </tr>

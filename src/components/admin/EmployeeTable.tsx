@@ -61,7 +61,7 @@ function EmployeeQrModal({
           </div>
           <button
             onClick={onClose}
-            className="text-zinc-400 hover:text-zinc-700 transition-colors p-1 rounded-lg hover:bg-zinc-100"
+            className="text-zinc-400 hover-brand-text transition-colors p-1 rounded-lg hover-brand"
             aria-label="Close"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,7 +186,7 @@ function AttendeeCountCell({
   )
 }
 
-const PAGE_SIZE = 30
+const PAGE_SIZE = 20
 
 export function EmployeeTable({
   campaignId,
@@ -381,11 +381,11 @@ export function EmployeeTable({
               placeholder={t('Search employees…')}
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-              className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm w-full sm:w-48 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm w-full sm:w-48 focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
             />
             <button
               onClick={handleExport}
-              className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors"
+              className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-700 hover-brand transition-colors"
             >
               {t('Export CSV')}
             </button>
@@ -394,8 +394,8 @@ export function EmployeeTable({
                 onClick={() => setGroupByDept((v) => !v)}
                 className={`border rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                   groupByDept
-                    ? 'border-indigo-300 bg-indigo-50 text-indigo-700'
-                    : 'border-zinc-200 text-zinc-700 hover:bg-zinc-50'
+                    ? 'border-brand bg-brand-soft text-indigo-700'
+                    : 'border-zinc-200 text-zinc-700 hover-brand'
                 }`}
               >
                 {t('By department')}
@@ -432,7 +432,7 @@ export function EmployeeTable({
                     ) : (
                       <tr
                         key={row.id}
-                        className={`border-b border-zinc-50 transition-colors duration-500 ${row.redeemed ? 'bg-green-50' : 'hover:bg-zinc-50'}`}
+                        className={`border-b border-zinc-50 transition-colors duration-500 ${row.redeemed ? 'bg-green-50' : 'hover-brand'}`}
                       >
                         <td className="px-3 py-2.5 font-medium text-zinc-800">{row.employee_name}</td>
                         <td className="px-3 py-2.5 font-mono text-xs text-zinc-500">{row.phone_number ? <span dir="ltr">{maskPhone(row.phone_number)}</span> : <span className="text-zinc-300">—</span>}</td>
@@ -496,7 +496,7 @@ export function EmployeeTable({
                             <button
                               onClick={() => row.qr_image_url && setEnlarged(row as TokenRow & { qr_image_url: string })}
                               disabled={!row.qr_image_url}
-                              className={`p-1 rounded transition-colors ${row.qr_image_url ? 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100' : 'text-zinc-200 cursor-not-allowed'}`}
+                              className={`p-1 rounded transition-colors ${row.qr_image_url ? 'text-zinc-400 hover-brand-text hover-brand' : 'text-zinc-200 cursor-not-allowed'}`}
                               aria-label={row.qr_image_url ? `View QR for ${row.employee_name}` : 'QR generating'}
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -511,7 +511,7 @@ export function EmployeeTable({
                 : pageRows.map((r) => (
                     <tr
                       key={r.id}
-                      className={`border-b border-zinc-50 transition-colors duration-500 ${r.redeemed ? 'bg-green-50' : 'hover:bg-zinc-50'}`}
+                      className={`border-b border-zinc-50 transition-colors duration-500 ${r.redeemed ? 'bg-green-50' : 'hover-brand'}`}
                     >
                       <td className="px-3 py-2.5 font-medium text-zinc-800">{r.employee_name}</td>
                       <td className="px-3 py-2.5 font-mono text-xs text-zinc-500">{r.phone_number ? maskPhone(r.phone_number) : <span className="text-zinc-300">—</span>}</td>
@@ -575,7 +575,7 @@ export function EmployeeTable({
                           <button
                             onClick={() => r.qr_image_url && setEnlarged(r as TokenRow & { qr_image_url: string })}
                             disabled={!r.qr_image_url}
-                            className={`p-1 rounded transition-colors ${r.qr_image_url ? 'text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100' : 'text-zinc-200 cursor-not-allowed'}`}
+                            className={`p-1 rounded transition-colors ${r.qr_image_url ? 'text-zinc-400 hover-brand-text hover-brand' : 'text-zinc-200 cursor-not-allowed'}`}
                             aria-label={r.qr_image_url ? `View QR for ${r.employee_name}` : 'QR generating'}
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -606,7 +606,7 @@ export function EmployeeTable({
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage <= 1}
-                className="border border-zinc-200 rounded-lg px-3 py-1 font-medium text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-40"
+                className="border border-zinc-200 rounded-lg px-3 py-1 font-medium text-zinc-700 hover-brand transition-colors disabled:opacity-40"
               >
                 {t('Prev')}
               </button>
@@ -614,7 +614,7 @@ export function EmployeeTable({
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={currentPage >= totalPages}
-                className="border border-zinc-200 rounded-lg px-3 py-1 font-medium text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-40"
+                className="border border-zinc-200 rounded-lg px-3 py-1 font-medium text-zinc-700 hover-brand transition-colors disabled:opacity-40"
               >
                 {t('Next')}
               </button>

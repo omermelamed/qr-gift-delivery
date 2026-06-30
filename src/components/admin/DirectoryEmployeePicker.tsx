@@ -86,7 +86,7 @@ export function DirectoryEmployeePicker({ campaignId, existingTokens = [], onAdd
     return (
       <div className="text-center py-8 text-zinc-400 text-sm">
         {t('Your directory is empty.')}{' '}
-        <a href="/admin/employees" className="text-indigo-600 hover:underline">{t('Add employees')}</a> first.
+        <a href="/admin/employees" className="text-brand hover:underline">{t('Add employees')}</a> first.
       </div>
     )
   }
@@ -127,13 +127,13 @@ export function DirectoryEmployeePicker({ campaignId, existingTokens = [], onAdd
         {filtered.map((e) => (
           <label
             key={e.id}
-            className="flex items-center gap-3 px-3 py-2 border-b border-zinc-50 last:border-0 hover:bg-zinc-50 cursor-pointer"
+            className="flex items-center gap-3 px-3 py-2 border-b border-zinc-50 last:border-0 hover-brand cursor-pointer"
           >
             <input
               type="checkbox"
               checked={selected.has(e.id)}
               onChange={() => toggle(e.id)}
-              className="w-4 h-4 rounded border-zinc-300 focus:ring-indigo-500"
+              className="w-4 h-4 rounded border-zinc-300 ring-brand"
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-zinc-800 truncate">{e.employee_name}</p>

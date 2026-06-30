@@ -42,7 +42,7 @@ export function LogoUploader({ currentUrl, onUploaded }: Props) {
         {preview ? (
           <img src={preview} alt="Company logo" className="w-full h-full object-cover" />
         ) : (
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-500" />
+          <div className="w-10 h-10 rounded-lg bg-brand" />
         )}
       </div>
 
@@ -58,7 +58,7 @@ export function LogoUploader({ currentUrl, onUploaded }: Props) {
           aria-label="Upload company logo"
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); inputRef.current?.click() } }}
           className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors ${
-            isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-zinc-200 hover:border-indigo-300 hover:bg-zinc-50'
+            isDragging ? 'border-brand bg-brand-soft' : 'border-zinc-200 hover:border-brand hover-brand'
           }`}
         >
           {uploading ? (
@@ -66,7 +66,7 @@ export function LogoUploader({ currentUrl, onUploaded }: Props) {
           ) : (
             <>
               <p className="text-sm text-zinc-500">
-                <span className="font-medium text-indigo-600">{t('Click to upload')}</span> {t('or drag and drop')}
+                <span className="font-medium text-brand">{t('Click to upload')}</span> {t('or drag and drop')}
               </p>
               <p className="text-xs text-zinc-400 mt-0.5">{t('PNG, JPG, WebP · Max 2 MB')}</p>
             </>

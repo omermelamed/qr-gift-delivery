@@ -64,24 +64,24 @@ export function AddDirectoryEmployeeModal({ onClose, onAdded }: Props) {
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-zinc-700">{t('Name')}</label>
             <input type="text" value={name} onChange={(e) => setName(e.target.value)} required
-              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent" />
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-zinc-700">{t('Phone')} <span className="text-zinc-400">{t('(optional)')}</span></label>
             <input type="tel" value={phone} onChange={(e) => { setPhone(e.target.value); setPhoneError(null) }} onBlur={handlePhoneBlur}
-              className={`border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${phoneError ? 'border-red-300' : 'border-zinc-200'}`} />
+              className={`border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent ${phoneError ? 'border-red-300' : 'border-zinc-200'}`} />
             {phoneError && <p className="text-xs text-red-500">{phoneError}</p>}
           </div>
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-zinc-700">{t('Department')} <span className="text-zinc-400">{t('(optional)')}</span></label>
             <input type="text" value={department} onChange={(e) => setDepartment(e.target.value)}
-              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" />
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent" />
           </div>
           <div className="flex gap-3 mt-2">
-            <button type="button" onClick={onClose} className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors">
+            <button type="button" onClick={onClose} className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 hover-brand transition-colors">
               {t('Cancel')}
             </button>
-            <button type="submit" disabled={loading} className="flex-1 bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
+            <button type="submit" disabled={loading} className="flex-1 bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
               {loading ? t('Adding…') : t('Add employee')}
             </button>
           </div>

@@ -85,9 +85,9 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
           onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) processFile(f) }}
-          className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors mb-4 ${isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-zinc-200 hover:border-indigo-300 hover:bg-zinc-50'}`}
+          className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors mb-4 ${isDragging ? 'border-brand bg-brand-soft' : 'border-zinc-200 hover:border-brand hover-brand'}`}
         >
-          <p className="text-sm text-zinc-500"><span className="font-medium text-indigo-600">{t('Click to browse')}</span> {t('or drag and drop')}</p>
+          <p className="text-sm text-zinc-500"><span className="font-medium text-brand">{t('Click to browse')}</span> {t('or drag and drop')}</p>
           <p className="text-xs text-zinc-400 mt-1">.csv {t('or')} .xlsx · {t('Columns:')} name/שם, phone_number/טלפון, department/מחלקה</p>
           {fileName && <p className="text-xs text-zinc-600 mt-2 font-medium">{fileName}</p>}
           <input ref={inputRef} type="file" accept=".csv,.xlsx,.xls" onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f) }} className="hidden" />
@@ -105,7 +105,7 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
               a.click()
               URL.revokeObjectURL(url)
             }}
-            className="mt-3 inline-flex items-center gap-1 text-xs text-indigo-500 hover:text-indigo-700 transition-colors"
+            className="mt-3 inline-flex items-center gap-1 text-xs text-indigo-500 hover-brand-text transition-colors"
           >
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -142,8 +142,8 @@ export function ImportDirectoryModal({ onClose, onImported }: Props) {
         )}
 
         <div className="flex gap-3">
-          <button onClick={onClose} className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors">{t('Cancel')}</button>
-          <button onClick={handleImport} disabled={rows.length === 0 || loading} className="flex-1 bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
+          <button onClick={onClose} className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 hover-brand transition-colors">{t('Cancel')}</button>
+          <button onClick={handleImport} disabled={rows.length === 0 || loading} className="flex-1 bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
             {loading ? t('Importing…') : `${t('Import')} ${rows.length} ${t('employees')}`}
           </button>
         </div>

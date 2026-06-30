@@ -31,7 +31,7 @@ export default function ScannerCampaignsPage() {
           <h1 className="text-xl font-bold text-zinc-900">{t('My Campaigns')}</h1>
           <Link
             href="/scan"
-            className="text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-violet-500 rounded-lg px-3 py-2 hover:brightness-110 transition-all"
+            className="text-sm font-semibold text-white bg-brand rounded-lg px-3 py-2 hover:brightness-110 transition-all"
           >
             {t('Open scanner')}
           </Link>
@@ -49,7 +49,7 @@ export default function ScannerCampaignsPage() {
               <Link
                 key={c.id}
                 href={`/scan/campaigns/${c.id}`}
-                className="bg-white rounded-2xl border border-zinc-200 p-5 flex items-center justify-between hover:border-indigo-300 hover:shadow-sm transition-all"
+                className="bg-white rounded-2xl border border-zinc-200 p-5 flex items-center justify-between hover:border-brand hover:shadow-sm transition-all"
               >
                 <div className="min-w-0">
                   <p className="font-semibold text-zinc-900">{c.name}</p>
@@ -66,14 +66,14 @@ export default function ScannerCampaignsPage() {
                       </div>
                       <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
+                          className="h-full bg-brand rounded-full"
                           style={{ width: `${(c.redeemed / c.total) * 100}%` }}
                         />
                       </div>
                     </div>
                   )}
                 </div>
-                <span className="text-sm font-medium text-indigo-600 flex-shrink-0 ms-3" aria-hidden><span className="inline-block rtl:rotate-180">→</span></span>
+                <span className="text-sm font-medium text-brand flex-shrink-0 ms-3" aria-hidden><span className="inline-block rtl:rotate-180">→</span></span>
               </Link>
             ))}
           </div>

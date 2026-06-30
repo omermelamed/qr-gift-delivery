@@ -17,9 +17,10 @@ type Props = {
   campaignId: string
   tokens: TokenSlice[]
   creditBalance: number
+  className?: string
 }
 
-export function ReminderButton({ campaignId, tokens, creditBalance }: Props) {
+export function ReminderButton({ campaignId, tokens, creditBalance, className }: Props) {
   const t = useT()
   const [showModal, setShowModal] = useState(false)
   const [result, setResult] = useState<{ dispatched: number; failed: number } | null>(null)
@@ -36,7 +37,7 @@ export function ReminderButton({ campaignId, tokens, creditBalance }: Props) {
       )}
       <button
         onClick={() => setShowModal(true)}
-        className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
+        className={className ?? 'border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 hover-brand transition-colors'}
       >
         {t('Resend SMS').replace('({count})', '')} ({unredeemedCount})
       </button>

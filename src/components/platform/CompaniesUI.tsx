@@ -53,7 +53,7 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
         </div>
         <button
           onClick={() => setShowCreate(true)}
-          className="bg-indigo-600 text-white rounded-lg px-4 py-2 text-sm font-semibold hover:bg-indigo-700 transition-colors"
+          className="bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold transition-colors"
         >
           + New Company
         </button>
@@ -78,7 +78,7 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
               </tr>
             )}
             {companies.map(company => (
-              <tr key={company.id} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50 transition-colors">
+              <tr key={company.id} className="border-b border-zinc-100 last:border-0 hover-brand transition-colors">
                 <td className="px-5 py-4 font-medium text-zinc-900 truncate">{company.name}</td>
                 <td className="px-5 py-4 text-zinc-500 text-xs truncate">{company.admin_email ?? <span className="text-zinc-300">—</span>}</td>
                 <td className="px-5 py-4 text-zinc-500">{new Date(company.created_at).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' })}</td>
@@ -108,7 +108,7 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
                     <button
                       onClick={() => handleLogin(company.id)}
                       disabled={loginLoading === company.id}
-                      className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition-colors disabled:opacity-50"
+                      className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-brand text-brand hover-brand transition-colors disabled:opacity-50"
                     >
                       {loginLoading === company.id ? 'Loading…' : 'Login'}
                     </button>
@@ -204,7 +204,7 @@ function CreateCompanyModal({
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-lg font-semibold text-zinc-900">New Company</h2>
-          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+          <button onClick={onClose} className="text-zinc-400 hover-brand-text transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -224,7 +224,7 @@ function CreateCompanyModal({
               onChange={e => setName(e.target.value)}
               required
               placeholder="Acme Corp"
-              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
             />
             {name && (
               <p className="text-xs text-zinc-400">Slug: {toSlug(name)}</p>
@@ -239,7 +239,7 @@ function CreateCompanyModal({
               onChange={e => setAdminEmail(e.target.value)}
               required
               placeholder="admin@acme.com"
-              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
             />
             <p className="text-xs text-zinc-400">An invite email will be sent to this address.</p>
           </div>
@@ -248,14 +248,14 @@ function CreateCompanyModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
+              className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover-brand transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 bg-indigo-600 text-white rounded-lg px-4 py-2 text-sm font-semibold hover:bg-indigo-700 transition-colors disabled:opacity-50"
+              className="flex-1 bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50"
             >
               {loading ? 'Creating…' : 'Create Company'}
             </button>
@@ -307,7 +307,7 @@ function AddCreditsModal({
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-zinc-900">Add Credits</h2>
-          <button onClick={onClose} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+          <button onClick={onClose} className="text-zinc-400 hover-brand-text transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -336,7 +336,7 @@ function AddCreditsModal({
               required
               placeholder="e.g. 500"
               autoFocus
-              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
             />
           </div>
 
@@ -344,7 +344,7 @@ function AddCreditsModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors"
+              className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover-brand transition-colors"
             >
               Cancel
             </button>

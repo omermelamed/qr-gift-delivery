@@ -13,7 +13,7 @@ type Props = {
 }
 
 const inputClass =
-  'w-full text-start border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent'
+  'w-full text-start border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent'
 
 export function DatePicker({ value, onChange, id, placeholder }: Props) {
   const { locale } = useLocale()
@@ -110,7 +110,7 @@ export function DatePicker({ value, onChange, id, placeholder }: Props) {
               type="button"
               onClick={() => shiftMonth(-1)}
               aria-label={t('Previous month')}
-              className="w-8 h-8 rounded-lg hover:bg-zinc-100 text-zinc-600 flex items-center justify-center"
+              className="w-8 h-8 rounded-lg hover-brand text-zinc-600 flex items-center justify-center"
             >
               ‹
             </button>
@@ -119,7 +119,7 @@ export function DatePicker({ value, onChange, id, placeholder }: Props) {
               type="button"
               onClick={() => shiftMonth(1)}
               aria-label={t('Next month')}
-              className="w-8 h-8 rounded-lg hover:bg-zinc-100 text-zinc-600 flex items-center justify-center"
+              className="w-8 h-8 rounded-lg hover-brand text-zinc-600 flex items-center justify-center"
             >
               ›
             </button>
@@ -147,10 +147,10 @@ export function DatePicker({ value, onChange, id, placeholder }: Props) {
                   onClick={() => pick(day)}
                   className={`h-9 rounded-lg text-sm transition-colors ${
                     isSelected
-                      ? 'bg-indigo-500 text-white font-semibold'
+                      ? 'bg-brand text-white font-semibold'
                       : isToday
-                        ? 'text-indigo-600 font-semibold hover:bg-zinc-100'
-                        : 'text-zinc-700 hover:bg-zinc-100'
+                        ? 'text-brand font-semibold hover-brand'
+                        : 'text-zinc-700 hover-brand'
                   }`}
                 >
                   {day}

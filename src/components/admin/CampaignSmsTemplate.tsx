@@ -55,7 +55,7 @@ export function CampaignSmsTemplate({ campaignId, initial, companyDefault }: Pro
         value={value}
         placeholder={placeholder}
         onChange={(e) => setValue(e.target.value)}
-        className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y"
+        className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand resize-y"
       />
       <span className="text-xs text-zinc-500">
         {t('Use {name} for the recipient and {link} for the gift link.')}{' '}
@@ -66,7 +66,7 @@ export function CampaignSmsTemplate({ campaignId, initial, companyDefault }: Pro
         type="button"
         onClick={save}
         disabled={busy}
-        className="self-start bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50"
+        className="self-start bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50"
       >
         {busy ? t('Saving…') : t('Save')}
       </button>

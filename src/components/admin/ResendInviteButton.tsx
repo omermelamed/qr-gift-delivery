@@ -32,7 +32,7 @@ export function ResendInviteButton({ userId }: { userId: string }) {
     <button
       onClick={handleResend}
       disabled={state === 'loading' || state === 'sent'}
-      className="border border-zinc-200 rounded-lg px-3 py-1 text-xs font-medium text-zinc-600 hover:bg-zinc-50 disabled:opacity-50 transition-colors"
+      className="border border-zinc-200 rounded-lg px-3 py-1 text-xs font-medium text-zinc-600 hover-brand disabled:opacity-50 transition-colors"
     >
       {state === 'loading' ? t('Sending…') : state === 'sent' ? t('Sent!') : state === 'error' ? t('Failed') : t('Resend')}
     </button>

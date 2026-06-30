@@ -118,7 +118,7 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
   const tabBtn = (t: Tab, label: string) => (
     <button
       onClick={() => { setTab(t); setMessage(null) }}
-      className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${tab === t ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
+      className={`flex-1 py-2 text-sm font-medium rounded-lg transition-colors ${tab === t ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover-brand-text'}`}
     >
       {label}
     </button>
@@ -150,12 +150,12 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
             onDragOver={(e) => { e.preventDefault(); setIsDragging(true) }}
             onDragLeave={() => setIsDragging(false)}
             onDrop={(e) => { e.preventDefault(); setIsDragging(false); const f = e.dataTransfer.files[0]; if (f) processFile(f) }}
-            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${isDragging ? 'border-indigo-400 bg-indigo-50' : 'border-zinc-200 hover:border-indigo-300 hover:bg-zinc-50'}`}
+            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${isDragging ? 'border-brand bg-brand-soft' : 'border-zinc-200 hover:border-brand hover-brand'}`}
           >
             <svg className="w-8 h-8 text-zinc-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="text-sm text-zinc-500"><span className="font-medium text-indigo-600">{t('Click to browse')}</span> {t('or drag and drop')}</p>
+            <p className="text-sm text-zinc-500"><span className="font-medium text-brand">{t('Click to browse')}</span> {t('or drag and drop')}</p>
             <p className="text-xs text-zinc-400 mt-1">.csv {t('or')} .xlsx</p>
             <input ref={inputRef} type="file" accept=".csv,.xlsx,.xls"
               onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f) }} className="hidden" />
@@ -169,11 +169,11 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
               </p>
               <label className="flex items-center gap-3 mb-4 cursor-pointer">
                 <input type="checkbox" checked={saveToDirectory} onChange={(e) => setSaveToDirectory(e.target.checked)}
-                  className="w-4 h-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500" />
+                  className="w-4 h-4 rounded border-zinc-300 text-brand ring-brand" />
                 <span className="text-sm text-zinc-700">{t('Also save to employee directory')}</span>
               </label>
               <button onClick={handleUploadConfirm} disabled={validRows.length === 0 || uploading}
-                className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
+                className="w-full bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
                 {uploading ? t('Uploading…') : `${t('Confirm Upload')} (${validRows.length} ${t('employees')})`}
               </button>
             </div>
@@ -198,14 +198,14 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
           ) : (
             <>
               <select value={cloneSource} onChange={(e) => setCloneSource(e.target.value)}
-                className="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent mb-4">
+                className="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm text-zinc-700 focus:outline-none focus:ring-2 ring-brand focus:border-transparent mb-4">
                 <option value="">{t('Select a campaign…')}</option>
                 {campaigns.map((c) => (
                   <option key={c.id} value={c.id}>{c.name}{c.campaign_date ? ` (${c.campaign_date})` : ''}</option>
                 ))}
               </select>
               <button onClick={handleClone} disabled={!cloneSource || cloning}
-                className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
+                className="w-full bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
                 {cloning ? t('Cloning…') : t('Clone employees')}
               </button>
             </>

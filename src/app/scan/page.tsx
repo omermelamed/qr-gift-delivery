@@ -134,7 +134,7 @@ function BatchSummaryModal({
         </div>
         <button
           onClick={onDone}
-          className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl transition-colors"
+          className="w-full py-4 bg-brand text-white font-semibold rounded-xl transition-colors"
         >
           {t('Done')}
         </button>
@@ -376,7 +376,7 @@ export default function ScanPage() {
         {isBatchMode && (
           <div className="absolute inset-x-0 bottom-0 top-[45%] flex flex-col bg-zinc-950">
             {/* Status bar */}
-            <div className="flex items-center justify-between px-4 py-2 bg-indigo-900/60 border-b border-indigo-700/40">
+            <div className="flex items-center justify-between px-4 py-2 bg-indigo-900/60 border-b border-brand/40">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
                 <span className="text-indigo-300 text-xs font-semibold uppercase tracking-widest">
@@ -391,7 +391,7 @@ export default function ScanPage() {
             {/* Loading spinner between scans */}
             {scanState === 'loading' && (
               <div className="flex justify-center py-2">
-                <div className="w-5 h-5 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-brand border-t-transparent rounded-full animate-spin" />
               </div>
             )}
 
@@ -417,10 +417,10 @@ export default function ScanPage() {
             {scanState === 'scanning' && (
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                 <div className="relative w-52 h-52">
-                  <span className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-indigo-400 rounded-tl-lg" />
-                  <span className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-indigo-400 rounded-tr-lg" />
-                  <span className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-indigo-400 rounded-bl-lg" />
-                  <span className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-indigo-400 rounded-br-lg" />
+                  <span className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-brand rounded-tl-lg" />
+                  <span className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-brand rounded-tr-lg" />
+                  <span className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-brand rounded-bl-lg" />
+                  <span className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-brand rounded-br-lg" />
                   <span className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-indigo-400 to-transparent animate-scan-line" style={{ top: '50%' }} />
                 </div>
                 <p className="text-white/50 text-sm mt-6">{t('Point camera at QR code')}</p>
@@ -430,7 +430,7 @@ export default function ScanPage() {
             {/* Loading overlay */}
             {scanState === 'loading' && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/70">
-                <div className="w-10 h-10 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
+                <div className="w-10 h-10 border-2 border-brand border-t-transparent rounded-full animate-spin" />
               </div>
             )}
 
@@ -482,13 +482,13 @@ export default function ScanPage() {
                     onClick={() => setArrivedCount((c) => c + 1)}
                     disabled={giftLoading}
                     aria-label={t('More')}
-                    className="w-16 h-16 rounded-full bg-indigo-600 text-white text-3xl flex items-center justify-center disabled:opacity-40 active:scale-95 transition-transform"
+                    className="w-16 h-16 rounded-full bg-brand text-white text-3xl flex items-center justify-center disabled:opacity-40 active:scale-95 transition-transform"
                   >+</button>
                 </div>
                 <button
                   onClick={handleArrivalConfirm}
                   disabled={giftLoading}
-                  className="w-full py-4 bg-gradient-to-r from-indigo-500 to-violet-500 text-white text-lg font-semibold rounded-2xl disabled:opacity-50 active:scale-95 transition-transform"
+                  className="w-full py-4 bg-brand text-white text-lg font-semibold rounded-2xl disabled:opacity-50 active:scale-95 transition-transform"
                 >
                   {giftLoading ? t('Saving…') : t('Confirm handover')}
                 </button>

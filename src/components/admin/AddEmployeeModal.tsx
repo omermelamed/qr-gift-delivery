@@ -67,7 +67,7 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
             />
           </div>
 
@@ -82,7 +82,7 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
               value={phone}
               onChange={(e) => { setPhone(e.target.value); setPhoneError(null) }}
               onBlur={validatePhone}
-              className={`border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+              className={`border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent ${
                 phoneError ? 'border-red-300' : 'border-zinc-200'
               }`}
             />
@@ -99,7 +99,7 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
               placeholder="Engineering"
               value={department}
               onChange={(e) => setDepartment(e.target.value)}
-              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
             />
           </div>
 
@@ -108,14 +108,14 @@ export function AddEmployeeModal({ campaignId, onClose }: Props) {
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 text-sm font-medium text-zinc-700 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium text-zinc-700 border border-zinc-200 rounded-lg hover-brand transition-colors disabled:opacity-50"
             >
               {t('Cancel')}
             </button>
             <button
               type="submit"
               disabled={loading || !name.trim()}
-              className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-violet-500 rounded-lg hover:brightness-110 transition-all disabled:opacity-50"
+              className="px-4 py-2 text-sm font-semibold text-white bg-brand rounded-lg hover:brightness-110 transition-all disabled:opacity-50"
             >
               {loading ? t('Adding…') : t('Add employee')}
             </button>

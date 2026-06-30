@@ -118,7 +118,7 @@ function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
               />
             </div>
 
@@ -131,14 +131,14 @@ function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all mt-1"
+              className="w-full bg-brand text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all mt-1"
             >
               {loading ? t('Signing in…') : t('Sign in')}
             </button>
@@ -153,7 +153,7 @@ function LoginForm() {
           <button
             type="button"
             onClick={handleGoogle}
-            className="w-full flex items-center justify-center gap-2 border border-zinc-200 rounded-lg px-4 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors"
+            className="w-full flex items-center justify-center gap-2 border border-zinc-200 rounded-lg px-4 py-2.5 text-sm font-semibold text-zinc-700 hover-brand transition-colors"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z" />
@@ -166,7 +166,7 @@ function LoginForm() {
 
           <button
             onClick={() => { setError(null); setForgotEmail(email); setMode('forgot') }}
-            className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors text-center"
+            className="text-sm text-zinc-400 hover-brand-text transition-colors text-center"
           >
             {t('Forgot password?')}
           </button>
@@ -194,14 +194,14 @@ function LoginForm() {
                 value={forgotEmail}
                 onChange={(e) => setForgotEmail(e.target.value)}
                 required
-                className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
+              className="w-full bg-brand text-white rounded-lg px-4 py-2.5 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
             >
               {loading ? t('Sending…') : t('Send reset link')}
             </button>
@@ -209,7 +209,7 @@ function LoginForm() {
 
           <button
             onClick={() => { setError(null); setMode('signin') }}
-            className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors text-center"
+            className="text-sm text-zinc-400 hover-brand-text transition-colors text-center"
           >
             {t('← Back to sign in')}
           </button>
@@ -230,7 +230,7 @@ function LoginForm() {
           </p>
           <button
             onClick={() => setMode('signin')}
-            className="text-sm text-zinc-400 hover:text-zinc-600 transition-colors text-center"
+            className="text-sm text-zinc-400 hover-brand-text transition-colors text-center"
           >
             {t('← Back to sign in')}
           </button>
@@ -246,7 +246,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center gap-3 mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500" />
+          <div className="w-12 h-12 rounded-2xl bg-brand" />
           <span className="text-xl font-bold text-zinc-900">GiftFlow</span>
         </div>
 

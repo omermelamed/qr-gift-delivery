@@ -77,7 +77,7 @@ export function GiftRedemptionView({
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+              className="text-sm font-semibold text-brand hover-brand-text"
             >
               {t('Change my answer')}
             </button>
@@ -87,7 +87,7 @@ export function GiftRedemptionView({
         ) : (
           <>
             {chosenGiftName && (
-              <p className="text-sm font-medium text-indigo-600 mb-4">
+              <p className="text-sm font-medium text-brand mb-4">
                 {t('Your gift')}: {chosenGiftName}
               </p>
             )}
@@ -111,7 +111,7 @@ export function GiftRedemptionView({
               <button
                 type="button"
                 onClick={() => setEditing(true)}
-                className="mt-4 text-sm font-semibold text-indigo-600 hover:text-indigo-700"
+                className="mt-4 text-sm font-semibold text-brand hover-brand-text"
               >
                 {t('Change my answer')}
               </button>

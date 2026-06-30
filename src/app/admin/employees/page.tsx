@@ -4,7 +4,12 @@ import { useState, useEffect } from 'react'
 import { AddDirectoryEmployeeModal } from '@/components/admin/AddDirectoryEmployeeModal'
 import { ImportDirectoryModal } from '@/components/admin/ImportDirectoryModal'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
+import { KebabMenu } from '@/components/admin/KebabMenu'
 import { useT } from '@/lib/i18n/useT'
+
+const MENU_ITEM = 'w-full text-start px-3 py-2 rounded-lg text-sm font-medium text-zinc-700 hover-brand transition-colors'
+const MENU_ITEM_DANGER = 'w-full text-start px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-colors'
+const MENU_ITEM_DISABLED = 'w-full text-start px-3 py-2 rounded-lg text-sm font-medium text-zinc-300 cursor-not-allowed'
 
 type Employee = { id: string; employee_name: string; phone: string | null; department: string | null; user_id?: string | null }
 
@@ -88,7 +93,7 @@ export default function EmployeesPage() {
           <p className="text-sm text-zinc-500 mt-0.5">{employees.length} {employees.length !== 1 ? t('employees') : t('employee')}</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={() => setShowImport(true)} className="border border-zinc-200 rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors">
+          <button onClick={() => setShowImport(true)} className="border border-zinc-200 rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover-brand transition-colors">
             {t('Import CSV')}
           </button>
           <button onClick={() => setShowAdd(true)} className="text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all" style={{ backgroundColor: 'var(--brand,#6366f1)' }}>
@@ -126,26 +131,26 @@ export default function EmployeesPage() {
             </thead>
             <tbody>
               {filtered.map((e) => (
-                <tr key={e.id} className="border-b border-zinc-50 hover:bg-zinc-50">
+                <tr key={e.id} className="border-b border-zinc-50 hover-brand">
                   {editingId === e.id ? (
                     <>
                       <td className="px-5 py-2">
                         <input value={editName} onChange={(ev) => setEditName(ev.target.value)}
-                          className="border border-zinc-200 rounded-lg px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                          className="border border-zinc-200 rounded-lg px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 ring-brand" />
                       </td>
                       <td className="px-5 py-2">
                         <input value={editPhone} onChange={(ev) => setEditPhone(ev.target.value)}
                           placeholder="+1234567890"
-                          className="border border-zinc-200 rounded-lg px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono" />
+                          className="border border-zinc-200 rounded-lg px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 ring-brand font-mono" />
                       </td>
                       <td className="px-5 py-2">
                         <input value={editDept} onChange={(ev) => setEditDept(ev.target.value)} placeholder="Department"
-                          className="border border-zinc-200 rounded-lg px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                          className="border border-zinc-200 rounded-lg px-2 py-1 text-sm w-full focus:outline-none focus:ring-2 ring-brand" />
                       </td>
                       <td className="px-5 py-2 text-end">
                         <div className="flex justify-end gap-2">
                           <button onClick={() => handleSaveEdit(e.id)} className="text-xs font-medium" style={{ color: 'var(--brand,#6366f1)' }}>{t('Save')}</button>
-                          <button onClick={() => setEditingId(null)} className="text-xs font-medium text-zinc-400 hover:text-zinc-600">{t('Cancel')}</button>
+                          <button onClick={() => setEditingId(null)} className="text-xs font-medium text-zinc-400 hover-brand-text">{t('Cancel')}</button>
                         </div>
                       </td>
                     </>
@@ -155,30 +160,20 @@ export default function EmployeesPage() {
                       <td className="px-5 py-3 font-mono text-xs text-zinc-500">
                         {e.phone
                           ? <span dir="ltr">{maskPhone(e.phone)}</span>
-                          : <button onClick={() => startEdit(e)} className="text-xs text-amber-500 hover:text-amber-600 font-medium">{t('+ Add phone')}</button>
+                          : <span className="text-zinc-300">—</span>
                         }
                       </td>
                       <td className="px-5 py-3 text-zinc-500">{e.department ?? <span className="text-zinc-300">—</span>}</td>
                       <td className="px-5 py-3 text-end">
-                        <div className="flex justify-end gap-3">
-                          <button onClick={() => startEdit(e)} className="text-zinc-400 hover:text-zinc-700 transition-colors">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
-                          {e.user_id ? (
-                            <span title="Remove from Team to delete" className="text-zinc-200 cursor-not-allowed">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </span>
-                          ) : (
-                            <button onClick={() => setRemoveTarget(e)} className="text-zinc-400 hover:text-red-500 transition-colors">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          )}
+                        <div className="flex justify-end">
+                          <KebabMenu>
+                            <button onClick={() => startEdit(e)} className={MENU_ITEM}>{t('Edit')}</button>
+                            {e.user_id ? (
+                              <button disabled title={t('Remove from Team to delete')} className={MENU_ITEM_DISABLED}>{t('Delete')}</button>
+                            ) : (
+                              <button onClick={() => setRemoveTarget(e)} className={MENU_ITEM_DANGER}>{t('Delete')}</button>
+                            )}
+                          </KebabMenu>
                         </div>
                       </td>
                     </>

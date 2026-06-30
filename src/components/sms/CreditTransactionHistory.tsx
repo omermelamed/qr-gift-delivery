@@ -48,7 +48,7 @@ export function CreditTransactionHistory({ transactions }: Props) {
           {transactions.map((tx) => {
             const style = TYPE_STYLES[tx.type]
             return (
-              <tr key={tx.id} className="border-b border-zinc-50 last:border-0 hover:bg-zinc-50 transition-colors">
+              <tr key={tx.id} className="border-b border-zinc-50 last:border-0 hover-brand transition-colors">
                 <td className="px-5 py-3 text-sm text-zinc-600">
                   {new Date(tx.created_at).toLocaleString(undefined, {
                     day: '2-digit',
