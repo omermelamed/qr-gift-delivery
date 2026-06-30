@@ -3,10 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { LogoUploader } from '@/components/admin/LogoUploader'
+import { SmsLengthHint } from '@/components/admin/SmsLengthHint'
 import { useT } from '@/lib/i18n/useT'
 
 const DEFAULT_TEMPLATE = "Hi {name}! Here's your QR code for your holiday gift. Scan to redeem: {link}"
-const MAX_SMS_CHARS = 160
 const DEFAULT_BRAND = '#6366f1'
 
 const PRESETS = [
@@ -139,10 +139,7 @@ export function SettingsForm({ companyId, initialName, initialLogoUrl, initialTe
           ) : (
             <span />
           )}
-          <p className={`text-xs ${template.length > MAX_SMS_CHARS ? 'text-amber-600' : 'text-zinc-400'}`}>
-            {template.length} / {MAX_SMS_CHARS} {t('chars')}
-            {template.length > MAX_SMS_CHARS && ` — ${t('will send as multiple SMS segments')}`}
-          </p>
+          <SmsLengthHint template={template} />
         </div>
       </div>
 
