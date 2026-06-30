@@ -26,6 +26,7 @@ export function DepartmentBreakdown({ tokens }: Props) {
 
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-5">
+      <div className="max-w-2xl mx-auto">
       <h2 className="font-semibold text-zinc-900 mb-4">{t('By Department')}</h2>
       <div className="flex flex-col gap-3">
         {rows.map(({ dept, claimed, total, pct }) => (
@@ -42,6 +43,7 @@ export function DepartmentBreakdown({ tokens }: Props) {
             </div>
           </div>
         ))}
+      </div>
       </div>
     </div>
   )

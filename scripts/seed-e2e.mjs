@@ -136,12 +136,14 @@ async function main() {
     bigCampaign = data
   }
   await admin.from('gift_tokens').delete().eq('campaign_id', bigCampaign.id)
+  const DEPTS = ['Engineering', 'Sales', 'Design', 'People', 'Finance', 'Support']
   const bigRows = Array.from({ length: 1000 }, (_, i) => {
     const redeemed = i % 5 === 0
     return {
       campaign_id: bigCampaign.id,
       employee_name: `Employee ${String(i + 1).padStart(3, '0')}`,
       phone_number: `+97250${String(1000000 + i)}`,
+      department: DEPTS[i % DEPTS.length],
       redeemed,
       redeemed_at: redeemed ? new Date().toISOString() : null,
     }
