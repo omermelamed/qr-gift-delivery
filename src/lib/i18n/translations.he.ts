@@ -619,4 +619,6 @@ export const he: Record<string, string> = {
   'codes · share or print this page': 'קודים · שתף או הדפס דף זה',
   'No QR codes found for this campaign.': 'לא נמצאו קודי QR לקמפיין זה.',
   'QR generating…': 'יוצר QR…',
+  'This page failed to load. No data was lost — please try again.': 'טעינת הדף נכשלה. שום מידע לא אבד — נסה שוב.',
+  'Reference': 'מזהה',
 }
