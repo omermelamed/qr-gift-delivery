@@ -21,3 +21,28 @@ body {
 :lang(he) {
   font-family: var(--font-heebo), sans-serif;
 }
+
+/* Pointer affordance for clickable elements. Modern browsers default
+   <button> to `cursor: default`, so set it explicitly everywhere. */
+button,
+[role="button"],
+a[href],
+summary,
+label[for],
+select,
+input[type="checkbox"],
+input[type="radio"],
+input[type="file"],
+input[type="color"],
+input[type="range"],
+input[type="submit"],
+input[type="reset"] {
+  cursor: pointer;
+}
+
+button:disabled,
+button[disabled],
+[role="button"][aria-disabled="true"],
+[aria-disabled="true"] {
+  cursor: not-allowed;
+}

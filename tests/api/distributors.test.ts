@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { makeServiceFrom } from '../helpers/supabase-mock'
 
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
@@ -101,23 +102,15 @@ describe('POST /api/campaigns/[id]/distributors', () => {
   })
 
   it('inserts a distributor assignment', async () => {
-    let inserted: unknown = null
-    mockFromService.mockImplementation((table: string) => {
-      if (table === 'user_company_roles') {
-        return {
-          select: () => ({
-            eq: () => ({
-              eq: () => ({
-                single: () => Promise.resolve({ data: { roles: { name: 'scanner' } }, error: null }),
-              }),
-            }),
-          }),
-        }
-      }
-      // campaign_distributors
-      return {
-        insert: (row: unknown) => { inserted = row; return Promise.resolve({ error: null }) },
-      }
+    const from = makeServiceFrom({
+      campaigns: { data: { id: 'c-1' }, error: null },
+      campaign_distributors: { data: [], error: null },
+      user_company_roles: { data: { roles: { name: 'scanner' } }, error: null },
+    })
+    mockFromService.mockImplementation(from)
+    mockGetUserById.mockResolvedValue({
+      data: { user: { id: 'u-scanner', email: 'scanner@co.com', app_metadata: { company_id: 'co-1', role_name: 'scanner' } } },
+      error: null,
     })
     const { POST } = await import('@/app/api/campaigns/[id]/distributors/route')
     const req = new NextRequest('http://localhost/api/campaigns/c-1/distributors', {
@@ -129,6 +122,7 @@ describe('POST /api/campaigns/[id]/distributors', () => {
     const body = await res.json()
     expect(res.status).toBe(200)
     expect(body.success).toBe(true)
+    const inserted = (from.builders.campaign_distributors.insert as ReturnType<typeof vi.fn>).mock.calls[0][0]
     expect(inserted).toMatchObject({ campaign_id: 'c-1', user_id: 'u-scanner' })
   })
 })

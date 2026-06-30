@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { makeServiceFrom } from '../helpers/supabase-mock'
 
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
+const mockListUsers = vi.fn()
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => ({ auth: { getUser: mockGetUser } }),
-  createServiceClient: () => ({ from: mockFromService }),
+  createServiceClient: () => ({ from: mockFromService, auth: { admin: { listUsers: mockListUsers } } }),
 }))
 
 vi.mock('@/lib/permissions', () => ({
@@ -23,6 +25,7 @@ describe('GET /api/campaigns/[id]/export', () => {
     vi.resetAllMocks()
     const { hasPermission } = await import('@/lib/permissions')
     vi.mocked(hasPermission).mockReturnValue(true)
+    mockListUsers.mockResolvedValue({ data: { users: [] }, error: null })
     mockGetUser.mockResolvedValue({
       data: {
         user: {
@@ -52,27 +55,13 @@ describe('GET /api/campaigns/[id]/export', () => {
   })
 
   it('returns CSV with correct headers and rows', async () => {
-    let callCount = 0
-    mockFromService.mockImplementation(() => {
-      callCount++
-      if (callCount === 1) {
-        return {
-          select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1' }, error: null }) }) }) }),
-        }
-      }
-      return {
-        select: () => ({
-          eq: () => ({
-            order: () => Promise.resolve({
-              data: [
-                { employee_name: 'Omer', phone_number: '+972501234567', department: 'Engineering', sms_sent_at: '2026-04-01T10:00:00Z', redeemed: true, redeemed_at: '2026-04-01T12:00:00Z', redeemed_by: 'dist-1' },
-              ],
-              error: null,
-            }),
-          }),
-        }),
-      }
-    })
+    mockFromService.mockImplementation(makeServiceFrom({
+      campaigns: { data: { id: 'c-1' }, error: null },
+      gift_tokens: { data: [
+        { employee_name: 'Omer', phone_number: '+972501234567', department: 'Engineering', sms_sent_at: '2026-04-01T10:00:00Z', redeemed: true, redeemed_at: '2026-04-01T12:00:00Z', redeemed_by: 'dist-1' },
+      ], error: null },
+      employees: { data: [], error: null },
+    }))
 
     const { GET } = await import('@/app/api/campaigns/[id]/export/route')
     const res = await GET(makeRequest('c-1'), { params: Promise.resolve({ id: 'c-1' }) })

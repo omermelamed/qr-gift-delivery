@@ -29,7 +29,7 @@ export default function ScannerCampaignDetailPage() {
     <main className="flex flex-col bg-zinc-50" style={{ height: '100dvh' }}>
       <div className="px-4 py-3 border-b border-zinc-200 bg-white flex items-center justify-between gap-2 flex-shrink-0">
         <Link href="/scan/campaigns" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors">
-          ← {t('My Campaigns')}
+          <span className="inline-block rtl:rotate-180">←</span> {t('My Campaigns')}
         </Link>
         <Link
           href="/scan"

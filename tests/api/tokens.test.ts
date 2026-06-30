@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { makeServiceFrom } from '../helpers/supabase-mock'
 
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
@@ -65,21 +66,11 @@ describe('POST /api/campaigns/[id]/tokens', () => {
   })
 
   it('inserts valid rows, skips invalid rows', async () => {
-    let callCount = 0
-    mockFromService.mockImplementation(() => {
-      callCount++
-      if (callCount === 1) {
-        // campaign lookup
-        return {
-          select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null }, error: null }) }) }) }),
-        }
-      }
-      // delete unsent + insert
-      return {
-        delete: () => ({ eq: () => ({ is: () => Promise.resolve({ error: null }) }) }),
-        insert: () => Promise.resolve({ error: null }),
-      }
-    })
+    mockFromService.mockImplementation(makeServiceFrom({
+      campaigns: { data: { id: 'c-1', sent_at: null }, error: null },
+      employees: { data: [], error: null },
+      gift_tokens: { error: null },
+    }))
 
     const { POST } = await import('@/app/api/campaigns/[id]/tokens/route')
     const res = await POST(
@@ -102,20 +93,12 @@ describe('POST /api/campaigns/[id]/tokens', () => {
   })
 
   it('normalises Israeli local phone to E.164', async () => {
-    let insertedRows: unknown[] = []
-    let callCount = 0
-    mockFromService.mockImplementation(() => {
-      callCount++
-      if (callCount === 1) {
-        return {
-          select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null }, error: null }) }) }) }),
-        }
-      }
-      return {
-        delete: () => ({ eq: () => ({ is: () => Promise.resolve({ error: null }) }) }),
-        insert: (rows: unknown[]) => { insertedRows = rows; return Promise.resolve({ error: null }) },
-      }
+    const from = makeServiceFrom({
+      campaigns: { data: { id: 'c-1', sent_at: null }, error: null },
+      employees: { data: [], error: null },
+      gift_tokens: { error: null },
     })
+    mockFromService.mockImplementation(from)
 
     const { POST } = await import('@/app/api/campaigns/[id]/tokens/route')
     await POST(
@@ -123,8 +106,10 @@ describe('POST /api/campaigns/[id]/tokens', () => {
       { params: Promise.resolve({ id: 'c-1' }) }
     )
 
+    const insertCalls = (from.builders.gift_tokens.insert as ReturnType<typeof vi.fn>).mock.calls
+    const insertedRows = insertCalls[0][0] as { phone_number: string }[]
     expect(insertedRows).toHaveLength(1)
-    expect((insertedRows[0] as { phone_number: string }).phone_number).toBe('+972501234567')
+    expect(insertedRows[0].phone_number).toBe('+972501234567')
   })
 
   it('populates from directory when source is "directory"', async () => {

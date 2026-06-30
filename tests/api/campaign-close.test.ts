@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { makeServiceFrom } from '../helpers/supabase-mock'
 
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
@@ -83,20 +84,15 @@ describe('POST /api/campaigns/[id]/close', () => {
   })
 
   it('closes a sent campaign and returns success', async () => {
-    let updated = false
-    mockFromService.mockImplementation((table: string) => {
-      if (table === 'campaigns') {
-        return {
-          select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: '2026-04-01', closed_at: null }, error: null }) }) }) }),
-          update: () => ({ eq: () => ({ eq: () => { updated = true; return Promise.resolve({ error: null }) } }) }),
-        }
-      }
+    const from = makeServiceFrom({
+      campaigns: { data: { id: 'c-1', sent_at: '2026-04-01', closed_at: null }, error: null },
     })
+    mockFromService.mockImplementation(from)
     const { POST } = await import('@/app/api/campaigns/[id]/close/route')
     const res = await POST(makeRequest('c-1'), { params: Promise.resolve({ id: 'c-1' }) })
     const body = await res.json()
     expect(res.status).toBe(200)
     expect(body.success).toBe(true)
-    expect(updated).toBe(true)
+    expect(from.builders.campaigns.update as ReturnType<typeof vi.fn>).toHaveBeenCalled()
   })
 })

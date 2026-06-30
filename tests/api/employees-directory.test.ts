@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { makeServiceFrom } from '../helpers/supabase-mock'
 
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
@@ -137,12 +138,8 @@ describe('PATCH /api/employees/[id]', () => {
   beforeEach(() => { vi.resetAllMocks(); mockGetUser.mockResolvedValue(adminUser()) })
 
   it('updates employee fields', async () => {
-    let updatedWith: unknown = null
-    mockFromService.mockReturnValue({
-      update: (fields: unknown) => ({
-        eq: () => ({ eq: () => ({ select: () => ({ single: () => { updatedWith = fields; return Promise.resolve({ data: { id: 'e-1' }, error: null }) } }) }) }),
-      }),
-    })
+    const from = makeServiceFrom({ employees: { data: { id: 'e-1' }, error: null } })
+    mockFromService.mockImplementation(from)
     const { PATCH } = await import('@/app/api/employees/[id]/route')
     const req = new NextRequest('http://localhost/api/employees/e-1', {
       method: 'PATCH',
@@ -151,15 +148,12 @@ describe('PATCH /api/employees/[id]', () => {
     })
     const res = await PATCH(req, { params: Promise.resolve({ id: 'e-1' }) })
     expect(res.status).toBe(200)
+    const updatedWith = (from.builders.employees.update as ReturnType<typeof vi.fn>).mock.calls[0][0]
     expect(updatedWith).toMatchObject({ employee_name: 'Alice Updated' })
   })
 
   it('returns 404 when employee not found for company', async () => {
-    mockFromService.mockReturnValue({
-      update: () => ({
-        eq: () => ({ eq: () => ({ select: () => ({ single: () => Promise.resolve({ data: null, error: null }) }) }) }),
-      }),
-    })
+    mockFromService.mockImplementation(makeServiceFrom({ employees: { data: null, error: null } }))
     const { PATCH } = await import('@/app/api/employees/[id]/route')
     const req = new NextRequest('http://localhost/api/employees/bad', {
       method: 'PATCH',
@@ -175,14 +169,12 @@ describe('DELETE /api/employees/[id]', () => {
   beforeEach(() => { vi.resetAllMocks(); mockGetUser.mockResolvedValue(adminUser()) })
 
   it('deletes the employee', async () => {
-    let deleted = false
-    mockFromService.mockReturnValue({
-      delete: () => ({ eq: () => ({ eq: () => { deleted = true; return Promise.resolve({ error: null }) } }) }),
-    })
+    const from = makeServiceFrom({ employees: { data: { id: 'e-1' }, error: null } })
+    mockFromService.mockImplementation(from)
     const { DELETE } = await import('@/app/api/employees/[id]/route')
     const req = new NextRequest('http://localhost/api/employees/e-1', { method: 'DELETE' })
     const res = await DELETE(req, { params: Promise.resolve({ id: 'e-1' }) })
     expect(res.status).toBe(200)
-    expect(deleted).toBe(true)
+    expect(from.builders.employees.delete as ReturnType<typeof vi.fn>).toHaveBeenCalled()
   })
 })

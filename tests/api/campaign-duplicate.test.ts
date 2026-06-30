@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { NextRequest } from 'next/server'
+import { makeServiceFrom } from '../helpers/supabase-mock'
 
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
@@ -71,45 +72,32 @@ describe('POST /api/campaigns/[id]/duplicate', () => {
   })
 
   it('creates new campaign without copying employees when copyEmployees is false', async () => {
-    let insertedCampaign: unknown = null
-    mockFromService.mockImplementation((table: string) => {
-      if (table === 'campaigns') {
-        return {
-          select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', company_id: 'co-1' }, error: null }) }) }) }),
-          insert: (row: unknown) => { insertedCampaign = row; return { select: () => ({ single: () => Promise.resolve({ data: { id: 'new-c' }, error: null }) }) } },
-        }
-      }
-      return { select: () => ({ eq: () => ({ data: [], error: null }) }) }
+    const from = makeServiceFrom({
+      campaigns: { data: { id: 'new-c', company_id: 'co-1' }, error: null },
+      gift_tokens: { data: [], error: null },
     })
+    mockFromService.mockImplementation(from)
 
     const { POST } = await import('@/app/api/campaigns/[id]/duplicate/route')
     const res = await POST(makeRequest('c-1', { name: 'Copy', campaign_date: '2026-05-01', copyEmployees: false }), { params: Promise.resolve({ id: 'c-1' }) })
     const body = await res.json()
     expect(res.status).toBe(200)
     expect(body.id).toBe('new-c')
+    const insertedCampaign = (from.builders.campaigns.insert as ReturnType<typeof vi.fn>).mock.calls[0][0]
     expect(insertedCampaign).toMatchObject({ name: 'Copy', campaign_date: '2026-05-01', company_id: 'co-1' })
   })
 
   it('copies employees without redeemed/sms fields when copyEmployees is true', async () => {
-    let tokenInsertRows: unknown = null
-    mockFromService.mockImplementation((table: string) => {
-      if (table === 'campaigns') {
-        return {
-          select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1' }, error: null }) }) }) }),
-          insert: () => ({ select: () => ({ single: () => Promise.resolve({ data: { id: 'new-c' }, error: null }) }) }),
-        }
-      }
-      if (table === 'gift_tokens') {
-        return {
-          select: () => ({ eq: () => Promise.resolve({ data: [{ employee_name: 'Alice', phone_number: '+1234', department: 'Eng', redeemed: true, redeemed_at: '2026-04-01', redeemed_by: 'u-1', sms_sent_at: '2026-04-01', qr_image_url: 'https://qr.example.com' }], error: null }) }),
-          insert: (rows: unknown) => { tokenInsertRows = rows; return Promise.resolve({ error: null }) },
-        }
-      }
+    const from = makeServiceFrom({
+      campaigns: { data: { id: 'new-c' }, error: null },
+      gift_tokens: { data: [{ employee_name: 'Alice', phone_number: '+1234', department: 'Eng', redeemed: true, redeemed_at: '2026-04-01', redeemed_by: 'u-1', sms_sent_at: '2026-04-01', qr_image_url: 'https://qr.example.com' }], error: null },
     })
+    mockFromService.mockImplementation(from)
 
     const { POST } = await import('@/app/api/campaigns/[id]/duplicate/route')
     const res = await POST(makeRequest('c-1', { name: 'Copy', campaign_date: null, copyEmployees: true }), { params: Promise.resolve({ id: 'c-1' }) })
     expect(res.status).toBe(200)
+    const tokenInsertRows = (from.builders.gift_tokens.insert as ReturnType<typeof vi.fn>).mock.calls[0][0]
     expect(Array.isArray(tokenInsertRows)).toBe(true)
     const row = (tokenInsertRows as Record<string, unknown>[])[0]
     expect(row.employee_name).toBe('Alice')

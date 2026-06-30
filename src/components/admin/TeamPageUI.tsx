@@ -64,8 +64,8 @@ export function TeamPageUI({ members }: Props) {
                     <p className="font-medium text-zinc-900">{m.name}</p>
                     <p className="text-xs text-zinc-400">{m.email}</p>
                   </td>
-                  <td className="px-5 py-3 text-zinc-500 font-mono text-xs" dir="ltr">
-                    {m.phone || <span className="text-zinc-300">—</span>}
+                  <td className="px-5 py-3 text-zinc-500 font-mono text-xs">
+                    {m.phone ? <span dir="ltr">{m.phone}</span> : <span className="text-zinc-300">—</span>}
                   </td>
                   <td className="px-5 py-3 text-zinc-600">{ROLE_LABELS[m.role_name] ?? m.role_name}</td>
                   <td className="px-5 py-3">

@@ -67,7 +67,7 @@ export default async function CompanyDetailPage({
     <div className="p-8 max-w-5xl mx-auto">
       <div className="mb-6">
         <Link href="/platform" className="text-sm text-zinc-400 hover:text-zinc-700 transition-colors">
-          ← Companies
+          <span className="inline-block rtl:rotate-180">←</span> Companies
         </Link>
       </div>
 

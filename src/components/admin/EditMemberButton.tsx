@@ -162,7 +162,7 @@ export function EditMemberButton({ userId, name, email, phone, roleName, isActiv
                     }`}
                   >
                     <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
-                      form.active ? 'translate-x-6' : 'translate-x-1'
+                      form.active ? 'translate-x-6 rtl:-translate-x-6' : 'translate-x-1 rtl:-translate-x-1'
                     }`} />
                   </button>
                 </div>
