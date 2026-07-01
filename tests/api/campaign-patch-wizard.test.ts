@@ -51,12 +51,14 @@ describe('PATCH /api/campaigns/[id] — wizard fields', () => {
     const { PATCH } = await import('@/app/api/campaigns/[id]/route')
     const res = await PATCH(patch({ name: '   ' }), ctx)
     expect(res.status).toBe(400)
+    expect((await res.json()).error).toBe('name is required')
   })
 
   it('rejects invalid date', async () => {
     const { PATCH } = await import('@/app/api/campaigns/[id]/route')
     const res = await PATCH(patch({ campaignDate: 'not-a-date' }), ctx)
     expect(res.status).toBe(400)
+    expect((await res.json()).error).toBe('campaignDate must be a valid date')
   })
 
   it('persists wizardLastStep', async () => {
@@ -70,5 +72,20 @@ describe('PATCH /api/campaigns/[id] — wizard fields', () => {
     const { PATCH } = await import('@/app/api/campaigns/[id]/route')
     const res = await PATCH(patch({ wizardLastStep: 9 }), ctx)
     expect(res.status).toBe(400)
+    expect((await res.json()).error).toBe('invalid_step')
+  })
+
+  it('rejects wizardLastStep below range (0)', async () => {
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    const res = await PATCH(patch({ wizardLastStep: 0 }), ctx)
+    expect(res.status).toBe(400)
+    expect((await res.json()).error).toBe('invalid_step')
+  })
+
+  it('rejects non-integer wizardLastStep (2.5)', async () => {
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    const res = await PATCH(patch({ wizardLastStep: 2.5 }), ctx)
+    expect(res.status).toBe(400)
+    expect((await res.json()).error).toBe('invalid_step')
   })
 })
