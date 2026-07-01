@@ -48,6 +48,7 @@ export function CampaignWizard({
   const [name, setName] = useState(campaign.name)
   const [campaignDate, setCampaignDate] = useState(campaign.campaign_date ?? '')
   const basicsDirty = useRef(false)
+  const [basicsError, setBasicsError] = useState<string | null>(null)
 
   const employeeCount = tokens.length
   const ctx: WizardContext = useMemo(
@@ -72,12 +73,18 @@ export function CampaignWizard({
 
   async function persistBasics() {
     if (!basicsDirty.current) return
-    basicsDirty.current = false
-    await fetch(`/api/campaigns/${campaign.id}`, {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim(), campaignDate }),
-    }).catch(() => {})
-    router.refresh()
+    try {
+      const res = await fetch(`/api/campaigns/${campaign.id}`, {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name.trim(), campaignDate }),
+      })
+      if (!res.ok) throw new Error('save failed')
+      basicsDirty.current = false
+      setBasicsError(null)
+      router.refresh()
+    } catch {
+      setBasicsError(t('Could not save the campaign name and date. Please try again.'))
+    }
   }
 
   async function goToStep(next: number) {
@@ -99,19 +106,22 @@ export function CampaignWizard({
         {step === 1 && (
           <div className="flex flex-col gap-5 max-w-lg">
             <h2 className="text-lg font-semibold text-zinc-900">{t('Basics')}</h2>
+            {basicsError && (
+              <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{basicsError}</p>
+            )}
             <div className="flex flex-col gap-1.5">
               <label htmlFor="wiz-name" className="text-sm font-medium text-zinc-700">{t('Campaign name')}</label>
               <input
                 id="wiz-name" type="text" value={name}
                 placeholder={t('e.g. Passover 2026')}
-                onChange={(e) => { setName(e.target.value); basicsDirty.current = true }}
+                onChange={(e) => { setName(e.target.value); basicsDirty.current = true; setBasicsError(null) }}
                 className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
               />
             </div>
             <div className="flex flex-col gap-1.5">
               <label htmlFor="wiz-date" className="text-sm font-medium text-zinc-700">{t('Campaign date')}</label>
               <DatePicker id="wiz-date" value={campaignDate}
-                onChange={(v) => { setCampaignDate(v); basicsDirty.current = true }} />
+                onChange={(v) => { setCampaignDate(v); basicsDirty.current = true; setBasicsError(null) }} />
             </div>
           </div>
         )}
