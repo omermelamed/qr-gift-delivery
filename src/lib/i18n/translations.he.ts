@@ -632,4 +632,22 @@ export const he: Record<string, string> = {
   'QR generating…': 'יוצר QR…',
   'This page failed to load. No data was lost — please try again.': 'טעינת הדף נכשלה. שום מידע לא אבד — נסה שוב.',
   'Reference': 'מזהה',
+
+  // Campaign creation wizard
+  'Campaign setup steps': 'שלבי הקמת הקמפיין',
+  'Basics': 'פרטים בסיסיים',
+  'Distribution': 'חלוקה',
+  'Message': 'הודעה',
+  'Review': 'סיכום',
+  'Review & Launch': 'סיכום והפעלה',
+  'Advanced settings': 'הגדרות מתקדמות',
+  'Gift options': 'אפשרויות מתנה',
+  'On': 'פעיל',
+  'Off': 'כבוי',
+  'Before launching, add:': 'לפני ההפעלה יש להוסיף:',
+  'name': 'שם',
+  'date': 'תאריך',
+  'Continue': 'המשך',
+  'Step 1 of 5 · Basics': 'שלב 1 מתוך 5 · פרטים בסיסיים',
+  'Could not save the campaign name and date. Please try again.': 'לא ניתן היה לשמור את שם ותאריך הקמפיין. נסו שוב.',
 }
