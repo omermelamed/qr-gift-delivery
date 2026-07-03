@@ -25,7 +25,7 @@ export function CampaignDetailHeader({ campaignName, campaignDate, sentAt, close
           <h1 className="text-2xl font-bold text-zinc-900">{campaignName}</h1>
           <StatusBadge sentAt={sentAt} closedAt={closedAt} />
         </div>
-        <p className="text-sm text-zinc-400 mt-0.5">{campaignDate ?? '—'}</p>
+        {campaignDate && <p className="text-sm text-zinc-400 mt-0.5">{campaignDate}</p>}
       </div>
     </>
   )

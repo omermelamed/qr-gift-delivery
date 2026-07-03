@@ -49,14 +49,14 @@ export function CampaignSmsTemplate({ campaignId, initial, companyDefault }: Pro
     : t('Use {name} for the recipient and {link} for the gift link.')
 
   return (
-    <div className="flex flex-col gap-2 bg-white rounded-2xl border border-zinc-200 shadow-sm p-4">
+    <div className="flex flex-col gap-2 bg-white rounded-2xl border border-zinc-200 p-4">
       <span className="text-sm font-medium text-zinc-900">{t('SMS message')}</span>
       <textarea
         rows={4}
         value={value}
         placeholder={placeholder}
         onChange={(e) => setValue(e.target.value)}
-        className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand resize-y"
+        className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand resize-none"
       />
       <span className="text-xs text-zinc-500">
         {t('Use {name} for the recipient and {link} for the gift link.')}{' '}

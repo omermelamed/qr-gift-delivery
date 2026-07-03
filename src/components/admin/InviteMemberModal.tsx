@@ -80,7 +80,6 @@ export function InviteMemberModal({ onClose }: Props) {
             <input
               id="inv-name"
               type="text"
-              placeholder={t('Jane Cohen')}
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
@@ -93,7 +92,6 @@ export function InviteMemberModal({ onClose }: Props) {
             <input
               id="inv-email"
               type="email"
-              placeholder="colleague@company.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -107,7 +105,6 @@ export function InviteMemberModal({ onClose }: Props) {
               id="inv-phone"
               type="tel"
               dir="ltr"
-              placeholder="+972..."
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="border border-zinc-200 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 ring-brand focus:border-transparent"

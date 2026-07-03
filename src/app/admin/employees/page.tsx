@@ -209,7 +209,7 @@ export default function EmployeesPage() {
         <ConfirmModal
           title={`Remove ${removeTarget.employee_name}?`}
           message="This removes them from the directory only. Existing campaign tokens are not affected."
-          confirmLabel="Remove"
+          confirmLabel={t('Delete')}
           loading={removeLoading}
           onConfirm={handleRemove}
           onCancel={() => setRemoveTarget(null)}

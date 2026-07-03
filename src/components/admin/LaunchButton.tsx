@@ -32,6 +32,13 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance }: { cam
     }
   }
 
+  const insufficientCredits = creditBalance < employeeCount
+  const disabledTooltip = insufficientCredits
+    ? t('Not enough credits — you need {needed} but have {available}')
+        .replace('{needed}', String(employeeCount))
+        .replace('{available}', String(creditBalance))
+    : undefined
+
   return (
     <>
       {error && (
@@ -39,13 +46,15 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance }: { cam
           {error}
         </p>
       )}
-      <button
-        onClick={() => setShowModal(true)}
-        disabled={creditBalance < employeeCount}
-        className="bg-brand text-white rounded-lg px-5 h-[34px] inline-flex items-center justify-center text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {t('🚀 Launch Campaign')}
-      </button>
+      <span title={disabledTooltip} className="inline-flex">
+        <button
+          onClick={() => setShowModal(true)}
+          disabled={insufficientCredits}
+          className="bg-brand text-white rounded-lg px-5 h-[34px] inline-flex items-center justify-center text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {t('🚀 Launch Campaign')}
+        </button>
+      </span>
       {showModal && (
         <ConfirmModal
           title={t('Launch campaign?')}

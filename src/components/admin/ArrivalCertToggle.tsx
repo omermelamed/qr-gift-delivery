@@ -64,7 +64,7 @@ export function ArrivalCertToggle({
   }
 
   return (
-    <div className="flex flex-col gap-3 bg-white rounded-2xl border border-zinc-200 shadow-sm p-4">
+    <div className="flex flex-col gap-3 bg-white rounded-2xl border border-zinc-200 p-4">
       <label className="flex items-start gap-3 cursor-pointer">
         <input
           type="checkbox"

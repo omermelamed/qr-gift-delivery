@@ -76,7 +76,36 @@ export async function PATCH(
   }
 
   const body = await request.json().catch(() => ({}))
-  const update: { supports_arrival_certificates?: boolean; max_attendee_count?: number | null; sms_template?: string | null } = {}
+  const update: {
+    name?: string
+    campaign_date?: string
+    supports_arrival_certificates?: boolean
+    max_attendee_count?: number | null
+    sms_template?: string | null
+    wizard_last_step?: number
+  } = {}
+
+  if ('name' in body) {
+    if (typeof body.name !== 'string' || !body.name.trim()) {
+      return NextResponse.json({ error: 'name is required' }, { status: 400 })
+    }
+    update.name = body.name.trim()
+  }
+
+  if ('campaignDate' in body) {
+    if (typeof body.campaignDate !== 'string' || isNaN(Date.parse(body.campaignDate))) {
+      return NextResponse.json({ error: 'campaignDate must be a valid date' }, { status: 400 })
+    }
+    update.campaign_date = body.campaignDate
+  }
+
+  if ('wizardLastStep' in body) {
+    const raw = body.wizardLastStep
+    if (typeof raw !== 'number' || !Number.isInteger(raw) || raw < 1 || raw > 5) {
+      return NextResponse.json({ error: 'invalid_step' }, { status: 400 })
+    }
+    update.wizard_last_step = raw
+  }
 
   if ('supportsArrivalCertificates' in body) {
     if (typeof body.supportsArrivalCertificates !== 'boolean') {

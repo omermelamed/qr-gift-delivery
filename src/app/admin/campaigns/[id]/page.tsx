@@ -1,17 +1,12 @@
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
-import { CampaignPopulator } from '@/components/admin/CampaignPopulator'
-import { LaunchButton } from '@/components/admin/LaunchButton'
 import { CloseCampaignButton } from '@/components/admin/CloseCampaignButton'
+import { CampaignWizard } from '@/components/admin/wizard/CampaignWizard'
 import { RedemptionProgress } from '@/components/admin/RedemptionProgress'
 import { DistributorAssignment } from '@/components/admin/DistributorAssignment'
-import { GiftOptionsEditor } from '@/components/admin/GiftOptionsEditor'
-import { ArrivalCertToggle } from '@/components/admin/ArrivalCertToggle'
-import { CampaignSmsTemplate } from '@/components/admin/CampaignSmsTemplate'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { CampaignNotes } from '@/components/admin/CampaignNotes'
@@ -48,7 +43,7 @@ export default async function CampaignDetailPage({
   const [campaignResult, creditsResult, companyResult] = await Promise.all([
     service
       .from('campaigns')
-      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates, max_attendee_count, sms_template')
+      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates, max_attendee_count, sms_template, wizard_last_step')
       .eq('id', campaignId)
       .eq('company_id', companyId)
       .single(),
@@ -130,9 +125,7 @@ export default async function CampaignDetailPage({
   const gifts = giftsData ?? []
   const claimedCount = allTokens.filter((t) => t.redeemed).length
   const isDraft = !campaign.sent_at
-  const canLaunch = isDraft && allTokens.length > 0
   const canClose = !!campaign.sent_at && !campaign.closed_at
-  const unredeemedCount = allTokens.filter((t) => !t.redeemed).length
 
   return (
     <div className="p-4 md:p-6 max-w-7xl mx-auto">
@@ -148,23 +141,21 @@ export default async function CampaignDetailPage({
         <div />
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
-          {canLaunch && (
-            <LaunchButton campaignId={campaign.id} employeeCount={allTokens.length} creditBalance={creditBalance} />
+          {!isDraft && (
+            <KebabMenu>
+              <DuplicateCampaignButton
+                campaignId={campaign.id}
+                sourceName={campaign.name}
+                sourceDate={campaign.campaign_date}
+                className={MENU_ITEM}
+              />
+              {campaign.sent_at && !campaign.closed_at && (
+                <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} className={MENU_ITEM} />
+              )}
+              {campaign.sent_at && <ViewQrLink campaignId={campaign.id} className={MENU_ITEM} />}
+              {campaign.sent_at && <ExportCsvLink campaignId={campaign.id} className={MENU_ITEM} />}
+            </KebabMenu>
           )}
-          <KebabMenu>
-            <DuplicateCampaignButton
-              campaignId={campaign.id}
-              sourceName={campaign.name}
-              sourceDate={campaign.campaign_date}
-              className={MENU_ITEM}
-            />
-            {campaign.sent_at && !campaign.closed_at && (
-              <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} className={MENU_ITEM} />
-            )}
-            {campaign.sent_at && <ViewQrLink campaignId={campaign.id} className={MENU_ITEM} />}
-            {campaign.sent_at && <ExportCsvLink campaignId={campaign.id} className={MENU_ITEM} />}
-            {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter className={MENU_ITEM_DANGER} />}
-          </KebabMenu>
         </div>
       </div>
 
@@ -182,32 +173,24 @@ export default async function CampaignDetailPage({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
 
         {isDraft ? (
-          <>
-            {/* Main column (2 cols): populator → employee table.
-                Kept as one stacking column so the sidebar's height never pushes
-                these apart (grid rows would otherwise couple their heights). */}
-            <div className="lg:col-span-2 flex flex-col gap-4">
-              <CampaignPopulator campaignId={campaign.id} existingTokens={allTokens.map((t) => ({ employee_name: t.employee_name, phone_number: t.phone_number }))} />
-              <EmployeeTable
-                campaignId={campaign.id}
-                initialRows={allTokens}
-                isDraft={isDraft}
-                gifts={gifts}
-                canEditGift={canEditGift}
-                showAttendance={campaign.supports_arrival_certificates}
-                canEditAttendance={canEditGift}
-              />
-            </div>
-
-            {/* Sidebar (1 col): config cards + notes, stacked independently. */}
-            <div className="flex flex-col gap-4">
-              <DistributorAssignment campaignId={campaign.id} />
-              <GiftOptionsEditor campaignId={campaign.id} />
-              <ArrivalCertToggle campaignId={campaign.id} initial={campaign.supports_arrival_certificates} initialMax={campaign.max_attendee_count} />
-              <CampaignSmsTemplate campaignId={campaign.id} initial={campaign.sms_template} companyDefault={companyDefaultTemplate} />
-              <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
-            </div>
-          </>
+          <div className="lg:col-span-3">
+            <CampaignWizard
+              campaign={{
+                id: campaign.id,
+                name: campaign.name,
+                campaign_date: campaign.campaign_date,
+                supports_arrival_certificates: campaign.supports_arrival_certificates,
+                max_attendee_count: campaign.max_attendee_count,
+                sms_template: campaign.sms_template,
+                wizard_last_step: campaign.wizard_last_step,
+              }}
+              tokens={allTokens}
+              gifts={gifts}
+              creditBalance={creditBalance}
+              companyDefaultTemplate={companyDefaultTemplate}
+              canEditGift={canEditGift}
+            />
+          </div>
         ) : (
           <>
             {/* Main column (2 cols): arrival → progress → gifts → employees.
