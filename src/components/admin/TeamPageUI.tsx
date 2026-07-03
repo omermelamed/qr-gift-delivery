@@ -63,7 +63,7 @@ export function TeamPageUI({ members }: Props) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t('Search by name or email…')}
-          className="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
+          className="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
         />
       </div>
 

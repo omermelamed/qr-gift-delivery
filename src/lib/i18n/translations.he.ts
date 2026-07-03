@@ -158,6 +158,15 @@ export const he: Record<string, string> = {
   'Create your first campaign to get started': 'צור את הקמפיין הראשון שלך כדי להתחיל',
   'of': 'מתוך',
   'claimed': 'מומשו',
+  'Search campaigns…': 'חיפוש קמפיינים…',
+  'All statuses': 'כל הסטטוסים',
+  'No campaigns match your filters': 'אין קמפיינים התואמים לסינון',
+  'Campaign due date': 'תאריך קמפיין',
+  'Created by': 'נוצר על ידי',
+  'All dates': 'כל התאריכים',
+  'From date': 'מתאריך',
+  'To date': 'עד תאריך',
+  'Clear dates': 'נקה תאריכים',
 
   // Admin team page
   'Member': 'חבר',
