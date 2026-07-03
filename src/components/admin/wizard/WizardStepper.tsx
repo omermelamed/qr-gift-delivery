@@ -3,7 +3,7 @@
 import { useT } from '@/lib/i18n/useT'
 import { canJumpTo, type WizardContext } from '@/lib/wizard'
 
-const STEP_LABELS = ['Basics', 'Employees', 'Distribution', 'Message', 'Review'] as const
+const STEP_LABELS = ['Basics', 'Employees', 'Scanners', 'Message', 'Review'] as const
 
 export function WizardStepper({
   current,

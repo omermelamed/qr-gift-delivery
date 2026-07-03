@@ -44,7 +44,7 @@ export function RemoveMemberButton({ userId, name, className }: Props) {
       {error && <span className="text-xs text-red-500 me-1">{error}</span>}
       {className ? (
         <button onClick={() => { setError(null); setShowModal(true) }} className={className}>
-          {t('Remove')}
+          {t('Delete')}
         </button>
       ) : (
         <button
@@ -61,7 +61,7 @@ export function RemoveMemberButton({ userId, name, className }: Props) {
       {showModal && createPortal(
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
-            <h2 className="text-base font-semibold text-zinc-900 mb-1">{t('Remove')} {name} {t('from team?')}</h2>
+            <h2 className="text-base font-semibold text-zinc-900 mb-1">{t('Delete')} {name} {t('from team?')}</h2>
             <p className="text-sm text-zinc-500 mb-5">
               {name} {t('will immediately lose access to GiftFlow. Choose what happens to their employee record.')}
             </p>
@@ -88,7 +88,7 @@ export function RemoveMemberButton({ userId, name, className }: Props) {
             <button
               onClick={() => setShowModal(false)}
               disabled={loading}
-              className="mt-4 w-full text-center text-sm text-zinc-400 hover-brand-text transition-colors disabled:opacity-50"
+              className="mt-4 w-full text-center text-sm font-medium text-zinc-600 hover-brand-text transition-colors disabled:opacity-50"
             >
               {t('Cancel')}
             </button>

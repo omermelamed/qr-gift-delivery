@@ -171,6 +171,8 @@ export const he: Record<string, string> = {
   'Pending': 'ממתין',
   'Active': 'פעיל',
   'No team members yet. Invite someone to get started.': 'אין חברי צוות עדיין. הזמן מישהו כדי להתחיל.',
+  'Search by name or email…': 'חפש לפי שם או אימייל…',
+  'No members match your search.': 'אין חברים התואמים את החיפוש.',
 
   // Admin settings
   'Manage your company profile and SMS defaults': 'נהל את פרופיל החברה וברירות המחדל של SMS',
@@ -274,6 +276,7 @@ export const he: Record<string, string> = {
   'Failed to delete campaign': 'שגיאה במחיקת קמפיין',
 
   // LaunchButton
+  'Not enough credits — you need {needed} but have {available}': 'אין מספיק קרדיטים — נדרשים {needed} אך יש {available}',
   '🚀 Launch Campaign': '🚀 הפעל קמפיין',
   'Launch campaign?': 'להפעיל את הקמפיין?',
   'Launch': 'הפעל',
@@ -634,8 +637,13 @@ export const he: Record<string, string> = {
   'Reference': 'מזהה',
 
   // Campaign creation wizard
-  'Campaign setup steps': 'שלבי הקמת הקמפיין',
+'Previous': 'הקודם',
+'Cancel campaign creation?': 'לבטל את יצירת הקמפיין?',
+'Are you sure you want to cancel? This action will remove this campaign.': 'האם אתה בטוח שברצונך לבטל? פעולה זו תמחק את הקמפיין.',
+'Yes, remove it': 'כן, מחק אותו',
+'Campaign setup steps': 'שלבי הקמת הקמפיין',
   'Basics': 'פרטים בסיסיים',
+  'Scanners': 'סורקים',
   'Distribution': 'חלוקה',
   'Message': 'הודעה',
   'Review': 'סיכום',

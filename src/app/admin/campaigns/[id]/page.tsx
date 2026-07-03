@@ -141,20 +141,21 @@ export default async function CampaignDetailPage({
         <div />
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 flex-shrink-0">
           {canClose && <CloseCampaignButton campaignId={campaign.id} />}
-          <KebabMenu>
-            <DuplicateCampaignButton
-              campaignId={campaign.id}
-              sourceName={campaign.name}
-              sourceDate={campaign.campaign_date}
-              className={MENU_ITEM}
-            />
-            {campaign.sent_at && !campaign.closed_at && (
-              <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} className={MENU_ITEM} />
-            )}
-            {campaign.sent_at && <ViewQrLink campaignId={campaign.id} className={MENU_ITEM} />}
-            {campaign.sent_at && <ExportCsvLink campaignId={campaign.id} className={MENU_ITEM} />}
-            {isDraft && <DeleteCampaignButton campaignId={campaign.id} redirectAfter className={MENU_ITEM_DANGER} />}
-          </KebabMenu>
+          {!isDraft && (
+            <KebabMenu>
+              <DuplicateCampaignButton
+                campaignId={campaign.id}
+                sourceName={campaign.name}
+                sourceDate={campaign.campaign_date}
+                className={MENU_ITEM}
+              />
+              {campaign.sent_at && !campaign.closed_at && (
+                <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} className={MENU_ITEM} />
+              )}
+              {campaign.sent_at && <ViewQrLink campaignId={campaign.id} className={MENU_ITEM} />}
+              {campaign.sent_at && <ExportCsvLink campaignId={campaign.id} className={MENU_ITEM} />}
+            </KebabMenu>
+          )}
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { RemoveMemberButton } from '@/components/admin/RemoveMemberButton'
 import { InviteButton } from '@/components/admin/InviteButton'
 import { EditMemberButton } from '@/components/admin/EditMemberButton'
@@ -24,6 +25,7 @@ type Props = { members: Member[] }
 
 export function TeamPageUI({ members }: Props) {
   const t = useT()
+  const [search, setSearch] = useState('')
 
   const ROLE_LABELS: Record<string, string> = {
     company_admin: t('Admin'),
@@ -31,6 +33,16 @@ export function TeamPageUI({ members }: Props) {
     scanner: t('Scanner'),
     platform_admin: t('Platform Admin'),
   }
+
+  const filtered = members.filter((m) => {
+    if (!search) return true
+    const q = search.toLowerCase()
+    return (
+      m.name.toLowerCase().includes(q) ||
+      m.email.toLowerCase().includes(q) ||
+      (ROLE_LABELS[m.role_name] ?? m.role_name).toLowerCase().includes(q)
+    )
+  })
 
   return (
     <div className="p-4 md:p-8 max-w-4xl mx-auto">
@@ -43,6 +55,16 @@ export function TeamPageUI({ members }: Props) {
           </p>
         </div>
         <InviteButton />
+      </div>
+
+      <div className="mb-4">
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder={t('Search by name or email…')}
+          className="w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
+        />
       </div>
 
       <div className="bg-white rounded-xl border border-zinc-200 overflow-x-auto">
@@ -62,7 +84,14 @@ export function TeamPageUI({ members }: Props) {
               </tr>
             </thead>
             <tbody>
-              {members.map((m) => (
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-5 py-10 text-center text-sm text-zinc-400">
+                    {t('No members match your search.')}
+                  </td>
+                </tr>
+              )}
+              {filtered.map((m) => (
                 <tr key={m.id} className="border-b border-zinc-50 hover-brand">
                   <td className="px-5 py-3">
                     <p className="font-medium text-zinc-900">{m.name}</p>

@@ -12,6 +12,7 @@ import { CampaignSmsTemplate } from '@/components/admin/CampaignSmsTemplate'
 import { ArrivalCertToggle } from '@/components/admin/ArrivalCertToggle'
 import { LaunchButton } from '@/components/admin/LaunchButton'
 import { WizardStepper } from '@/components/admin/wizard/WizardStepper'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import {
   clampStep, canAdvance, resolveInitialStep, unmetRequirements,
   WIZARD_STEP_COUNT, type WizardContext,
@@ -60,6 +61,27 @@ export function CampaignWizard({
     resolveInitialStep(searchParams.get('step'), campaign.wizard_last_step, ctx),
   )
   const [advancedOpen, setAdvancedOpen] = useState(campaign.supports_arrival_certificates)
+  const [showCancelDialog, setShowCancelDialog] = useState(false)
+  const [cancelLoading, setCancelLoading] = useState(false)
+  const [cancelError, setCancelError] = useState<string | null>(null)
+
+  async function handleCancel() {
+    setCancelLoading(true)
+    setCancelError(null)
+    try {
+      const res = await fetch(`/api/campaigns/${campaign.id}`, { method: 'DELETE' })
+      if (!res.ok) {
+        const data = await res.json()
+        setCancelError(data.error ?? t('Failed to delete campaign'))
+        return
+      }
+      router.push('/admin')
+    } catch {
+      setCancelError(t('Network error — please try again'))
+    } finally {
+      setCancelLoading(false)
+    }
+  }
 
   function persistStep(next: number) {
     const params = new URLSearchParams(searchParams.toString())
@@ -102,7 +124,7 @@ export function CampaignWizard({
     <div>
       <WizardStepper current={step} ctx={ctx} onJump={goToStep} />
 
-      <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 md:p-6">
+      <div className="bg-white rounded-2xl border border-zinc-200 p-5 md:p-6">
         {step === 1 && (
           <div className="flex flex-col gap-5 max-w-lg">
             <h2 className="text-lg font-semibold text-zinc-900">{t('Basics')}</h2>
@@ -144,7 +166,6 @@ export function CampaignWizard({
         {step === 3 && (
           <div className="flex flex-col gap-4">
             <DistributorAssignment campaignId={campaign.id} />
-            <GiftOptionsEditor campaignId={campaign.id} />
           </div>
         )}
 
@@ -164,7 +185,8 @@ export function CampaignWizard({
                 <span className={`transition-transform ${advancedOpen ? 'rotate-180' : ''}`}>⌄</span>
               </button>
               {advancedOpen && (
-                <div className="px-4 pb-4">
+                <div className="px-4 pb-4 flex flex-col gap-4">
+                  <GiftOptionsEditor campaignId={campaign.id} />
                   <ArrivalCertToggle
                     campaignId={campaign.id}
                     initial={campaign.supports_arrival_certificates}
@@ -192,22 +214,33 @@ export function CampaignWizard({
                 {t('Before launching, add:')} {missing.map((m) => t(m)).join(', ')}
               </p>
             ) : (
-              <LaunchButton campaignId={campaign.id} employeeCount={employeeCount} creditBalance={creditBalance} />
+              <div className="flex justify-center">
+                <LaunchButton campaignId={campaign.id} employeeCount={employeeCount} creditBalance={creditBalance} />
+              </div>
             )}
           </div>
         )}
       </div>
 
-      {/* Back / Next */}
+      {/* Previous / Cancel / Next */}
       <div className="flex items-center justify-between mt-5">
-        <button
-          type="button"
-          onClick={() => goToStep(step - 1)}
-          disabled={step === 1}
-          className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover-brand-text disabled:opacity-40 disabled:cursor-not-allowed"
-        >
-          ← {t('Back')}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => goToStep(step - 1)}
+            disabled={step === 1}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover-brand-text disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            {t('Previous')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowCancelDialog(true)}
+            className="rounded-lg px-4 py-2 text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+          >
+            {t('Cancel')}
+          </button>
+        </div>
         {step < WIZARD_STEP_COUNT && (
           <button
             type="button"
@@ -215,10 +248,22 @@ export function CampaignWizard({
             disabled={nextDisabled}
             className="rounded-lg px-5 py-2 text-sm font-semibold bg-brand text-white hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {t('Next')} →
+            {t('Next')}
           </button>
         )}
       </div>
+
+      {showCancelDialog && (
+        <ConfirmModal
+          title={t('Cancel campaign creation?')}
+          message={t('Are you sure you want to cancel? This action will remove this campaign.')}
+          confirmLabel={t('Yes, remove it')}
+          loading={cancelLoading}
+          error={cancelError}
+          onConfirm={handleCancel}
+          onCancel={() => { setShowCancelDialog(false); setCancelError(null) }}
+        />
+      )}
     </div>
   )
 }
