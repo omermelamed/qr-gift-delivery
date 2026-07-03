@@ -4,10 +4,9 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { normalizePhone } from '@/lib/phone'
 import { normalizeCSVRow, parseSheetRows } from '@/lib/csv'
-import { DirectoryEmployeePicker } from '@/components/admin/DirectoryEmployeePicker'
 import { useT } from '@/lib/i18n/useT'
 
-type Tab = 'upload' | 'directory' | 'clone'
+type Tab = 'upload' | 'manual' | 'clone'
 type ParsedRow = { name: string; phone_number: string; department?: string }
 type ValidatedRow = ParsedRow & { _status: 'valid' | 'invalid'; _reason?: string }
 type CampaignOption = { id: string; name: string; campaign_date: string | null }
@@ -25,15 +24,53 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
   const [tab, setTab] = useState<Tab>('upload')
   const [rows, setRows] = useState<ValidatedRow[]>([])
   const [isDragging, setIsDragging] = useState(false)
-  const [saveToDirectory, setSaveToDirectory] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null)
   const [campaigns, setCampaigns] = useState<CampaignOption[]>([])
   const [cloneSource, setCloneSource] = useState('')
   const [cloning, setCloning] = useState(false)
+  const [manualName, setManualName] = useState('')
+  const [manualPhone, setManualPhone] = useState('')
+  const [manualDept, setManualDept] = useState('')
+  const [manualPhoneError, setManualPhoneError] = useState<string | null>(null)
+  const [manualLoading, setManualLoading] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
   const t = useT()
+
+  function validateManualPhone() {
+    if (manualPhone.trim() && !normalizePhone(manualPhone)) {
+      setManualPhoneError(t('Invalid phone number'))
+      return false
+    }
+    setManualPhoneError(null)
+    return true
+  }
+
+  async function handleManualAdd(e: React.FormEvent) {
+    e.preventDefault()
+    if (!validateManualPhone()) return
+    setManualLoading(true)
+    setMessage(null)
+    try {
+      const res = await fetch(`/api/campaigns/${campaignId}/employees`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: manualName.trim(), phone_number: manualPhone.trim(), department: manualDept.trim() || undefined }),
+      })
+      const data = await res.json()
+      if (!res.ok) { setMessage({ text: data.error ?? t('Failed to add employee'), type: 'error' }); return }
+      setManualName('')
+      setManualPhone('')
+      setManualDept('')
+      setMessage({ text: t('Employee added'), type: 'success' })
+      router.refresh()
+    } catch {
+      setMessage({ text: t('Network error — please try again'), type: 'error' })
+    } finally {
+      setManualLoading(false)
+    }
+  }
 
   useEffect(() => {
     if (tab === 'clone' && campaigns.length === 0) {
@@ -68,19 +105,6 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
     setUploading(true)
     setMessage(null)
     try {
-      if (saveToDirectory) {
-        const importRes = await fetch('/api/employees/import', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ rows: validRows.map(({ name, phone_number, department }) => ({ employee_name: name, phone: phone_number, department })) }),
-        })
-        if (!importRes.ok) {
-          const importData = await importRes.json()
-          setMessage({ text: importData.error ?? 'Failed to save to directory', type: 'error' })
-          setUploading(false)
-          return
-        }
-      }
       const res = await fetch(`/api/campaigns/${campaignId}/tokens`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -88,7 +112,7 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
       })
       const data = await res.json()
       if (!res.ok) { setMessage({ text: data.error ?? 'Upload failed', type: 'error' }); return }
-      setMessage({ text: `${data.inserted} ${t('employees uploaded')}${saveToDirectory ? ` ${t('and saved to directory')}` : ''}`, type: 'success' })
+      setMessage({ text: `${data.inserted} ${t('employees uploaded')}`, type: 'success' })
       setRows([])
       router.refresh()
     } finally {
@@ -131,7 +155,7 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
       {/* Tab bar */}
       <div className="flex bg-zinc-100 rounded-lg p-1 mb-5 gap-1">
         {tabBtn('upload', t('Upload file'))}
-        {tabBtn('directory', t('From directory'))}
+        {tabBtn('manual', t('Add manually'))}
         {tabBtn('clone', t('Clone campaign'))}
       </div>
 
@@ -167,11 +191,6 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
                 <span className="text-green-700 font-medium">{validRows.length} {t('valid')}</span>
                 {invalidCount > 0 && <span className="text-red-600 font-medium"> · {invalidCount} {t('invalid')}</span>}
               </p>
-              <label className="flex items-center gap-3 mb-4 cursor-pointer">
-                <input type="checkbox" checked={saveToDirectory} onChange={(e) => setSaveToDirectory(e.target.checked)}
-                  className="w-4 h-4 rounded border-zinc-300 text-brand ring-brand" />
-                <span className="text-sm text-zinc-700">{t('Also save to employee directory')}</span>
-              </label>
               <button onClick={handleUploadConfirm} disabled={validRows.length === 0 || uploading}
                 className="w-full bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
                 {uploading ? t('Uploading…') : `${t('Confirm Upload')} (${validRows.length} ${t('employees')})`}
@@ -181,12 +200,48 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
         </>
       )}
 
-      {/* Directory tab */}
-      {tab === 'directory' && (
-        <DirectoryEmployeePicker campaignId={campaignId} existingTokens={existingTokens} onAdded={() => {
-          router.refresh()
-          setMessage({ text: t('Employees added from directory'), type: 'success' })
-        }} />
+      {/* Manual add tab */}
+      {tab === 'manual' && (
+        <form onSubmit={handleManualAdd} className="flex flex-col gap-3 sm:flex-row sm:gap-2 sm:items-end">
+          <div className="flex flex-col gap-1 flex-1">
+            <label htmlFor="mp-name" className="text-xs font-medium text-zinc-600">{t('Name')}</label>
+            <input
+              id="mp-name" type="text" required value={manualName}
+              onChange={(e) => setManualName(e.target.value)}
+              className="h-9 border border-zinc-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
+            />
+            <p className="h-4" />
+          </div>
+          <div className="flex flex-col gap-1 flex-1">
+            <label htmlFor="mp-phone" className="text-xs font-medium text-zinc-600">{t('Phone')}</label>
+            <input
+              id="mp-phone" type="tel" dir="ltr" value={manualPhone}
+              onChange={(e) => { setManualPhone(e.target.value); setManualPhoneError(null) }}
+              onBlur={validateManualPhone}
+              className={`h-9 border rounded-lg px-3 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent ${manualPhoneError ? 'border-red-300' : 'border-zinc-200'}`}
+            />
+            <p className="text-xs h-4 text-red-500">{manualPhoneError ?? ''}</p>
+          </div>
+          <div className="flex flex-col gap-1 flex-1">
+            <label htmlFor="mp-dept" className="text-xs font-medium text-zinc-600">{t('Department')}</label>
+            <input
+              id="mp-dept" type="text" value={manualDept}
+              onChange={(e) => setManualDept(e.target.value)}
+              className="h-9 border border-zinc-200 rounded-lg px-3 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
+            />
+            <p className="h-4" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <button
+              type="submit"
+              disabled={manualLoading || !manualName.trim()}
+              className="bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all whitespace-nowrap w-full sm:w-auto"
+            >
+              {manualLoading ? t('Adding…') : t('Add employee')}
+            </button>
+            <p className="h-4" />
+          </div>
+        </form>
       )}
 
       {/* Clone tab */}

@@ -410,6 +410,7 @@ export const he: Record<string, string> = {
   // CampaignPopulator
   'Upload file': 'העלה קובץ',
   'From directory': 'מספרייה',
+  'Add manually': 'הוסף ידנית',
   'Clone campaign': 'שכפל קמפיין',
   'Also save to employee directory': 'שמור גם בספריית העובדים',
   'Copy all employees from another campaign into this one.': 'העתק את כל העובדים מקמפיין אחר לקמפיין זה.',
