@@ -240,7 +240,7 @@ export function EmployeeTable({
 
   const showGiftCol = gifts.length > 0
   const colCount = 8 + (showGiftCol ? 1 : 0) + (showAttendance ? 1 : 0)
-  const [groupByDept, setGroupByDept] = useState(false)
+  const [selectedDept, setSelectedDept] = useState('')
   const [distributorNames, setDistributorNames] = useState<Record<string, string>>({})
 
   useEffect(() => {
@@ -322,53 +322,23 @@ export function EmployeeTable({
       .catch(() => {})
   }, [campaignId, isDraft, rows, distributorNames])
 
-  useEffect(() => {
-    if (!hasDepts) setGroupByDept(false)
-  }, [hasDepts])
+  const departments = [...new Set(rows.map((r) => r.department).filter(Boolean) as string[])].sort()
 
-  const filteredRows = search.trim()
-    ? rows.filter((r) => {
-        const q = search.toLowerCase()
-        return (
-          r.employee_name.toLowerCase().includes(q) ||
-          (r.phone_number && r.phone_number.includes(q)) ||
-          (r.department && r.department.toLowerCase().includes(q))
-        )
-      })
-    : rows
+  const filteredRows = rows.filter((r) => {
+    const q = search.trim().toLowerCase()
+    const matchesSearch = !q ||
+      r.employee_name.toLowerCase().includes(q) ||
+      (r.phone_number && r.phone_number.includes(q)) ||
+      (r.department && r.department.toLowerCase().includes(q))
+    const matchesDept = !selectedDept || r.department === selectedDept
+    return matchesSearch && matchesDept
+  })
 
   // Client-side pagination of the flat view so 1000+ tokens render ~30 at a time.
   const totalPages = Math.max(1, Math.ceil(filteredRows.length / PAGE_SIZE))
   const currentPage = Math.min(page, totalPages)
   const pageStart = (currentPage - 1) * PAGE_SIZE
   const pageRows = filteredRows.slice(pageStart, pageStart + PAGE_SIZE)
-
-  type GroupHeader = { _type: 'header'; department: string; claimed: number; total: number }
-  type TableRow = TokenRow | GroupHeader
-
-  function buildGroupedRows(): TableRow[] {
-    const groups = new Map<string, TokenRow[]>()
-    for (const row of filteredRows) {
-      const key = row.department ?? 'No department'
-      if (!groups.has(key)) groups.set(key, [])
-      groups.get(key)!.push(row)
-    }
-    const sorted = [...groups.entries()].sort(([a], [b]) => {
-      if (a === 'No department') return 1
-      if (b === 'No department') return -1
-      return a.localeCompare(b)
-    })
-    const result: TableRow[] = []
-    for (const [dept, deptRows] of sorted) {
-      const sortedRows = [...deptRows].sort((a, b) => {
-        if (a.redeemed !== b.redeemed) return a.redeemed ? 1 : -1
-        return a.employee_name.localeCompare(b.employee_name)
-      })
-      result.push({ _type: 'header', department: dept, claimed: deptRows.filter((r) => r.redeemed).length, total: deptRows.length })
-      result.push(...sortedRows)
-    }
-    return result
-  }
 
   return (
     <>
@@ -390,16 +360,16 @@ export function EmployeeTable({
               {t('Export CSV')}
             </button>
             {hasDepts && (
-              <button
-                onClick={() => setGroupByDept((v) => !v)}
-                className={`border rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                  groupByDept
-                    ? 'border-brand bg-brand-soft text-indigo-700'
-                    : 'border-zinc-200 text-zinc-700 hover-brand'
-                }`}
+              <select
+                value={selectedDept}
+                onChange={(e) => { setSelectedDept(e.target.value); setPage(1) }}
+                className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm text-zinc-700 focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
               >
-                {t('By department')}
-              </button>
+                <option value="">{t('All depts')}</option>
+                {departments.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
             )}
           </div>
         </div>
@@ -421,94 +391,7 @@ export function EmployeeTable({
               </tr>
             </thead>
             <tbody>
-              {groupByDept
-                ? buildGroupedRows().map((row) =>
-                    '_type' in row ? (
-                      <tr key={`header-${row.department}`} className="bg-zinc-50">
-                        <td colSpan={colCount} className="px-3 py-1.5 text-xs font-semibold text-zinc-500">
-                          {row.department} · {row.claimed}/{row.total} claimed
-                        </td>
-                      </tr>
-                    ) : (
-                      <tr
-                        key={row.id}
-                        className={`border-b border-zinc-50 transition-colors duration-500 ${row.redeemed ? 'bg-green-50' : 'hover-brand'}`}
-                      >
-                        <td className="px-3 py-2.5 font-medium text-zinc-800">{row.employee_name}</td>
-                        <td className="px-3 py-2.5 font-mono text-xs text-zinc-500">{row.phone_number ? <span dir="ltr">{maskPhone(row.phone_number)}</span> : <span className="text-zinc-300">—</span>}</td>
-                        <td className="px-3 py-2.5 text-zinc-500">{row.department ?? <span className="text-zinc-300">—</span>}</td>
-                        {showGiftCol && (
-                          <td className="px-3 py-1.5">
-                            <GiftCell
-                              giftId={row.gift_id}
-                              gifts={gifts}
-                              giftMap={giftMap}
-                              editable={canEditGift}
-                              onChange={(giftId) => changeGift(row.id, giftId)}
-                            />
-                          </td>
-                        )}
-                        {showAttendance && (
-                          <td className="px-3 py-1.5">
-                            <div className="flex items-center gap-1.5">
-                              <AttendeeCountCell
-                                attending={row.attending}
-                                attendeeCount={row.attendee_count}
-                                editable={canEditAttendance}
-                                onChange={(value) => changeAttendance(row.id, value)}
-                              />
-                              {row.arrived_count != null && <span className="text-xs text-green-600 font-medium">→ {row.arrived_count}</span>}
-                            </div>
-                          </td>
-                        )}
-                        <td className="px-3 py-2.5">
-                          {!row.phone_number
-                            ? <span className="text-zinc-400 text-xs font-medium">{t('QR only')}</span>
-                            : row.sms_sent_at
-                              ? <span className="text-green-600 text-xs font-medium">{t('✓ Sent')}</span>
-                              : isDraft ? <span className="text-zinc-300">—</span> : <span className="text-amber-500 text-xs font-medium">{t('Not sent')}</span>}
-                        </td>
-                        <td className="px-3 py-2.5">
-                          {row.redeemed
-                            ? <span className="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">{t('Claimed')}</span>
-                            : <span className="text-zinc-300">—</span>}
-                        </td>
-                        <td className="px-3 py-2.5 text-xs text-zinc-400">
-                          {row.redeemed_at ? new Date(row.redeemed_at).toLocaleString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }) : <span className="text-zinc-300">—</span>}
-                        </td>
-                        <td className="px-3 py-2.5 text-xs text-zinc-400">
-                          {row.redeemed_by
-                            ? distributorNames[row.redeemed_by] ?? row.redeemed_by
-                            : <span className="text-zinc-300">—</span>}
-                        </td>
-                        <td className="px-3 py-2.5">
-                          {isDraft ? (
-                            <button
-                              onClick={() => handleRemove(row.id)}
-                              className="p-1 rounded text-zinc-300 hover:text-red-500 hover:bg-red-50 transition-colors"
-                              aria-label={`Remove ${row.employee_name}`}
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                              </svg>
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => row.qr_image_url && setEnlarged(row as TokenRow & { qr_image_url: string })}
-                              disabled={!row.qr_image_url}
-                              className={`p-1 rounded transition-colors ${row.qr_image_url ? 'text-zinc-400 hover-brand-text hover-brand' : 'text-zinc-200 cursor-not-allowed'}`}
-                              aria-label={row.qr_image_url ? `View QR for ${row.employee_name}` : 'QR generating'}
-                            >
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                              </svg>
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    )
-                  )
-                : pageRows.map((r) => (
+              {pageRows.map((r) => (
                     <tr
                       key={r.id}
                       className={`border-b border-zinc-50 transition-colors duration-500 ${r.redeemed ? 'bg-green-50' : 'hover-brand'}`}
@@ -599,7 +482,7 @@ export function EmployeeTable({
           </table>
         </div>
 
-        {!groupByDept && filteredRows.length > PAGE_SIZE && (
+        {filteredRows.length > PAGE_SIZE && (
           <div className="flex items-center justify-between gap-3 pt-4 mt-1 border-t border-zinc-100 text-sm text-zinc-500">
             <span>{t('Showing')} {pageStart + 1}–{Math.min(pageStart + PAGE_SIZE, filteredRows.length)} {t('of')} {filteredRows.length}</span>
             <div className="flex items-center gap-2">
