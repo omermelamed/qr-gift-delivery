@@ -717,4 +717,5 @@ export const he: Record<string, string> = {
   'Steps to launch': 'צעדים להשקה',
   'Apps to install': 'אפליקציות להתקין',
   'Scan per gift': 'סריקה לכל מתנה',
+  'Back to top': 'חזרה למעלה',
 }

@@ -9,6 +9,7 @@ import { QrMark, Eyebrow } from './Marks'
 import { LandingNav } from './LandingNav'
 import { StatsStrip } from './StatsStrip'
 import { FeatureIcon, type FeatureIconName } from './FeatureIcon'
+import { BackToTop } from './BackToTop'
 
 export { QrMark, Eyebrow } from './Marks'
 
@@ -196,6 +197,7 @@ export function LandingPage() {
           </div>
         </div>
       </footer>
+      <BackToTop />
     </div>
   )
 }

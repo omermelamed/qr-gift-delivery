@@ -494,6 +494,18 @@ input:-webkit-autofill:focus {
   font-family: var(--font-heebo), sans-serif;
 }
 
+/* Contact form: positive validity indicator (required fields only).
+   State indication, not decoration — lives outside the motion gate. */
+.valid-check {
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+input:user-valid + .valid-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
 /* --- Landing motion (spec: docs/superpowers/specs/2026-07-05-landing-animations-design.md).
    Everything here is gated on no-preference: reduced-motion users get the
    static page, and base styles never hide content. --- */
@@ -579,6 +591,16 @@ input:-webkit-autofill:focus {
   .step-chip { transition: background-color 0.4s ease 0.4s, color 0.4s ease 0.4s; }
   [data-reveal] .step-chip { background: color-mix(in oklab, var(--brand) 10%, white); color: var(--brand); }
   [data-reveal='shown'] .step-chip { background: var(--brand); color: white; }
+
+  /* Contact success mark: strokes draw in sequence. Without motion these
+     rules don't apply and the mark renders fully drawn. */
+  .draw-stroke-1,
+  .draw-stroke-2 {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw-stroke 0.5s ease-out both;
+  }
+  .draw-stroke-2 { animation-delay: 0.35s; }
 }
 
 /* Pointer affordance for clickable elements. Modern browsers default

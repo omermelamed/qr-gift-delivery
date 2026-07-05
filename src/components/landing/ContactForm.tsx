@@ -9,6 +9,24 @@ type Status = 'idle' | 'sending' | 'success' | 'error'
 const inputClass =
   'w-full rounded-xl border border-indigo-800 bg-indigo-900/50 px-4 py-2.5 text-white placeholder:text-indigo-300/50 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40'
 
+// Emerald check that fades in via CSS :user-valid (see globals.css).
+function ValidCheck() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="valid-check pointer-events-none absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-emerald-400"
+      aria-hidden="true"
+    >
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  )
+}
+
 export function ContactForm() {
   const t = useT()
   const { locale } = useLocale()
@@ -42,7 +60,11 @@ export function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="flex items-center justify-center rounded-2xl border border-indigo-800 bg-indigo-900/50 p-10 text-center">
+      <div className="rounded-2xl border border-indigo-800 bg-indigo-900/50 p-10 text-center">
+        <svg viewBox="0 0 52 52" className="mx-auto mb-4 h-12 w-12 text-emerald-400" aria-hidden="true">
+          <circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" strokeWidth="2" pathLength="1" className="draw-stroke-1" />
+          <path d="M15 27l8 8 15-15" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" pathLength="1" className="draw-stroke-2" />
+        </svg>
         <p className="text-lg font-medium">{t("Thanks! We'll be in touch within one business day.")}</p>
       </div>
     )
@@ -62,16 +84,25 @@ export function ContactForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="grid gap-1.5 text-sm font-medium text-indigo-100">
           {t('Full name')}
-          <input name="name" required maxLength={120} className={inputClass} />
+          <span className="relative block">
+            <input name="name" required maxLength={120} className={inputClass} />
+            <ValidCheck />
+          </span>
         </label>
         <label className="grid gap-1.5 text-sm font-medium text-indigo-100">
           {t('Company')}
-          <input name="company" required maxLength={120} className={inputClass} />
+          <span className="relative block">
+            <input name="company" required maxLength={120} className={inputClass} />
+            <ValidCheck />
+          </span>
         </label>
       </div>
       <label className="grid gap-1.5 text-sm font-medium text-indigo-100">
         {t('Work email')}
-        <input type="email" name="email" required maxLength={254} className={inputClass} />
+        <span className="relative block">
+          <input type="email" name="email" required maxLength={254} className={inputClass} />
+          <ValidCheck />
+        </span>
       </label>
       <label className="grid gap-1.5 text-sm font-medium text-indigo-100">
         {t('Phone (optional)')}
@@ -91,7 +122,17 @@ export function ContactForm() {
         disabled={status === 'sending'}
         className="rounded-full bg-white px-6 py-3 text-base font-semibold text-indigo-950 transition hover:bg-indigo-100 disabled:opacity-60 motion-safe:hover:-translate-y-px"
       >
-        {status === 'sending' ? t('Sending…') : t('Send')}
+        {status === 'sending' ? (
+          <span className="inline-flex items-center justify-center gap-2">
+            <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 animate-spin" aria-hidden="true">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.25" strokeWidth="4" />
+              <path d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+            </svg>
+            {t('Sending…')}
+          </span>
+        ) : (
+          t('Send')
+        )}
       </button>
     </form>
   )
