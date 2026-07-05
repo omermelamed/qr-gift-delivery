@@ -286,18 +286,22 @@ body {
   box-shadow: 0 8px 24px rgba(110, 139, 116, 0.14);
 }
 
-/* Status strip on a card's leading edge (inset-inline-start = right in RTL,
-   left in LTR) — "leading" is the deliberately RTL-safe reading of "the
-   right side" from the design spec, since this app serves both locales.
-   Modifier classes set the color per status; reuse the same brand tokens
-   the status badges/dots use so the whole status vocabulary stays in sync. */
+/* Status indicator on a card's leading edge (inset-inline-start = right in
+   RTL, left in LTR) — "leading" is the deliberately RTL-safe reading of
+   "the right side" from the design spec, since this app serves both
+   locales. A short pill inset from the corners (not a full-height strip)
+   so it never has to trace the card's own corner curve — its own 999px
+   radius is independent of the card, which is what keeps it looking
+   crisp regardless of the card's border-radius. Modifier classes set the
+   color per status; reuse the same brand tokens the status badges/dots
+   use so the whole status vocabulary stays in sync. */
 .card-strip {
   position: absolute;
-  inset-block: 0;
+  top: 14px;
+  bottom: 14px;
   inset-inline-start: 0;
-  width: 4px;
-  border-start-start-radius: var(--radius-card);
-  border-end-start-radius: var(--radius-card);
+  width: 6px;
+  border-radius: 999px;
 }
 .card-strip-active { background: var(--brand); }
 .card-strip-draft { background: var(--color-accent); }
