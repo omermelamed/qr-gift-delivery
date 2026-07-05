@@ -6,6 +6,7 @@ import { HeroMockup } from './HeroMockup'
 import { ContactForm } from './ContactForm'
 import { Reveal } from './Reveal'
 import { QrMark, Eyebrow } from './Marks'
+import { LandingNav } from './LandingNav'
 
 export { QrMark, Eyebrow } from './Marks'
 
@@ -58,31 +59,7 @@ export function LandingPage() {
       <noscript>
         <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
       </noscript>
-      <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/80 backdrop-blur">
-        <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-          <a href="#top" className="font-display flex items-center gap-2 text-lg font-bold tracking-tight">
-            <QrMark className="text-brand" />
-            GiftFlow
-          </a>
-          <div className="flex items-center gap-3 sm:gap-6">
-            <a href="#how-it-works" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:block">
-              {t('How it works')}
-            </a>
-            <a href="#why" className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:block">
-              {t('Why GiftFlow')}
-            </a>
-            <Link href="/login" className="text-sm font-medium text-zinc-600 hover:text-zinc-900">
-              {t('Log in')}
-            </Link>
-            <a
-              href="#contact"
-              className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 motion-safe:hover:-translate-y-px"
-            >
-              {t('Book a demo')}
-            </a>
-          </div>
-        </nav>
-      </header>
+      <LandingNav />
 
       <main id="top">
         <section className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
@@ -112,7 +89,7 @@ export function LandingPage() {
           <HeroMockup />
         </section>
 
-        <section id="how-it-works" className="border-y border-zinc-100 bg-zinc-50">
+        <section id="how-it-works" className="scroll-mt-16 border-y border-zinc-100 bg-zinc-50">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
             <Reveal>
               <Eyebrow>{t('How it works')}</Eyebrow>
@@ -137,7 +114,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="why" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+        <section id="why" className="mx-auto max-w-6xl scroll-mt-16 px-4 py-16 sm:px-6 lg:py-24">
           <Reveal>
             <Eyebrow>{t('Why GiftFlow')}</Eyebrow>
             <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
@@ -157,7 +134,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="contact" className="bg-indigo-950 text-white">
+        <section id="contact" className="scroll-mt-16 bg-indigo-950 text-white">
           <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
             <Reveal>
               <Eyebrow className="text-indigo-300">{t('Book a demo')}</Eyebrow>
