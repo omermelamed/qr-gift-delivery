@@ -33,6 +33,48 @@ export function Eyebrow({
   )
 }
 
+const STEPS = [
+  {
+    title: 'Upload your employee list',
+    body: 'A CSV file is all it takes — your campaign is ready in minutes.',
+  },
+  {
+    title: 'Everyone gets a personal QR',
+    body: 'Sent by SMS. Nothing to install, nothing to print.',
+  },
+  {
+    title: 'Scan and watch it live',
+    body: 'Each code redeems exactly once, and the dashboard updates as gifts are handed out.',
+  },
+]
+
+const FEATURES = [
+  {
+    title: 'One scan, one gift',
+    body: 'A code can never be redeemed twice — validation is atomic at the database level.',
+  },
+  {
+    title: 'Live dashboard',
+    body: 'See every redemption the moment it happens, from any device.',
+  },
+  {
+    title: 'Nothing to install',
+    body: 'Employees just open a text message. Scanners use any phone camera.',
+  },
+  {
+    title: 'Scan as a team',
+    body: 'The whole team can scan in parallel — everyone sees the same live state.',
+  },
+  {
+    title: 'Hebrew and English',
+    body: 'Full right-to-left support across the product, for employees and admins alike.',
+  },
+  {
+    title: 'Per-campaign reports',
+    body: 'Export exactly who picked up what, when, and who handed it out.',
+  },
+]
+
 export function LandingPage() {
   const t = useT()
   return (
@@ -90,7 +132,41 @@ export function LandingPage() {
           <HeroMockup />
         </section>
 
-        {/* Tasks 5–6 insert #how-it-works, #why and #contact sections here */}
+        <section id="how-it-works" className="border-y border-zinc-100 bg-zinc-50">
+          <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+            <Eyebrow>{t('How it works')}</Eyebrow>
+            <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
+              {t('From employee list to gift day in three steps')}
+            </h2>
+            <ol className="mt-10 grid gap-6 lg:grid-cols-3">
+              {STEPS.map((step, i) => (
+                <li key={step.title} className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm">
+                  <p className="font-display text-sm font-bold text-brand">{i + 1}</p>
+                  <h3 className="mt-2 text-lg font-semibold">{t(step.title)}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t(step.body)}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section id="why" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
+          <Eyebrow>{t('Why GiftFlow')}</Eyebrow>
+          <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
+            {t('Built for the day itself')}
+          </h2>
+          <div className="mt-10 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((f) => (
+              <div key={f.title}>
+                <h3 className="flex items-center gap-2 text-base font-semibold">
+                  <QrMark className="text-brand" />
+                  {t(f.title)}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t(f.body)}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </main>
 
       <footer className="border-t border-zinc-100 bg-white">
