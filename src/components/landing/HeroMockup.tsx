@@ -1,30 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useT } from '@/lib/i18n/useT'
-
-// Server-renders the final value (no flash without JS), then counts up from 0
-// after hydration. Skipped under prefers-reduced-motion.
-function CountUp({ to }: { to: number }) {
-  const [value, setValue] = useState(to)
-
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    let raf = 0
-    const start = performance.now()
-    const duration = 1200
-    const tick = (now: number) => {
-      const p = Math.min((now - start) / duration, 1)
-      const eased = 1 - Math.pow(1 - p, 3)
-      setValue(Math.round(to * eased))
-      if (p < 1) raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [to])
-
-  return <>{value}</>
-}
+import { CountUp } from './CountUp'
 
 // Deterministic decorative "QR" — three finder patterns plus scattered modules.
 const MODULES: Array<[number, number]> = [
