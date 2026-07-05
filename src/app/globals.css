@@ -286,33 +286,39 @@ body {
   box-shadow: 0 8px 24px rgba(110, 139, 116, 0.14);
 }
 
+/* Modifier for cards that carry a full-height .card-strip: square off the
+   two corners on the strip's side (inline-start = right in RTL, left in
+   LTR) so the strip can run flush top-to-bottom with no corner-radius
+   mismatch, while the opposite side stays fully rounded. Declared after
+   .card so these longhand corners win over its border-radius shorthand
+   (same specificity, later source order — both are plain, unlayered
+   classes). Physical corners (hardcoded top-right/bottom-right) would
+   square the wrong side in LTR, where the strip sits on the left instead —
+   these logical properties flip automatically with direction. */
+.card-with-strip {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}
+
 /* Status indicator on a card's leading edge (inset-inline-start = right in
    RTL, left in LTR) — "leading" is the deliberately RTL-safe reading of
    "the right side" from the design spec, since this app serves both
-   locales. A short pill inset from the corners (not a full-height strip)
-   so it never has to trace the card's own corner curve — its own 999px
-   radius is independent of the card, which is what keeps it looking
-   crisp regardless of the card's border-radius. Modifier classes set the
-   color per status; reuse the same brand tokens the status badges/dots
-   use so the whole status vocabulary stays in sync. */
+   locales. Pair with `.card-with-strip` on the card itself. Modifier
+   classes set the color per status; reuse the same brand tokens the
+   status badges/dots use so the whole status vocabulary stays in sync. */
 .card-strip {
   position: absolute;
-  /* Inset must clear --radius-card (18px): below that, the card's own
-     border is still following its corner arc rather than running flush
-     to the edge, so the pill's straight-across position would stick out
-     past the card's actual (curved) boundary there — visible as a gap. */
-  top: 22px;
-  bottom: 22px;
-  /* -1px, not 0: `inset-inline-start` on an absolutely positioned element
-     is measured from the *padding* edge (i.e. just inside the 1px card
-     border), not the card's true outer edge. At 0 the pill sits flush
-     against the inside of the border, leaving that 1px border color
-     visible as a sliver between the pill and the card's actual visual
-     edge. -1px extends the pill by the border width so it touches the
-     card's true outer boundary with no gap at all. */
+  /* -1px on all three outer sides, not 0: absolute inset is measured from
+     the *padding* edge (just inside the 1px card border), not the card's
+     true outer edge. At 0 the strip sits flush against the inside of the
+     border, leaving a 1px sliver of border color visible past its edge on
+     every side that touches the card's boundary. -1px extends it by the
+     border width so it lands exactly on the card's true outer edge, with
+     no gap (verified with getBoundingClientRect, not just eyeballed). */
+  top: -1px;
+  bottom: -1px;
   inset-inline-start: -1px;
   width: 6px;
-  border-radius: 999px;
 }
 .card-strip-active { background: var(--brand); }
 .card-strip-draft { background: var(--color-accent); }
