@@ -87,7 +87,7 @@ export function Sidebar({ logoUrl }: Props) {
               href={item.href}
               aria-label={item.label}
               aria-current={item.active ? 'page' : undefined}
-              className={`text-nav flex items-center gap-3 px-2 py-2 rounded-lg transition-colors ${
+              className={`text-nav flex items-center gap-3 px-2 py-2 rounded-xl transition-colors ${
                 item.active ? 'bg-nav-active font-medium' : 'bg-nav-hover'
               }`}
             >
@@ -103,7 +103,7 @@ export function Sidebar({ logoUrl }: Props) {
           <button
             onClick={handleSignOut}
             aria-label={t('Sign out')}
-            className="text-nav flex items-center gap-3 px-2 py-2 rounded-lg bg-nav-hover transition-colors w-full"
+            className="text-nav flex items-center gap-3 px-2 py-2 rounded-xl bg-nav-hover transition-colors w-full"
           >
             {signOutIcon}
             <span className="text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-75">
@@ -122,7 +122,7 @@ export function Sidebar({ logoUrl }: Props) {
               href={item.href}
               aria-label={item.label}
               aria-current={item.active ? 'page' : undefined}
-              className={`text-nav flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg transition-colors ${
+              className={`text-nav flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-xl transition-colors ${
                 item.active ? 'bg-nav-active font-semibold' : ''
               }`}
             >
@@ -135,7 +135,7 @@ export function Sidebar({ logoUrl }: Props) {
           <button
             onClick={handleSignOut}
             aria-label={t('Sign out')}
-            className="text-nav flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg transition-colors"
+            className="text-nav flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-xl transition-colors"
           >
             {signOutIcon}
             <span className="text-[10px] font-medium leading-tight">{t('Sign out')}</span>

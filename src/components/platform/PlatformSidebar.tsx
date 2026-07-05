@@ -32,7 +32,7 @@ export function PlatformSidebar() {
             <Link
               key={href}
               href={href}
-              className={`text-nav flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`text-nav flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                 active ? 'bg-nav-active' : 'bg-nav-hover'
               }`}
             >
@@ -46,7 +46,7 @@ export function PlatformSidebar() {
       <div className="px-3 py-4 border-t border-nav">
         <button
           onClick={handleSignOut}
-          className="text-nav flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium bg-nav-hover transition-colors w-full"
+          className="text-nav flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium bg-nav-hover transition-colors w-full"
         >
           <span className="material-symbols-outlined text-[18px]">logout</span>
           Sign out

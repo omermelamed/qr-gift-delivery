@@ -83,7 +83,7 @@ export function KebabMenu({ children, label }: { children: React.ReactNode; labe
           // would reach an ancestor <Link> (campaign card) and navigate.
           onClick={(e) => { e.stopPropagation(); setOpen(false) }}
           style={{ position: 'fixed', top: coords.top, left: coords.left, right: coords.right, display: open ? 'flex' : 'none' }}
-          className="z-50 min-w-44 bg-white border border-zinc-200 rounded-xl shadow-lg p-1 flex-col"
+          className="z-50 min-w-44 bg-white border border-[#E7E0D8] rounded-[14px] shadow-[0_8px_30px_rgba(46,49,47,0.10)] p-1.5 flex-col"
         >
           {children}
         </div>,

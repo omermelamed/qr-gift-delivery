@@ -50,17 +50,26 @@
   --color-surface: #FFFFFF;
   --color-section-background: #F3F0EA;
   --color-disabled-background: #ECE9E2;
+  /* Aliases matching the 2026-refresh spec's naming (same design system,
+     renamed vocabulary) — kept as aliases rather than renaming the above,
+     since --color-section-background/text-tertiary etc. are already read
+     elsewhere in the app. New code should prefer these names. */
+  --color-surface-soft: var(--color-section-background);
+  --color-surface-sage: #EEF3EF;
+  --color-surface-warm: #FFF4EA;
 
   /* Text */
   --color-text-primary: #2E312F;
   --color-text-secondary: #5C625D;
   --color-text-tertiary: #888D89;
+  --color-text-muted: var(--color-text-tertiary);
   --color-text-disabled: #B4B7B5;
   --color-text-on-dark: #FFFFFF;
 
   /* Borders */
   --color-border-default: #DDD9D2;
   --color-border-light: #EDE9E2;
+  --color-border-strong: #CFC7BE;
   --color-border-focus: #6E8B74;
 
   /* Status */
@@ -82,28 +91,26 @@
   --color-info-bg: #EEF6FA;
   --color-info-text: #5A8FB5;
 
-  /* Campaign status badge overrides per Omer (distinct from the generic
-     success/warning/error/info vocabulary above — these three are specific
-     to the campaign Active/Closed/Draft badge). Draft reuses the exact grey
-     Closed used to have (--color-zinc-100/500, i.e. #F3F0EA / #5C625D). */
-  --color-status-active-bg: color-mix(in srgb, #A3B18A 38%, white);
-  --color-status-active-text: color-mix(in srgb, #A3B18A 34%, black);
-  --color-status-closed-bg: color-mix(in srgb, #B5654D 14%, white);
-  --color-status-closed-text: color-mix(in srgb, #B5654D 60%, black);
-  --color-status-draft-bg: #F3F0EA;
-  --color-status-draft-text: #5C625D;
+  /* Campaign status badge (Active/Draft/Closed) — bespoke pastel/text pairs
+     from the 2026-refresh spec, superseding the earlier grey-Draft pass.
+     Not derived from the tokens above by design: these are hand-tuned for
+     the pill badge specifically, not generic success/warning/error. */
+  --color-status-active-bg: #EAF3EC;
+  --color-status-active-text: #4F7258;
+  --color-status-draft-bg: #FFF3DD;
+  --color-status-draft-text: #A7681F;
+  --color-status-closed-bg: #FBEDE8;
+  --color-status-closed-text: #A84F36;
 
-  /* Navigation (sidebars, top/bottom nav, tabs, menus).
-     Sidebar override per Omer: background matches the primary button color
-     (--brand), cream text/icons throughout (no separate active/inactive
-     text color — active rows are indicated by a darker background tint
-     instead, see .bg-nav-hover/.bg-nav-active). */
+  /* Navigation (sidebars, top/bottom nav, tabs, menus) — solid sage surface,
+     translucent-white icons/text by default, a light "lifted chip" (app
+     background + sage icon) for the active item rather than a darker tint. */
   --color-nav-background: var(--brand);
-  --color-nav-text-default: #DAD7CD;
-  --color-nav-text-active: #DAD7CD;
-  --color-nav-text-inactive: #DAD7CD;
-  --color-nav-hover-bg: color-mix(in srgb, var(--brand) 88%, black);
-  --color-nav-active-bg: color-mix(in srgb, var(--brand) 80%, black);
+  --color-nav-text-default: rgba(255, 255, 255, 0.72);
+  --color-nav-active-text: #6E8B74;
+  --color-nav-hover-bg: rgba(255, 255, 255, 0.12);
+  --color-nav-active-bg: #F8F6F2;
+  --color-nav-border: rgba(255, 255, 255, 0.16);
 
   /* Elevation */
   --shadow-level-1: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -113,8 +120,9 @@
   /* Radius */
   --radius-input: 12px;
   --radius-button: 14px;
-  --radius-card: 16px;
+  --radius-card: 18px;
   --radius-modal: 24px;
+  --radius-pill: 999px;
 
   /* Spacing (documents the scale; Tailwind's default spacing-1/2/3/4/6/8/12
      already equal 4/8/12/16/24/32/48px, so no utility overrides needed) */
@@ -256,12 +264,94 @@ body {
 }
 
 /* Card / panel primitive — event sections, RSVP summaries, gift/payment
-   areas, guest rows, dashboard widgets. */
+   areas, guest rows, dashboard widgets, list rows (e.g. campaign cards).
+   `position: relative` so an optional .card-strip child can anchor to an
+   edge; cards that don't use a strip are unaffected. */
 .card {
+  position: relative;
   background: var(--color-surface);
-  border: 1px solid var(--color-border-light);
+  border: 1px solid #E7E0D8;
   border-radius: var(--radius-card);
-  box-shadow: var(--shadow-level-1);
+  box-shadow: 0 4px 14px rgba(46, 49, 47, 0.05);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+.card:hover {
+  border-color: #CFC7BE;
+  box-shadow: 0 10px 26px rgba(46, 49, 47, 0.08);
+  transform: translateY(-1px);
+}
+.card-selected {
+  border-color: var(--brand);
+  background: #F7FAF7;
+  box-shadow: 0 8px 24px rgba(110, 139, 116, 0.14);
+}
+
+/* Status strip on a card's leading edge (inset-inline-start = right in RTL,
+   left in LTR) — "leading" is the deliberately RTL-safe reading of "the
+   right side" from the design spec, since this app serves both locales.
+   Modifier classes set the color per status; reuse the same brand tokens
+   the status badges/dots use so the whole status vocabulary stays in sync. */
+.card-strip {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 4px;
+  border-start-start-radius: var(--radius-card);
+  border-end-start-radius: var(--radius-card);
+}
+.card-strip-active { background: var(--brand); }
+.card-strip-draft { background: var(--color-accent); }
+.card-strip-closed { background: var(--color-secondary); }
+
+/* Toolbar wrapping filters/search into one cohesive surface. */
+.toolbar {
+  background: var(--color-surface);
+  border: 1px solid #E7E0D8;
+  border-radius: 18px;
+  padding: 12px;
+  box-shadow: 0 4px 14px rgba(46, 49, 47, 0.04);
+}
+
+/* Shared input treatment (search boxes, dropdown triggers, date fields). */
+.input-field {
+  background: var(--color-surface);
+  border: 1px solid #E4DDD4;
+  border-radius: var(--radius-input);
+  color: var(--color-text-primary);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.input-field::placeholder { color: #9B9F9C; }
+.input-field:focus {
+  outline: none;
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(110, 139, 116, 0.14);
+}
+
+/* Prominent primary CTA (e.g. "+ New Campaign") — more elevated than a
+   plain .bg-brand button, reserved for a page's single main action. */
+.btn-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 20px;
+  background: var(--brand);
+  color: #FFFFFF;
+  border-radius: var(--radius-button);
+  font-weight: 700;
+  box-shadow: 0 8px 18px rgba(110, 139, 116, 0.22);
+  transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+.btn-cta:hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 10px 22px rgba(110, 139, 116, 0.28);
+  transform: translateY(-1px);
+}
+.btn-cta:active {
+  background: var(--color-primary-active);
+  box-shadow: 0 8px 18px rgba(110, 139, 116, 0.22);
+  transform: translateY(0);
 }
 
 /* Modal / dialog / bottom-sheet surface — a separate class (not `.card` +
@@ -275,14 +365,21 @@ body {
   box-shadow: var(--shadow-level-2);
 }
 
-/* Sidebar / nav surface. Text and icons are one uniform color (icons use
-   `stroke="currentColor"`, so setting text color on the row covers both) —
-   active vs. inactive rows are distinguished by background tint, not color. */
+/* Sidebar / nav surface. Icons use `stroke="currentColor"`, so setting text
+   color on the row covers both label and icon. .bg-nav-active is declared
+   after .text-nav so its color wins the cascade (equal specificity, later
+   source order) on the active item, which carries both classes. */
 .bg-nav { background-color: var(--color-nav-background); }
-.text-nav { color: var(--color-nav-text-default); }
+.text-nav {
+  color: var(--color-nav-text-default);
+  transition: background-color 160ms ease, color 160ms ease;
+}
 .bg-nav-hover:hover { background-color: var(--color-nav-hover-bg); }
-.bg-nav-active { background-color: var(--color-nav-active-bg); }
-.border-nav { border-color: var(--color-nav-hover-bg); }
+.bg-nav-active {
+  background-color: var(--color-nav-active-bg);
+  color: var(--color-nav-active-text);
+}
+.border-nav { border-color: var(--color-nav-border); }
 
 /* Status badges (RSVP / campaign / credit states). Pair with a rounded-full
    pill className, e.g. `<span className="badge-success rounded-full px-2.5
