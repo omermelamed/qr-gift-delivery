@@ -264,9 +264,7 @@ body {
 }
 
 /* Card / panel primitive — event sections, RSVP summaries, gift/payment
-   areas, guest rows, dashboard widgets, list rows (e.g. campaign cards).
-   `position: relative` so an optional .card-strip child can anchor to an
-   edge; cards that don't use a strip are unaffected. */
+   areas, guest rows, dashboard widgets, list rows (e.g. campaign cards). */
 .card {
   position: relative;
   background: var(--color-surface);
@@ -286,43 +284,42 @@ body {
   box-shadow: 0 8px 24px rgba(110, 139, 116, 0.14);
 }
 
-/* Modifier for cards that carry a full-height .card-strip: square off the
-   two corners on the strip's side (inline-start = right in RTL, left in
-   LTR) so the strip can run flush top-to-bottom with no corner-radius
-   mismatch, while the opposite side stays fully rounded. Declared after
-   .card so these longhand corners win over its border-radius shorthand
-   (same specificity, later source order — both are plain, unlayered
-   classes). Physical corners (hardcoded top-right/bottom-right) would
-   square the wrong side in LTR, where the strip sits on the left instead —
-   these logical properties flip automatically with direction. */
-.card-with-strip {
-  border-start-start-radius: 0;
-  border-end-start-radius: 0;
+/* Modifier for cards that carry a ::after status indicator (e.g. campaign
+   cards). `overflow: hidden` is what actually keeps the indicator inside
+   the card's rounded silhouette — it clips to .card's own border-radius,
+   so the indicator's shape can never mismatch the card's real corner
+   curve the way an independently-radius'd strip could. Kept as an opt-in
+   modifier (not baked into .card) so plain cards without an indicator
+   don't unexpectedly clip other content. */
+.card-with-status {
+  overflow: hidden;
 }
-
-/* Status indicator on a card's leading edge (inset-inline-start = right in
-   RTL, left in LTR) — "leading" is the deliberately RTL-safe reading of
-   "the right side" from the design spec, since this app serves both
-   locales. Pair with `.card-with-strip` on the card itself. Modifier
-   classes set the color per status; reuse the same brand tokens the
-   status badges/dots use so the whole status vocabulary stays in sync. */
-.card-strip {
+/* Status indicator — a ::after pseudo-element, not a border: .card:hover
+   changes border-color, and border-right shares that same property, so
+   it would silently override a border-right-based status color on hover.
+   A pseudo-element's background is a separate property, so there's
+   nothing for hover to clobber. Inset 1px on the three edges that meet
+   the card's own border, so the card's border stays visible next to it
+   rather than being covered. inset-inline-start = right in RTL, left in
+   LTR — logical, not physical, since this app also serves an LTR locale.
+   The indicator's own corner radius is redundant with the parent's clip
+   in every current browser, but costs nothing and matches the card's
+   curve exactly if that ever changes. */
+.card-with-status::after {
+  content: '';
   position: absolute;
-  /* -1px on all three outer sides, not 0: absolute inset is measured from
-     the *padding* edge (just inside the 1px card border), not the card's
-     true outer edge. At 0 the strip sits flush against the inside of the
-     border, leaving a 1px sliver of border color visible past its edge on
-     every side that touches the card's boundary. -1px extends it by the
-     border width so it lands exactly on the card's true outer edge, with
-     no gap (verified with getBoundingClientRect, not just eyeballed). */
-  top: -1px;
-  bottom: -1px;
-  inset-inline-start: -1px;
+  top: 1px;
+  bottom: 1px;
+  inset-inline-start: 1px;
   width: 6px;
+  background: var(--status-color);
+  border-start-start-radius: calc(var(--radius-card) - 1px);
+  border-end-start-radius: calc(var(--radius-card) - 1px);
+  pointer-events: none;
 }
-.card-strip-active { background: var(--brand); }
-.card-strip-draft { background: var(--color-accent); }
-.card-strip-closed { background: var(--color-secondary); }
+.status-active { --status-color: var(--brand); }
+.status-draft { --status-color: var(--color-accent); }
+.status-closed { --status-color: var(--color-secondary); }
 
 /* Toolbar wrapping filters/search into one cohesive surface. */
 .toolbar {

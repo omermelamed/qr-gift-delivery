@@ -268,9 +268,8 @@ export function AdminDashboardUI({ campaigns }: Props) {
               <Link
                 key={c.id}
                 href={`/admin/campaigns/${c.id}`}
-                className="card card-with-strip block p-5 group"
+                className={`card card-with-status status-${status} block p-5 group`}
               >
-                <span className={`card-strip card-strip-${status}`} aria-hidden="true" />
                 <div className="flex items-center justify-between gap-4">
                   <div className="min-w-0">
                     <p className="text-lg font-extrabold text-zinc-900 group-hover-brand-text transition-colors truncate">
