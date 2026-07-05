@@ -343,6 +343,23 @@ body {
   box-shadow: 0 0 0 3px rgba(110, 139, 116, 0.14);
 }
 
+/* Neutralizes the browser's autofill tint (Chrome/Safari default to a
+   light blue or yellow fill on saved-credential inputs — most visible on
+   the login form's email/password fields). Regular `background`/`background-
+   color` can't override it; browsers render autofilled inputs from a
+   separate UA layer that only responds to `-webkit-box-shadow`. The huge
+   inset shadow visually repaints the field to the app's surface color,
+   and the long transition delay stops the native tint from flashing
+   before it applies. Applies globally — any input can be autofilled, not
+   just login's. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--color-surface) inset;
+  -webkit-text-fill-color: var(--color-text-primary);
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* Prominent primary CTA (e.g. "+ New Campaign") — more elevated than a
    plain .bg-brand button, reserved for a page's single main action. */
 .btn-cta {
