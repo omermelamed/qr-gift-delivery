@@ -297,9 +297,20 @@ body {
    use so the whole status vocabulary stays in sync. */
 .card-strip {
   position: absolute;
-  top: 14px;
-  bottom: 14px;
-  inset-inline-start: 0;
+  /* Inset must clear --radius-card (18px): below that, the card's own
+     border is still following its corner arc rather than running flush
+     to the edge, so the pill's straight-across position would stick out
+     past the card's actual (curved) boundary there — visible as a gap. */
+  top: 22px;
+  bottom: 22px;
+  /* -1px, not 0: `inset-inline-start` on an absolutely positioned element
+     is measured from the *padding* edge (i.e. just inside the 1px card
+     border), not the card's true outer edge. At 0 the pill sits flush
+     against the inside of the border, leaving that 1px border color
+     visible as a sliver between the pill and the card's actual visual
+     edge. -1px extends the pill by the border width so it touches the
+     card's true outer boundary with no gap at all. */
+  inset-inline-start: -1px;
   width: 6px;
   border-radius: 999px;
 }
