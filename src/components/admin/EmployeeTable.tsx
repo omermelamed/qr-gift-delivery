@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/browser'
 import { AddEmployeeModal } from '@/components/admin/AddEmployeeModal'
@@ -188,6 +188,61 @@ function AttendeeCountCell({
 
 const PAGE_SIZE = 20
 
+function DeptDropdown({ value, options, onChange }: { value: string; options: string[]; onChange: (v: string) => void }) {
+  const t = useT()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    function handle(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handle)
+    return () => document.removeEventListener('mousedown', handle)
+  }, [open])
+
+  const allLabel = t('All depts')
+  const selectedLabel = value || allLabel
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="h-9 flex items-center gap-2 border border-zinc-200 rounded-lg px-3 text-sm bg-white hover:border-zinc-300 focus:outline-none focus:ring-2 ring-brand transition-colors whitespace-nowrap"
+      >
+        <span className="w-2 h-2 rounded-full flex-shrink-0 bg-zinc-300" />
+        <span className="text-zinc-700">{selectedLabel}</span>
+        <svg className={`w-4 h-4 text-zinc-400 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute top-full mt-1.5 right-0 z-20 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 min-w-[160px]">
+          {[{ value: '', label: allLabel }, ...options.map((d) => ({ value: d, label: d }))].map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => { onChange(opt.value); setOpen(false) }}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm text-left hover:bg-zinc-50 transition-colors ${opt.value === value ? 'text-zinc-900 font-medium' : 'text-zinc-600'}`}
+            >
+              <span className="w-2 h-2 rounded-full flex-shrink-0 bg-zinc-300" />
+              {opt.label}
+              {opt.value === value && (
+                <svg className="w-3.5 h-3.5 text-brand ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                </svg>
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export function EmployeeTable({
   campaignId,
   initialRows,
@@ -360,16 +415,11 @@ export function EmployeeTable({
               {t('Export CSV')}
             </button>
             {hasDepts && (
-              <select
+              <DeptDropdown
                 value={selectedDept}
-                onChange={(e) => { setSelectedDept(e.target.value); setPage(1) }}
-                className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-700 focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
-              >
-                <option value="">{t('All depts')}</option>
-                {departments.map((d) => (
-                  <option key={d} value={d}>{d}</option>
-                ))}
-              </select>
+                options={departments}
+                onChange={(v) => { setSelectedDept(v); setPage(1) }}
+              />
             )}
           </div>
         </div>
