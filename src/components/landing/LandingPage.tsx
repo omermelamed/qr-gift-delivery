@@ -7,6 +7,7 @@ import { ContactForm } from './ContactForm'
 import { Reveal } from './Reveal'
 import { QrMark, Eyebrow } from './Marks'
 import { LandingNav } from './LandingNav'
+import { StatsStrip } from './StatsStrip'
 
 export { QrMark, Eyebrow } from './Marks'
 
@@ -88,6 +89,8 @@ export function LandingPage() {
           </div>
           <HeroMockup />
         </section>
+
+        <StatsStrip />
 
         <section id="how-it-works" className="scroll-mt-16 border-y border-zinc-100 bg-zinc-50">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">

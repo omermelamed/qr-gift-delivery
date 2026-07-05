@@ -714,4 +714,7 @@ export const he: Record<string, string> = {
   'Send': 'שליחה',
   "Thanks! We'll be in touch within one business day.": 'תודה! נחזור אליכם תוך יום עסקים.',
   "Something went wrong. Your message wasn't sent — please try again.": 'משהו השתבש. ההודעה לא נשלחה — נסו שוב.',
+  'Steps to launch': 'צעדים להשקה',
+  'Apps to install': 'אפליקציות להתקין',
+  'Scan per gift': 'סריקה לכל מתנה',
 }
