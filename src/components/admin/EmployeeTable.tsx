@@ -363,7 +363,7 @@ export function EmployeeTable({
               <select
                 value={selectedDept}
                 onChange={(e) => { setSelectedDept(e.target.value); setPage(1) }}
-                className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm text-zinc-700 focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
+                className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-700 focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
               >
                 <option value="">{t('All depts')}</option>
                 {departments.map((d) => (
