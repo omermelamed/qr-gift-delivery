@@ -416,7 +416,7 @@ export function EmployeeTable({
                 <th className="px-3 py-2 font-medium text-start">SMS</th>
                 <th className="px-3 py-2 font-medium text-start">{t('Claimed')}</th>
                 <th className="px-3 py-2 font-medium text-start">{t('Claimed At')}</th>
-                <th className="px-3 py-2 font-medium text-start">{t('Distributor')}</th>
+                <th className="px-3 py-2 font-medium text-start">{t('Scanner')}</th>
                 <th className="px-3 py-2 font-medium w-8" />
               </tr>
             </thead>

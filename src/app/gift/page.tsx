@@ -95,7 +95,7 @@ export default function GiftPage() {
                     <div className="mt-4 p-3 bg-brand-soft rounded-lg">
                       <p className="text-sm text-indigo-700 font-medium">{t('Hi')} {gift.employeeName}!</p>
                       <p className="text-sm text-brand mt-0.5">
-                        {t('You have an unclaimed gift. Find a gift distributor and show them this screen to claim it.')}
+                        {t('You have an unclaimed gift. Find a scanner and show them this screen to claim it.')}
                       </p>
                     </div>
                   </div>

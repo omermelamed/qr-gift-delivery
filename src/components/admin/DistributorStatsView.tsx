@@ -11,7 +11,7 @@ export function DistributorStatsView({ rows, total }: Props) {
   const t = useT()
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-5">
-      <h2 className="font-semibold text-zinc-900 mb-4">{t('Distributor Stats')}</h2>
+      <h2 className="font-semibold text-zinc-900 mb-4">{t('Scanner Stats')}</h2>
       <div className="flex flex-col gap-2">
         {rows.map(({ userId, name, count }) => (
           <div key={userId} className="flex items-center justify-between text-sm">

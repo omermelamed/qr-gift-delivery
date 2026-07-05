@@ -59,7 +59,7 @@ export function DistributorAssignment({ campaignId }: { campaignId: string }) {
   return (
     <div className="bg-white rounded-xl border border-zinc-200 p-5">
       <div className="flex items-center gap-1.5 mb-1">
-        <h2 className="font-semibold text-zinc-900">{t('Distributors')}</h2>
+        <h2 className="font-semibold text-zinc-900">{t('Scanners')}</h2>
         <span className="group relative inline-flex items-center">
           <button
             type="button"
@@ -112,7 +112,7 @@ export function DistributorAssignment({ campaignId }: { campaignId: string }) {
           disabled={loading}
           className="text-sm font-medium text-brand hover-brand-text transition-colors disabled:opacity-50"
         >
-          {t('+ Add distributor')}
+          {t('+ Add scanner')}
         </button>
 
         {showPicker && (

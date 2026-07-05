@@ -7,7 +7,7 @@ import { useT } from '@/lib/i18n/useT'
 const ROLE_VALUES = [
   { value: 'company_admin', key: 'Admin' },
   { value: 'campaign_manager', key: 'Campaign Manager' },
-  { value: 'scanner', key: 'Scanner (Distributor)' },
+  { value: 'scanner', key: 'Scanner' },
 ] as const
 
 type Props = { onClose: () => void }

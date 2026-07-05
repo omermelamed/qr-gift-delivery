@@ -105,7 +105,7 @@ export function GiftRedemptionView({
               </div>
             )}
             <p className="text-sm text-zinc-500 mt-6">
-              {t('Show this QR code to a distributor to collect your gift.')}
+              {t('Show this QR code to a scanner to collect your gift.')}
             </p>
             {supportsArrival && (
               <button
