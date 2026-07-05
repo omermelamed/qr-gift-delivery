@@ -19,7 +19,6 @@ function CountUp({ to }: { to: number }) {
       setValue(Math.round(to * eased))
       if (p < 1) raf = requestAnimationFrame(tick)
     }
-    setValue(0)
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
   }, [to])
