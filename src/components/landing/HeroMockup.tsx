@@ -1,6 +1,31 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useT } from '@/lib/i18n/useT'
+
+// Server-renders the final value (no flash without JS), then counts up from 0
+// after hydration. Skipped under prefers-reduced-motion.
+function CountUp({ to }: { to: number }) {
+  const [value, setValue] = useState(to)
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    let raf = 0
+    const start = performance.now()
+    const duration = 1200
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / duration, 1)
+      const eased = 1 - Math.pow(1 - p, 3)
+      setValue(Math.round(to * eased))
+      if (p < 1) raf = requestAnimationFrame(tick)
+    }
+    setValue(0)
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [to])
+
+  return <>{value}</>
+}
 
 // Deterministic decorative "QR" — three finder patterns plus scattered modules.
 const MODULES: Array<[number, number]> = [
@@ -64,7 +89,8 @@ export function HeroMockup() {
           </span>
         </div>
         <p className="font-display mt-2 text-2xl font-bold">
-          312<span className="text-base font-medium text-zinc-400"> / 500</span>
+          <CountUp to={312} />
+          <span className="text-base font-medium text-zinc-400"> / 500</span>
         </p>
         <p className="text-xs text-zinc-500">{t('gifts redeemed')}</p>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100">
