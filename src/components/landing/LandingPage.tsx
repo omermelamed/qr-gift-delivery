@@ -98,7 +98,7 @@ export function LandingPage() {
             </Link>
             <a
               href="#contact"
-              className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-90"
+              className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 motion-safe:hover:-translate-y-px"
             >
               {t('Book a demo')}
             </a>
@@ -109,19 +109,19 @@ export function LandingPage() {
       <main id="top">
         <section className="mx-auto grid max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
           <div>
-            <Eyebrow>{t('Employee gifting, scanned')}</Eyebrow>
-            <h1 className="font-display mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
+            <Eyebrow className="rise text-brand">{t('Employee gifting, scanned')}</Eyebrow>
+            <h1 className="font-display rise rise-d1 mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
               {t('Gift day without the spreadsheet chaos')}
             </h1>
-            <p className="mt-5 max-w-xl text-lg leading-relaxed text-zinc-600">
+            <p className="rise rise-d2 mt-5 max-w-xl text-lg leading-relaxed text-zinc-600">
               {t(
                 'GiftFlow sends every employee a personal QR code by SMS. Your team scans at the event, and you watch redemptions live — no double handouts, no guesswork.'
               )}
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-5">
+            <div className="rise rise-d3 mt-8 flex flex-wrap items-center gap-5">
               <a
                 href="#contact"
-                className="rounded-full bg-brand px-6 py-3 text-base font-semibold text-white shadow-md transition-opacity hover:opacity-90"
+                className="rounded-full bg-brand px-6 py-3 text-base font-semibold text-white shadow-md transition hover:opacity-90 motion-safe:hover:-translate-y-px"
               >
                 {t('Book a demo')}
               </a>

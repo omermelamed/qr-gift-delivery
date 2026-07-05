@@ -494,6 +494,43 @@ input:-webkit-autofill:focus {
   font-family: var(--font-heebo), sans-serif;
 }
 
+/* --- Landing motion (spec: docs/superpowers/specs/2026-07-05-landing-animations-design.md).
+   Everything here is gated on no-preference: reduced-motion users get the
+   static page, and base styles never hide content. --- */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: translateY(14px) scale(0.92); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .rise { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .pop { animation: pop-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .rise-d1 { animation-delay: 80ms; }
+  .rise-d2 { animation-delay: 160ms; }
+  .rise-d3 { animation-delay: 240ms; }
+  .rise-d4 { animation-delay: 450ms; }
+
+  /* Scroll reveal: JS flips data-reveal to "shown" (see Reveal.tsx). translate
+     and box-shadow are listed so hover lifts still animate on revealed cards
+     (this unlayered rule beats Tailwind's layered transition utilities). */
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      translate 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  [data-reveal='shown'] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Pointer affordance for clickable elements. Modern browsers default
    <button> to `cursor: default`, so set it explicitly everywhere. */
 button,

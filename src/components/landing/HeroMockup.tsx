@@ -37,7 +37,7 @@ export function HeroMockup() {
   return (
     <div className="relative mx-auto w-full max-w-sm" aria-hidden="true">
       {/* Phone showing the SMS every employee receives */}
-      <div className="rounded-[2rem] border border-zinc-200 bg-white p-4 shadow-xl">
+      <div className="rise rise-d2 rounded-[2rem] border border-zinc-200 bg-white p-4 shadow-xl">
         <div className="rounded-2xl bg-zinc-50 p-4">
           <p className="text-xs font-medium text-zinc-400">GiftFlow</p>
           <div className="mt-2 rounded-2xl rounded-ss-sm bg-white p-4 shadow-sm">
@@ -52,7 +52,7 @@ export function HeroMockup() {
       </div>
       {/* Floating live-dashboard card — the HR side of the same moment.
           On mobile there's no room beside the phone, so it stacks below. */}
-      <div className="mt-4 w-full rounded-2xl border border-zinc-100 bg-white p-4 shadow-2xl sm:absolute sm:-bottom-6 sm:-end-8 sm:mt-0 sm:w-56">
+      <div className="pop rise-d4 mt-4 w-full rounded-2xl border border-zinc-100 bg-white p-4 shadow-2xl sm:absolute sm:-bottom-6 sm:-end-8 sm:mt-0 sm:w-56">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold text-zinc-500">{t('Holiday campaign')}</p>
           <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
