@@ -255,7 +255,6 @@ export const he: Record<string, string> = {
   'Search…': 'חפש…',
   'All depts': 'כל המחלקות',
   'Gift': 'מתנה',
-  'Scanner': 'סורק',
   'Claimed At': 'מומש בתאריך',
   'By department': 'לפי מחלקה',
   'By Department': 'לפי מחלקה',
@@ -304,7 +303,6 @@ export const he: Record<string, string> = {
   'No gift recorded': 'לא נרשמה מתנה',
 
   // DistributorAssignment
-  'Scanners': 'מי סורק?',
   'Any scanner can scan this campaign': 'כל סורק יכול לסרוק קמפיין זה',
   'How to add a scanner': 'איך מוסיפים סורק',
   'To add a new scanner, go to the': 'על מנת להוסיף סורק חדש, היכנס',
