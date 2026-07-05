@@ -8,6 +8,7 @@ import { Reveal } from './Reveal'
 import { QrMark, Eyebrow } from './Marks'
 import { LandingNav } from './LandingNav'
 import { StatsStrip } from './StatsStrip'
+import { FeatureIcon, type FeatureIconName } from './FeatureIcon'
 
 export { QrMark, Eyebrow } from './Marks'
 
@@ -26,30 +27,36 @@ const STEPS = [
   },
 ]
 
-const FEATURES = [
+const FEATURES: Array<{ title: string; body: string; icon: FeatureIconName }> = [
   {
     title: 'One scan, one gift',
     body: 'A code can never be redeemed twice — validation is atomic at the database level.',
+    icon: 'scan',
   },
   {
     title: 'Live dashboard',
     body: 'See every redemption the moment it happens, from any device.',
+    icon: 'activity',
   },
   {
     title: 'Nothing to install',
     body: 'Employees just open a text message. Scanners use any phone camera.',
+    icon: 'phone',
   },
   {
     title: 'Scan as a team',
     body: 'The whole team can scan in parallel — everyone sees the same live state.',
+    icon: 'users',
   },
   {
     title: 'Hebrew and English',
     body: 'Full right-to-left support across the product, for employees and admins alike.',
+    icon: 'globe',
   },
   {
     title: 'Per-campaign reports',
     body: 'Export exactly who picked up what, when, and who handed it out.',
+    icon: 'chart',
   },
 ]
 
@@ -141,9 +148,11 @@ export function LandingPage() {
           </Reveal>
           <div className="mt-10 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f, i) => (
-              <Reveal key={f.title} delay={i * 50}>
-                <h3 className="flex items-center gap-2 text-base font-semibold">
-                  <QrMark className="text-brand" />
+              <Reveal key={f.title} delay={i * 50} className="group">
+                <h3 className="flex items-center gap-3 text-base font-semibold">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand transition-colors duration-200 group-hover:bg-brand group-hover:text-white">
+                    <FeatureIcon name={f.icon} />
+                  </span>
                   {t(f.title)}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t(f.body)}</p>
