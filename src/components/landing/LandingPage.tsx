@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { useT } from '@/lib/i18n/useT'
 import { HeroMockup } from './HeroMockup'
+import { ContactForm } from './ContactForm'
 
 // The QR finder pattern — the square-in-square corner mark of every QR code —
 // is the landing page's signature glyph.
@@ -165,6 +166,21 @@ export function LandingPage() {
                 <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t(f.body)}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        <section id="contact" className="bg-indigo-950 text-white">
+          <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
+            <div>
+              <Eyebrow className="text-indigo-300">{t('Book a demo')}</Eyebrow>
+              <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
+                {t('See your next gift day in GiftFlow')}
+              </h2>
+              <p className="mt-4 max-w-md leading-relaxed text-indigo-200/90">
+                {t("Tell us about your next gift day and we'll show you GiftFlow in action.")}
+              </p>
+            </div>
+            <ContactForm />
           </div>
         </section>
       </main>
