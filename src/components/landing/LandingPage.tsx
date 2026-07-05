@@ -85,7 +85,8 @@ export function LandingPage() {
       </header>
 
       <main id="top">
-        <section className="mx-auto grid max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
+        <section className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(55%_45%_at_72%_18%,rgba(99,102,241,0.09),transparent)]" />
           <div>
             <Eyebrow className="rise text-brand">{t('Employee gifting, scanned')}</Eyebrow>
             <h1 className="font-display rise rise-d1 mt-4 text-4xl font-bold tracking-tight sm:text-5xl">

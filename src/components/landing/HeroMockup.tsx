@@ -41,19 +41,34 @@ export function HeroMockup() {
       <div className="rise rise-d2 rounded-[2rem] border border-zinc-200 bg-white p-4 shadow-xl">
         <div className="rounded-2xl bg-zinc-50 p-4">
           <p className="text-xs font-medium text-zinc-400">GiftFlow</p>
-          <div className="mt-2 rounded-2xl rounded-ss-sm bg-white p-4 shadow-sm">
-            <p className="text-sm text-zinc-800">{t('Hi Dana! Your holiday gift is waiting 🎁')}</p>
-            <p className="mt-1 text-sm text-zinc-500">{t('Show this code at the event:')}</p>
-            <div className="relative mt-3 flex justify-center overflow-hidden py-2 text-zinc-900">
-              <FakeQr />
-              <div className="animate-scan-line absolute inset-x-6 top-1/2 h-0.5 rounded bg-brand/70 motion-reduce:hidden" />
+          <div className="relative mt-2 rounded-2xl rounded-ss-sm bg-white p-4 shadow-sm">
+            {/* Typing indicator — overlays, then fades as the message appears */}
+            <div className="sms-typing absolute start-4 top-4 flex gap-1 opacity-0" aria-hidden="true">
+              <span className="h-1.5 w-1.5 rounded-full bg-zinc-300" />
+              <span className="h-1.5 w-1.5 rounded-full bg-zinc-300" />
+              <span className="h-1.5 w-1.5 rounded-full bg-zinc-300" />
+            </div>
+            <div className="sms-msg">
+              <p className="text-sm text-zinc-800">{t('Hi Dana! Your holiday gift is waiting 🎁')}</p>
+              <p className="mt-1 text-sm text-zinc-500">{t('Show this code at the event:')}</p>
+              <div className="relative mt-3 flex justify-center overflow-hidden py-2 text-zinc-900">
+                <FakeQr />
+                <div className="scan-once absolute inset-x-6 top-1/2 h-0.5 rounded bg-brand/70 opacity-0 motion-reduce:hidden" />
+              </div>
             </div>
           </div>
         </div>
       </div>
       {/* Floating live-dashboard card — the HR side of the same moment.
           On mobile there's no room beside the phone, so it stacks below. */}
-      <div className="pop rise-d4 mt-4 w-full rounded-2xl border border-zinc-100 bg-white p-4 shadow-2xl sm:absolute sm:-bottom-6 sm:-end-8 sm:mt-0 sm:w-56">
+      <div className="pop d-hero-card mt-4 w-full rounded-2xl border border-zinc-100 bg-white p-4 shadow-2xl sm:absolute sm:-bottom-6 sm:-end-8 sm:mt-0 sm:w-56">
+        {/* Redeemed toast — lands after the counter settles */}
+        <div className="toast-in absolute -top-3 end-3 flex items-center gap-1 rounded-full bg-emerald-500 px-2.5 py-1 text-xs font-semibold text-white opacity-0 shadow-md motion-reduce:hidden">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3" aria-hidden="true">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+          {t('Redeemed')}
+        </div>
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold text-zinc-500">{t('Holiday campaign')}</p>
           <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
@@ -65,12 +80,12 @@ export function HeroMockup() {
           </span>
         </div>
         <p className="font-display mt-2 text-2xl font-bold">
-          <CountUp to={312} />
+          <CountUp to={312} startDelay={2400} />
           <span className="text-base font-medium text-zinc-400"> / 500</span>
         </p>
         <p className="text-xs text-zinc-500">{t('gifts redeemed')}</p>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100">
-          <div className="h-full w-[62%] rounded-full bg-brand" />
+          <div className="bar-grow h-full w-[62%] rounded-full bg-brand" />
         </div>
       </div>
     </div>
