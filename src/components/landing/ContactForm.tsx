@@ -62,8 +62,8 @@ export function ContactForm() {
     return (
       <div className="rounded-2xl border border-indigo-800 bg-indigo-900/50 p-10 text-center">
         <svg viewBox="0 0 52 52" className="mx-auto mb-4 h-12 w-12 text-emerald-400" aria-hidden="true">
-          <circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" strokeWidth="2" pathLength="1" className="draw-stroke-1" />
-          <path d="M15 27l8 8 15-15" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" pathLength="1" className="draw-stroke-2" />
+          <circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" strokeWidth="2" className="draw-stroke-1" />
+          <path d="M15 27l8 8 15-15" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="draw-stroke-2" />
         </svg>
         <p className="text-lg font-medium">{t("Thanks! We'll be in touch within one business day.")}</p>
       </div>

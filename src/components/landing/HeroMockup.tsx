@@ -53,7 +53,7 @@ export function HeroMockup() {
               <p className="mt-1 text-sm text-zinc-500">{t('Show this code at the event:')}</p>
               <div className="relative mt-3 flex justify-center overflow-hidden py-2 text-zinc-900">
                 <FakeQr />
-                <div className="scan-once absolute inset-x-6 top-1/2 h-0.5 rounded bg-brand/70 opacity-0 motion-reduce:hidden" />
+                <div className="scan-once absolute inset-x-6 top-1/2 h-0.5 rounded opacity-0 motion-reduce:hidden" />
               </div>
             </div>
           </div>

@@ -7,7 +7,6 @@ import { ContactForm } from './ContactForm'
 import { Reveal } from './Reveal'
 import { QrMark, Eyebrow } from './Marks'
 import { LandingNav } from './LandingNav'
-import { StatsStrip } from './StatsStrip'
 import { FeatureIcon, type FeatureIconName } from './FeatureIcon'
 import { BackToTop } from './BackToTop'
 
@@ -98,8 +97,6 @@ export function LandingPage() {
           <HeroMockup />
         </section>
 
-        <StatsStrip />
-
         <section id="how-it-works" className="scroll-mt-16 border-y border-zinc-100 bg-zinc-50">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
             <Reveal>
@@ -109,14 +106,14 @@ export function LandingPage() {
               </h2>
             </Reveal>
             <Reveal className="mt-8 hidden lg:block">
-              <svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true" className="h-8 w-full overflow-visible text-brand/40 rtl:-scale-x-100">
+              {/* viewBox ≈ rendered size so stroke width stays uniform without
+                  non-scaling-stroke (which breaks pathLength dash normalization) */}
+              <svg viewBox="0 0 1100 32" preserveAspectRatio="none" aria-hidden="true" className="h-8 w-full overflow-visible rtl:-scale-x-100">
                 <path
-                  d="M0 5 C 20 -3, 32 13, 50 5 S 82 -3, 100 5"
+                  d="M0 16 C 220 -8, 350 40, 550 16 S 900 -8, 1100 16"
                   fill="none"
-                  stroke="currentColor"
+                  strokeOpacity="0.4"
                   strokeWidth="1.5"
-                  pathLength="1"
-                  vectorEffect="non-scaling-stroke"
                   className="connector-path"
                 />
               </svg>
@@ -151,7 +148,7 @@ export function LandingPage() {
             {FEATURES.map((f, i) => (
               <Reveal key={f.title} delay={i * 50} className="group">
                 <h3 className="flex items-center gap-3 text-base font-semibold">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand/10 text-brand transition-colors duration-200 group-hover:bg-brand group-hover:text-white">
+                  <span className="feature-tile flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors duration-200">
                     <FeatureIcon name={f.icon} />
                   </span>
                   {t(f.title)}
