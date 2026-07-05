@@ -484,6 +484,16 @@ input:-webkit-autofill:focus {
   font-family: var(--font-heebo), sans-serif;
 }
 
+/* Landing display face: Space Grotesk for English headlines; Hebrew headlines
+   fall back to Heebo so RTL pages keep one coherent voice. */
+.font-display {
+  font-family: var(--font-display, var(--font-inter)), sans-serif;
+  letter-spacing: -0.01em;
+}
+:lang(he) .font-display {
+  font-family: var(--font-heebo), sans-serif;
+}
+
 /* Pointer affordance for clickable elements. Modern browsers default
    <button> to `cursor: default`, so set it explicitly everywhere. */
 button,

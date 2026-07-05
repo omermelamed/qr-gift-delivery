@@ -667,4 +667,22 @@ export const he: Record<string, string> = {
   'Continue': 'המשך',
   'Step 1 of 5 · Basics': 'שלב 1 מתוך 5 · פרטים בסיסיים',
   'Could not save the campaign name and date. Please try again.': 'לא ניתן היה לשמור את שם ותאריך הקמפיין. נסו שוב.',
+
+  // Landing page
+  'Employee gifting, scanned': 'חלוקת מתנות לעובדים, בסריקה',
+  'Gift day without the spreadsheet chaos': 'יום חלוקת מתנות בלי כאוס של אקסלים',
+  'GiftFlow sends every employee a personal QR code by SMS. Your team scans at the event, and you watch redemptions live — no double handouts, no guesswork.':
+    'GiftFlow שולחת לכל עובד קוד QR אישי ב-SMS. הצוות שלכם סורק באירוע, ואתם רואים את המימושים בזמן אמת — בלי חלוקות כפולות, בלי ניחושים.',
+  'Book a demo': 'קבעו הדגמה',
+  'See how it works': 'איך זה עובד',
+  'How it works': 'איך זה עובד',
+  'Why GiftFlow': 'למה GiftFlow',
+  'Log in': 'התחברות',
+  'Hi Dana! Your holiday gift is waiting 🎁': 'היי דנה! מתנת החג שלך מחכה 🎁',
+  'Show this code at the event:': 'הציגו את הקוד הזה באירוע:',
+  'Holiday campaign': 'קמפיין חג',
+  'Live': 'חי',
+  'gifts redeemed': 'מתנות מומשו',
+  'Employee gift distribution, scanned.': 'חלוקת מתנות לעובדים, בסריקה.',
+  'Contact': 'צור קשר',
 }
