@@ -50,8 +50,9 @@ export function HeroMockup() {
           </div>
         </div>
       </div>
-      {/* Floating live-dashboard card — the HR side of the same moment */}
-      <div className="absolute -bottom-6 -end-2 w-56 rounded-2xl border border-zinc-100 bg-white p-4 shadow-2xl sm:-end-8">
+      {/* Floating live-dashboard card — the HR side of the same moment.
+          On mobile there's no room beside the phone, so it stacks below. */}
+      <div className="mt-4 w-full rounded-2xl border border-zinc-100 bg-white p-4 shadow-2xl sm:absolute sm:-bottom-6 sm:-end-8 sm:mt-0 sm:w-56">
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold text-zinc-500">{t('Holiday campaign')}</p>
           <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
