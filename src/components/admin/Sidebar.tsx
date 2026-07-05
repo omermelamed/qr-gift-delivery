@@ -68,14 +68,14 @@ export function Sidebar({ logoUrl }: Props) {
   return (
     <>
       {/* ── Desktop sidebar (md+) ── */}
-      <nav className="hidden md:flex group flex-col bg-white border-e border-zinc-200 w-14 hover:w-56 transition-all duration-200 overflow-hidden flex-shrink-0 h-full">
-        <div className="flex items-center gap-3 h-14 px-3 border-b border-zinc-200 flex-shrink-0">
+      <nav className="hidden md:flex group flex-col bg-nav border-nav border-e w-14 hover:w-56 transition-all duration-200 overflow-hidden flex-shrink-0 h-full">
+        <div className="flex items-center gap-3 h-14 px-3 border-b border-nav flex-shrink-0">
           {logoUrl ? (
             <img src={logoUrl} alt="Logo" className="w-8 h-8 rounded-lg object-cover flex-shrink-0" />
           ) : (
-            <div className="w-8 h-8 rounded-lg bg-brand flex-shrink-0" />
+            <div className="w-8 h-8 rounded-lg bg-[var(--color-nav-text-default)] flex-shrink-0" />
           )}
-          <span className="text-zinc-900 font-bold text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-75">
+          <span className="text-nav font-bold text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-75">
             GiftFlow
           </span>
         </div>
@@ -87,8 +87,8 @@ export function Sidebar({ logoUrl }: Props) {
               href={item.href}
               aria-label={item.label}
               aria-current={item.active ? 'page' : undefined}
-              className={`flex items-center gap-3 px-2 py-2 rounded-lg transition-colors ${
-                item.active ? 'bg-brand-soft text-brand font-medium' : 'text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100'
+              className={`text-nav flex items-center gap-3 px-2 py-2 rounded-lg transition-colors ${
+                item.active ? 'bg-nav-active font-medium' : 'bg-nav-hover'
               }`}
             >
               {item.icon}
@@ -99,11 +99,11 @@ export function Sidebar({ logoUrl }: Props) {
           ))}
         </div>
 
-        <div className="p-2 border-t border-zinc-200 flex-shrink-0">
+        <div className="p-2 border-t border-nav flex-shrink-0">
           <button
             onClick={handleSignOut}
             aria-label={t('Sign out')}
-            className="flex items-center gap-3 px-2 py-2 rounded-lg text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 transition-colors w-full"
+            className="text-nav flex items-center gap-3 px-2 py-2 rounded-lg bg-nav-hover transition-colors w-full"
           >
             {signOutIcon}
             <span className="text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 delay-75">
@@ -114,7 +114,7 @@ export function Sidebar({ logoUrl }: Props) {
       </nav>
 
       {/* ── Mobile bottom bar (<md) ── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-zinc-200 safe-bottom">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-nav border-nav border-t safe-bottom">
         <div className="flex items-center justify-around px-1 py-1.5">
           {navItems.map((item) => (
             <Link
@@ -122,8 +122,8 @@ export function Sidebar({ logoUrl }: Props) {
               href={item.href}
               aria-label={item.label}
               aria-current={item.active ? 'page' : undefined}
-              className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg transition-colors ${
-                item.active ? 'text-brand' : 'text-zinc-500'
+              className={`text-nav flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg transition-colors ${
+                item.active ? 'bg-nav-active font-semibold' : ''
               }`}
             >
               {item.icon}
@@ -135,7 +135,7 @@ export function Sidebar({ logoUrl }: Props) {
           <button
             onClick={handleSignOut}
             aria-label={t('Sign out')}
-            className="flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg text-zinc-500 transition-colors"
+            className="text-nav flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-lg transition-colors"
           >
             {signOutIcon}
             <span className="text-[10px] font-medium leading-tight">{t('Sign out')}</span>

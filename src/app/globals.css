@@ -82,13 +82,28 @@
   --color-info-bg: #EEF6FA;
   --color-info-text: #5A8FB5;
 
-  /* Navigation (sidebars, top/bottom nav, tabs, menus) */
-  --color-nav-background: #FFFFFF;
-  --color-nav-text-default: #5C625D;
-  --color-nav-text-active: #6E8B74;
-  --color-nav-text-inactive: #9EA39F;
-  --color-nav-hover-bg: #F3F0EA;
-  --color-nav-active-bg: #EEF3EF;
+  /* Campaign status badge overrides per Omer (distinct from the generic
+     success/warning/error/info vocabulary above — these three are specific
+     to the campaign Active/Closed/Draft badge). Draft reuses the exact grey
+     Closed used to have (--color-zinc-100/500, i.e. #F3F0EA / #5C625D). */
+  --color-status-active-bg: color-mix(in srgb, #A3B18A 38%, white);
+  --color-status-active-text: color-mix(in srgb, #A3B18A 34%, black);
+  --color-status-closed-bg: color-mix(in srgb, #B5654D 14%, white);
+  --color-status-closed-text: color-mix(in srgb, #B5654D 60%, black);
+  --color-status-draft-bg: #F3F0EA;
+  --color-status-draft-text: #5C625D;
+
+  /* Navigation (sidebars, top/bottom nav, tabs, menus).
+     Sidebar override per Omer: background matches the primary button color
+     (--brand), cream text/icons throughout (no separate active/inactive
+     text color — active rows are indicated by a darker background tint
+     instead, see .bg-nav-hover/.bg-nav-active). */
+  --color-nav-background: var(--brand);
+  --color-nav-text-default: #DAD7CD;
+  --color-nav-text-active: #DAD7CD;
+  --color-nav-text-inactive: #DAD7CD;
+  --color-nav-hover-bg: color-mix(in srgb, var(--brand) 88%, black);
+  --color-nav-active-bg: color-mix(in srgb, var(--brand) 80%, black);
 
   /* Elevation */
   --shadow-level-1: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -259,6 +274,15 @@ body {
   border-radius: var(--radius-modal);
   box-shadow: var(--shadow-level-2);
 }
+
+/* Sidebar / nav surface. Text and icons are one uniform color (icons use
+   `stroke="currentColor"`, so setting text color on the row covers both) —
+   active vs. inactive rows are distinguished by background tint, not color. */
+.bg-nav { background-color: var(--color-nav-background); }
+.text-nav { color: var(--color-nav-text-default); }
+.bg-nav-hover:hover { background-color: var(--color-nav-hover-bg); }
+.bg-nav-active { background-color: var(--color-nav-active-bg); }
+.border-nav { border-color: var(--color-nav-hover-bg); }
 
 /* Status badges (RSVP / campaign / credit states). Pair with a rounded-full
    pill className, e.g. `<span className="badge-success rounded-full px-2.5
