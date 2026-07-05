@@ -298,23 +298,21 @@ body {
    changes border-color, and border-right shares that same property, so
    it would silently override a border-right-based status color on hover.
    A pseudo-element's background is a separate property, so there's
-   nothing for hover to clobber. Inset 1px on the three edges that meet
-   the card's own border, so the card's border stays visible next to it
-   rather than being covered. inset-inline-start = right in RTL, left in
-   LTR — logical, not physical, since this app also serves an LTR locale.
-   The indicator's own corner radius is redundant with the parent's clip
-   in every current browser, but costs nothing and matches the card's
-   curve exactly if that ever changes. */
+   nothing for hover to clobber. Flush to the card's edge (0, not inset) —
+   the parent's overflow:hidden clips it to the card's rounded silhouette,
+   so it can run edge-to-edge without poking past the corner curve.
+   inset-inline-start = right in RTL, left in LTR — logical, not physical,
+   since this app also serves an LTR locale. */
 .card-with-status::after {
   content: '';
   position: absolute;
-  top: 1px;
-  bottom: 1px;
-  inset-inline-start: 1px;
-  width: 6px;
+  top: 0;
+  bottom: 0;
+  inset-inline-start: 0;
+  width: 9px;
   background: var(--status-color);
-  border-start-start-radius: calc(var(--radius-card) - 1px);
-  border-end-start-radius: calc(var(--radius-card) - 1px);
+  border-start-start-radius: calc(var(--radius-card) + 1px);
+  border-end-start-radius: calc(var(--radius-card) + 1px);
   pointer-events: none;
 }
 .status-active { --status-color: var(--brand); }
