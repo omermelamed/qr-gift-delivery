@@ -566,6 +566,19 @@ input:-webkit-autofill:focus {
   }
   [dir='rtl'] .bar-grow { transform-origin: 100% 50%; }
   .toast-in { animation: pop-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) 3.4s both; }
+
+  /* How-it-works journey line: draws when its Reveal flips to shown */
+  .connector-path { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  [data-reveal='shown'] .connector-path {
+    animation: draw-stroke 1.4s ease-in-out 0.3s both;
+  }
+  @keyframes draw-stroke { to { stroke-dashoffset: 0 } }
+  /* Step chips fill shortly after their card reveals. Base markup is the
+     final filled state; these rules stage the tinted pre-reveal state only
+     when motion is allowed. */
+  .step-chip { transition: background-color 0.4s ease 0.4s, color 0.4s ease 0.4s; }
+  [data-reveal] .step-chip { background: color-mix(in oklab, var(--brand) 10%, white); color: var(--brand); }
+  [data-reveal='shown'] .step-chip { background: var(--brand); color: white; }
 }
 
 /* Pointer affordance for clickable elements. Modern browsers default

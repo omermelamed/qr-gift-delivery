@@ -100,14 +100,29 @@ export function LandingPage() {
                 {t('From employee list to gift day in three steps')}
               </h2>
             </Reveal>
-            <ol className="mt-10 grid gap-6 lg:grid-cols-3">
+            <Reveal className="mt-8 hidden lg:block">
+              <svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true" className="h-8 w-full overflow-visible text-brand/40 rtl:-scale-x-100">
+                <path
+                  d="M0 5 C 20 -3, 32 13, 50 5 S 82 -3, 100 5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  pathLength="1"
+                  vectorEffect="non-scaling-stroke"
+                  className="connector-path"
+                />
+              </svg>
+            </Reveal>
+            <ol className="mt-6 grid gap-6 lg:grid-cols-3">
               {STEPS.map((step, i) => (
                 <li key={step.title}>
                   <Reveal
                     delay={i * 100}
                     className="h-full rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm hover:shadow-md motion-safe:hover:-translate-y-0.5"
                   >
-                    <p className="font-display text-sm font-bold text-brand">{i + 1}</p>
+                    <span className="step-chip font-display flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-sm font-bold text-white">
+                      {i + 1}
+                    </span>
                     <h3 className="mt-2 text-lg font-semibold">{t(step.title)}</h3>
                     <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t(step.body)}</p>
                   </Reveal>
