@@ -465,6 +465,10 @@ export const he: Record<string, string> = {
   'Sent': 'נשלח',
 
   // TokenUploader / CampaignPopulator shared
+  'Invalid rows — fix these in your file and re-upload': 'שורות לא תקינות — תקנו אותן בקובץ ועלו מחדש',
+  'These rows were skipped. Only valid rows will be uploaded.': 'שורות אלו דולגו. רק שורות תקינות יועלו.',
+  'Row': 'שורה',
+  '(no name)': '(ללא שם)',
   'File is empty or has no data rows': 'הקובץ ריק או שאין בו שורות נתונים',
   'Failed to read file': 'קריאת הקובץ נכשלה',
   'Confirm Upload': 'אשר העלאה',

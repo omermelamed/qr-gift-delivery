@@ -191,6 +191,39 @@ export function CampaignPopulator({ campaignId, existingTokens = [] }: { campaig
                 <span className="text-green-700 font-medium">{validRows.length} {t('valid')}</span>
                 {invalidCount > 0 && <span className="text-red-600 font-medium"> · {invalidCount} {t('invalid')}</span>}
               </p>
+              {invalidCount > 0 && (
+                <div className="bg-red-50 border border-red-100 rounded-lg p-3 mb-4">
+                  <p className="text-xs font-semibold text-red-700 mb-2 uppercase tracking-wide">
+                    {t('Invalid rows — fix these in your file and re-upload')}
+                  </p>
+                  <ul className="space-y-2">
+                    {rows
+                      .map((row, i) => ({ row, i }))
+                      .filter(({ row }) => row._status === 'invalid')
+                      .slice(0, 10)
+                      .map(({ row, i }) => (
+                        <li key={i} className="flex items-center gap-2 text-sm">
+                          <svg className="w-4 h-4 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          <span className="text-zinc-400 font-mono text-xs w-12">{t('Row')} {i + 1}</span>
+                          <span className={`flex-1 truncate ${row.name?.trim() ? 'text-zinc-700 font-medium' : 'text-zinc-400 italic'}`}>
+                            {row.name?.trim() || t('(no name)')}
+                          </span>
+                          <span className="bg-red-100 text-red-700 text-xs px-2 py-0.5 rounded-full font-medium whitespace-nowrap">
+                            {t(row._reason ?? '')}
+                          </span>
+                        </li>
+                      ))}
+                  </ul>
+                  {invalidCount > 10 && (
+                    <p className="text-xs text-red-400 mt-2">…{invalidCount - 10} {t('more rows not shown')}</p>
+                  )}
+                  <p className="text-xs text-red-500 mt-3">
+                    {t('These rows were skipped. Only valid rows will be uploaded.')}
+                  </p>
+                </div>
+              )}
               <button onClick={handleUploadConfirm} disabled={validRows.length === 0 || uploading}
                 className="w-full bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all">
                 {uploading ? t('Uploading…') : `${t('Confirm Upload')} (${validRows.length} ${t('employees')})`}
