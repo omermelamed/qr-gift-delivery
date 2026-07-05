@@ -5,6 +5,7 @@ import type { ReactNode } from 'react'
 import { useT } from '@/lib/i18n/useT'
 import { HeroMockup } from './HeroMockup'
 import { ContactForm } from './ContactForm'
+import { Reveal } from './Reveal'
 
 // The QR finder pattern — the square-in-square corner mark of every QR code —
 // is the landing page's signature glyph.
@@ -80,6 +81,9 @@ export function LandingPage() {
   const t = useT()
   return (
     <div className="min-h-screen bg-white text-zinc-900">
+      <noscript>
+        <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
+      </noscript>
       <header className="sticky top-0 z-40 border-b border-zinc-100 bg-white/80 backdrop-blur">
         <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <a href="#top" className="font-display flex items-center gap-2 text-lg font-bold tracking-tight">
@@ -135,16 +139,23 @@ export function LandingPage() {
 
         <section id="how-it-works" className="border-y border-zinc-100 bg-zinc-50">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
-            <Eyebrow>{t('How it works')}</Eyebrow>
-            <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
-              {t('From employee list to gift day in three steps')}
-            </h2>
+            <Reveal>
+              <Eyebrow>{t('How it works')}</Eyebrow>
+              <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
+                {t('From employee list to gift day in three steps')}
+              </h2>
+            </Reveal>
             <ol className="mt-10 grid gap-6 lg:grid-cols-3">
               {STEPS.map((step, i) => (
-                <li key={step.title} className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm">
-                  <p className="font-display text-sm font-bold text-brand">{i + 1}</p>
-                  <h3 className="mt-2 text-lg font-semibold">{t(step.title)}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t(step.body)}</p>
+                <li key={step.title}>
+                  <Reveal
+                    delay={i * 100}
+                    className="h-full rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm hover:shadow-md motion-safe:hover:-translate-y-0.5"
+                  >
+                    <p className="font-display text-sm font-bold text-brand">{i + 1}</p>
+                    <h3 className="mt-2 text-lg font-semibold">{t(step.title)}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t(step.body)}</p>
+                  </Reveal>
                 </li>
               ))}
             </ol>
@@ -152,26 +163,28 @@ export function LandingPage() {
         </section>
 
         <section id="why" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
-          <Eyebrow>{t('Why GiftFlow')}</Eyebrow>
-          <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
-            {t('Built for the day itself')}
-          </h2>
+          <Reveal>
+            <Eyebrow>{t('Why GiftFlow')}</Eyebrow>
+            <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
+              {t('Built for the day itself')}
+            </h2>
+          </Reveal>
           <div className="mt-10 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((f) => (
-              <div key={f.title}>
+            {FEATURES.map((f, i) => (
+              <Reveal key={f.title} delay={i * 50}>
                 <h3 className="flex items-center gap-2 text-base font-semibold">
                   <QrMark className="text-brand" />
                   {t(f.title)}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t(f.body)}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </section>
 
         <section id="contact" className="bg-indigo-950 text-white">
           <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
-            <div>
+            <Reveal>
               <Eyebrow className="text-indigo-300">{t('Book a demo')}</Eyebrow>
               <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
                 {t('See your next gift day in GiftFlow')}
@@ -179,8 +192,10 @@ export function LandingPage() {
               <p className="mt-4 max-w-md leading-relaxed text-indigo-200/90">
                 {t("Tell us about your next gift day and we'll show you GiftFlow in action.")}
               </p>
-            </div>
-            <ContactForm />
+            </Reveal>
+            <Reveal delay={100}>
+              <ContactForm />
+            </Reveal>
           </div>
         </section>
       </main>
