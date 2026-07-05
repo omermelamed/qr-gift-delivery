@@ -4,16 +4,318 @@
   --font-sans: var(--font-inter);
 }
 
-/* Single global brand color. All .bg-brand / .text-brand / .hover-brand* /
-   .border-brand / .ring-brand utilities read this. Change it here to rebrand. */
+/* ==========================================================================
+   Design system: Sage / Terracotta / Gold
+   ==========================================================================
+   This app has no JS theme provider — Tailwind utility classes + these CSS
+   variables ARE the theme layer. Two mechanisms do the work:
+
+   1. Semantic tokens below (--color-*, --shadow-*, --radius-*) — the
+      source of truth. Reach for these (via the .bg-brand-style utility
+      classes, or `bg-[var(--color-x)]` arbitrary values) in new code.
+
+   2. Tailwind default-palette overrides in the `@theme` block further down
+      — this app used Tailwind's stock zinc/red/green/emerald/amber/blue/
+      violet classes as its de facto neutral + status colors everywhere
+      (hundreds of call sites: text-zinc-500, bg-red-50, text-green-700...).
+      Redefining those palettes' hex values is how the rebrand reaches every
+      one of those call sites without hand-editing each file. `indigo` is
+      deliberately NOT overridden — a few spots (the landing page's dark
+      section, the scan-in-progress banner) use it for bespoke dark accents
+      unrelated to the old brand color and are restyled individually instead.
+   ========================================================================== */
+
 :root {
-  --brand: #6366f1;
+  /* Primary / Sage — also read by the legacy `--brand` alias below */
+  --color-primary: #6E8B74;
+  --color-primary-hover: #5E7863;
+  --color-primary-active: #4E6554;
+  --color-primary-disabled: #B8C6BB;
+  --color-on-primary: #FFFFFF;
+
+  /* Secondary / Terracotta */
+  --color-secondary: #C76D4A;
+  --color-secondary-hover: #B95E3B;
+  --color-secondary-active: #A64F2C;
+  --color-secondary-disabled: #E5B8A8;
+  --color-on-secondary: #FFFFFF;
+
+  /* Accent / Gold */
+  --color-accent: #E8B86D;
+  --color-accent-hover: #D9A95C;
+  --color-accent-active: #C89642;
+
+  /* Backgrounds */
+  --color-background: #F8F6F2;
+  --color-surface: #FFFFFF;
+  --color-section-background: #F3F0EA;
+  --color-disabled-background: #ECE9E2;
+
+  /* Text */
+  --color-text-primary: #2E312F;
+  --color-text-secondary: #5C625D;
+  --color-text-tertiary: #888D89;
+  --color-text-disabled: #B4B7B5;
+  --color-text-on-dark: #FFFFFF;
+
+  /* Borders */
+  --color-border-default: #DDD9D2;
+  --color-border-light: #EDE9E2;
+  --color-border-focus: #6E8B74;
+
+  /* Status */
+  --color-success: #6E8B74;
+  --color-warning: #E8B86D;
+  --color-error: #D9534F;
+  --color-info: #5A8FB5;
+
+  /* Status badge fill/text pairs (RSVP, campaign, credit states) */
+  --color-success-bg: #EDF6EF;
+  --color-success-text: #6E8B74;
+  --color-success-border: #B8C6BB;
+  --color-warning-bg: #FFF5E4;
+  --color-warning-text: #D99A2B;
+  --color-warning-border: #E8B86D;
+  --color-error-bg: #FCEDEC;
+  --color-error-text: #C44E42;
+  --color-error-border: #F2B8B5;
+  --color-info-bg: #EEF6FA;
+  --color-info-text: #5A8FB5;
+
+  /* Navigation (sidebars, top/bottom nav, tabs, menus) */
+  --color-nav-background: #FFFFFF;
+  --color-nav-text-default: #5C625D;
+  --color-nav-text-active: #6E8B74;
+  --color-nav-text-inactive: #9EA39F;
+  --color-nav-hover-bg: #F3F0EA;
+  --color-nav-active-bg: #EEF3EF;
+
+  /* Elevation */
+  --shadow-level-1: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-level-2: 0 8px 30px rgba(0, 0, 0, 0.10);
+  --shadow-level-3: 0 12px 30px rgba(0, 0, 0, 0.15);
+
+  /* Radius */
+  --radius-input: 12px;
+  --radius-button: 14px;
+  --radius-card: 16px;
+  --radius-modal: 24px;
+
+  /* Spacing (documents the scale; Tailwind's default spacing-1/2/3/4/6/8/12
+     already equal 4/8/12/16/24/32/48px, so no utility overrides needed) */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-12: 48px;
+
+  /* Legacy single-variable brand hook — every existing .bg-brand / .text-brand /
+     .border-brand / .ring-brand / .hover-brand* utility (below) reads this, so
+     pointing it at --color-primary re-themes every one of those call sites. */
+  --brand: var(--color-primary);
+}
+
+/* Tailwind default-palette overrides — see file-header note above. */
+@theme {
+  /* Neutral scale: replaces cool zinc with a warm greige. Anchors: 50=app
+     background, 100=section background, 200=default border, 400=tertiary
+     text, 500=secondary text, 900=primary text (all exact token matches);
+     300/600/700/800/950 are interpolated so the ramp stays smooth. */
+  --color-zinc-50: #F8F6F2;
+  --color-zinc-100: #F3F0EA;
+  --color-zinc-200: #DDD9D2;
+  --color-zinc-300: #ACAFA9;
+  --color-zinc-400: #888D89;
+  --color-zinc-500: #5C625D;
+  --color-zinc-600: #4E534F;
+  --color-zinc-700: #40443F;
+  --color-zinc-800: #343733;
+  --color-zinc-900: #2E312F;
+  --color-zinc-950: #1E201E;
+
+  /* gray is used a handful of places interchangeably with zinc — keep it
+     identical so nothing reads as a mismatched second neutral scale. */
+  --color-gray-50: #F8F6F2;
+  --color-gray-100: #F3F0EA;
+  --color-gray-200: #DDD9D2;
+  --color-gray-300: #ACAFA9;
+  --color-gray-400: #888D89;
+  --color-gray-500: #5C625D;
+  --color-gray-600: #4E534F;
+  --color-gray-700: #40443F;
+  --color-gray-800: #343733;
+  --color-gray-900: #2E312F;
+  --color-gray-950: #1E201E;
+
+  /* Error — anchors: 200=declined-border, 500=error, 600=declined-text */
+  --color-red-50: #FCEDEC;
+  --color-red-100: #F9DEDB;
+  --color-red-200: #F2B8B5;
+  --color-red-300: #E8938D;
+  --color-red-400: #E17169;
+  --color-red-500: #D9534F;
+  --color-red-600: #C44E42;
+  --color-red-700: #A63F35;
+  --color-red-800: #832F28;
+  --color-red-900: #5E211C;
+  --color-red-950: #3D1512;
+
+  /* Success — reuses primary sage per spec. green and emerald both appear in
+     the codebase for the same "success" meaning, so both get this scale. */
+  --color-green-50: #EDF6EF;
+  --color-green-100: #DCEEE0;
+  --color-green-200: #B8C6BB;
+  --color-green-300: #9AB09F;
+  --color-green-400: #7E9C83;
+  --color-green-500: #6E8B74;
+  --color-green-600: #5E7863;
+  --color-green-700: #4E6554;
+  --color-green-800: #3E5143;
+  --color-green-900: #2E3D33;
+  --color-green-950: #1D2820;
+  --color-emerald-50: #EDF6EF;
+  --color-emerald-100: #DCEEE0;
+  --color-emerald-200: #B8C6BB;
+  --color-emerald-300: #9AB09F;
+  --color-emerald-400: #7E9C83;
+  --color-emerald-500: #6E8B74;
+  --color-emerald-600: #5E7863;
+  --color-emerald-700: #4E6554;
+  --color-emerald-800: #3E5143;
+  --color-emerald-900: #2E3D33;
+  --color-emerald-950: #1D2820;
+
+  /* Warning/accent — anchors: 400=accent, 500=pending-text, 600=accent-active */
+  --color-amber-50: #FFF5E4;
+  --color-amber-100: #FCEACB;
+  --color-amber-200: #F5D9A0;
+  --color-amber-300: #EFC985;
+  --color-amber-400: #E8B86D;
+  --color-amber-500: #D99A2B;
+  --color-amber-600: #C89642;
+  --color-amber-700: #B07E2F;
+  --color-amber-800: #8A6224;
+  --color-amber-900: #634619;
+  --color-amber-950: #3D2B0F;
+
+  /* Info — anchors: 500=info. `violet` is folded in here too: its only uses
+     (Draft badges, an impersonation-mode banner, a credit-grant label) are
+     all "informational/notice" in meaning, not brand-adjacent. `indigo` is
+     intentionally left untouched — see file-header note. */
+  --color-blue-50: #EEF6FA;
+  --color-blue-100: #DCEEF5;
+  --color-blue-200: #B9DCEB;
+  --color-blue-300: #96CAE0;
+  --color-blue-400: #7CADCF;
+  --color-blue-500: #5A8FB5;
+  --color-blue-600: #4A7A9E;
+  --color-blue-700: #3D6482;
+  --color-blue-800: #304F66;
+  --color-blue-900: #243B4C;
+  --color-blue-950: #182735;
+  --color-violet-50: #EEF6FA;
+  --color-violet-100: #DCEEF5;
+  --color-violet-200: #B9DCEB;
+  --color-violet-300: #96CAE0;
+  --color-violet-400: #7CADCF;
+  --color-violet-500: #5A8FB5;
+  --color-violet-600: #4A7A9E;
+  --color-violet-700: #3D6482;
+  --color-violet-800: #304F66;
+  --color-violet-900: #243B4C;
+  --color-violet-950: #182735;
+
+  /* Elevation: same shapes, tuned to the new spec's opacity/spread */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.10);
+  --shadow-xl: 0 10px 30px rgba(0, 0, 0, 0.12);
+  --shadow-2xl: 0 12px 30px rgba(0, 0, 0, 0.15);
 }
 
 body {
-  background: #fafafa;
-  color: #18181b;
+  background: var(--color-background);
+  color: var(--color-text-primary);
 }
+
+/* Card / panel primitive — event sections, RSVP summaries, gift/payment
+   areas, guest rows, dashboard widgets. */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-level-1);
+}
+
+/* Modal / dialog / bottom-sheet surface — a separate class (not `.card` +
+   a radius override) because unlayered custom CSS always beats Tailwind's
+   `@layer utilities` classes for the same property, so a `rounded-[...]`
+   utility can never win against `.card`'s own border-radius declaration. */
+.modal-surface {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-modal);
+  box-shadow: var(--shadow-level-2);
+}
+
+/* Status badges (RSVP / campaign / credit states). Pair with a rounded-full
+   pill className, e.g. `<span className="badge-success rounded-full px-2.5
+   py-1 text-xs font-semibold">`. */
+.badge-success { background: var(--color-success-bg); color: var(--color-success-text); }
+.badge-warning { background: var(--color-warning-bg); color: var(--color-warning-text); }
+.badge-error { background: var(--color-error-bg); color: var(--color-error-text); }
+.badge-info { background: var(--color-info-bg); color: var(--color-info-text); }
+
+/* Chips / pills / tags */
+.chip-selected { background: var(--color-primary); color: var(--color-on-primary); }
+.chip-unselected {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-default);
+  color: var(--color-text-secondary);
+}
+.chip-unselected:hover { background: var(--color-nav-hover-bg); }
+
+/* Secondary (terracotta) button */
+.btn-secondary {
+  background: var(--color-surface);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: var(--radius-button);
+  transition: background-color 0.15s ease;
+}
+.btn-secondary:hover { background: #EEF3EF; }
+.btn-secondary:active { background: #E1E9E3; }
+
+/* Terracotta CTA / floating-highlight button */
+.btn-terracotta {
+  background: var(--color-secondary);
+  color: var(--color-on-secondary);
+  border-radius: var(--radius-button);
+  transition: background-color 0.15s ease;
+}
+.btn-terracotta:hover { background: var(--color-secondary-hover); }
+.btn-terracotta:active { background: var(--color-secondary-active); }
+
+/* Accent / highlight button — use sparingly */
+.btn-accent {
+  background: var(--color-accent);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-button);
+  transition: background-color 0.15s ease;
+}
+.btn-accent:hover { background: var(--color-accent-hover); }
+.btn-accent:active { background: var(--color-accent-active); }
+
+/* Floating action button */
+.fab {
+  background: var(--color-secondary);
+  color: #FFFFFF;
+  box-shadow: var(--shadow-level-3);
+  transition: background-color 0.15s ease;
+}
+.fab:hover { background: var(--color-secondary-hover); }
 
 @keyframes scan-line {
   0%, 100% { transform: translateY(-48px); opacity: 0.8; }
@@ -60,7 +362,7 @@ button[disabled],
   transition: background-color 0.15s ease;
 }
 .hover-brand:hover {
-  background-color: color-mix(in srgb, var(--brand, #6366f1) 5%, transparent);
+  background-color: color-mix(in srgb, var(--brand, #6E8B74) 5%, transparent);
 }
 
 /* Brand-colored text on hover. `.hover-brand-text` reacts to hovering the element
@@ -72,30 +374,40 @@ button[disabled],
 }
 .hover-brand-text:hover,
 .group:hover .group-hover-brand-text {
-  color: var(--brand, #6366f1);
+  color: var(--brand, #6E8B74);
 }
 
-/* Brand-colored text (clickable accents: links, "+ Add…", "browse", etc.). */
+/* Brand-colored text (clickable accents: links, "+ Add…", "browse", etc.). Also
+   the default/hover/active link colors from the spec (all three read this same
+   variable stack, since links don't carry separate hover/active classes today). */
 .text-brand {
-  color: var(--brand, #6366f1);
+  color: var(--brand, #6E8B74);
 }
 
-/* Solid brand background (primary buttons), with a subtle darken on hover. */
+/* Solid brand background (primary buttons) — hover/active/disabled per spec. */
 .bg-brand {
-  background-color: var(--brand, #6366f1);
+  background-color: var(--brand, #6E8B74);
+  transition: background-color 0.15s ease;
 }
 .bg-brand:hover {
-  background-color: color-mix(in srgb, var(--brand, #6366f1) 88%, #000);
+  background-color: var(--color-primary-hover);
 }
-/* Light brand fill (selected pills, dropzone backgrounds). */
+.bg-brand:active {
+  background-color: var(--color-primary-active);
+}
+.bg-brand:disabled,
+.bg-brand[aria-disabled="true"] {
+  background-color: var(--color-primary-disabled);
+}
+/* Light brand fill (selected pills, dropzone backgrounds, active nav rows). */
 .bg-brand-soft {
-  background-color: color-mix(in srgb, var(--brand, #6366f1) 10%, transparent);
+  background-color: color-mix(in srgb, var(--brand, #6E8B74) 10%, transparent);
 }
-/* Brand border (drag-and-drop zones, selected states). */
+/* Brand border (drag-and-drop zones, selected states, focus outlines). */
 .border-brand {
-  border-color: var(--brand, #6366f1);
+  border-color: var(--brand, #6E8B74);
 }
 /* Brand focus ring — sets Tailwind's ring color variable. */
 .ring-brand {
-  --tw-ring-color: var(--brand, #6366f1);
+  --tw-ring-color: var(--brand, #6E8B74);
 }

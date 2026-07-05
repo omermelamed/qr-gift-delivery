@@ -149,7 +149,7 @@ export function CampaignNotes({
                       className="border border-zinc-200 rounded-lg px-2 py-1.5 text-xs focus:outline-none focus:ring-1 resize-none w-full"
                     />
                     <div className="flex gap-1.5">
-                      <button onClick={() => handleEdit(note.id)} className="text-xs text-white px-2 py-1 rounded" style={{ backgroundColor: 'var(--brand,#6366f1)' }}>{t('Save')}</button>
+                      <button onClick={() => handleEdit(note.id)} className="text-xs text-white px-2 py-1 rounded" style={{ backgroundColor: 'var(--brand,#6E8B74)' }}>{t('Save')}</button>
                       <button onClick={() => setEditingId(null)} className="text-xs text-zinc-500 px-2 py-1 rounded hover-brand">{t('Cancel')}</button>
                     </div>
                   </div>
@@ -188,7 +188,7 @@ export function CampaignNotes({
           type="submit"
           disabled={submitting || !draft.trim()}
           className="text-white text-xs font-medium px-3 py-1.5 rounded-lg disabled:opacity-40 flex-shrink-0"
-          style={{ backgroundColor: 'var(--brand,#6366f1)' }}
+          style={{ backgroundColor: 'var(--brand,#6E8B74)' }}
         >
           {t('Post')}
         </button>

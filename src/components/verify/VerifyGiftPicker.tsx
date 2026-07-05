@@ -6,7 +6,7 @@ import { VerifyArrivalCount } from '@/components/verify/VerifyArrivalCount'
 import { useT } from '@/lib/i18n/useT'
 import type { GiftOption } from '@/types'
 
-const GIFT_COLORS = ['#6366f1', '#8b5cf6', '#f59e0b', '#14b8a6', '#f43f5e', '#f97316']
+const GIFT_COLORS = ['#6E8B74', '#C76D4A', '#E8B86D', '#5A8FB5', '#9B6B5C', '#8B6BA8']
 
 type RedeemResult =
   | { ok: true; employeeName: string; giftName: string | null }

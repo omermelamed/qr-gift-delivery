@@ -58,7 +58,7 @@ export function GiftRedemptionView({
   const showNotComing = supportsArrival && attending === false && !editing
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-50 to-violet-50 px-6">
+    <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-zinc-50 to-[var(--color-success-bg)] px-6">
       <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-8 max-w-sm w-full text-center">
         <h1 className="text-2xl font-bold text-zinc-900 mb-1">{employeeName}</h1>
         {campaignName && <p className="text-sm text-zinc-500 mb-6">{campaignName}</p>}

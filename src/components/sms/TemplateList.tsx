@@ -46,7 +46,7 @@ export function TemplateList({ templates }: Props) {
         <Link
           href="/admin/sms/templates/new"
           className="text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all"
-          style={{ backgroundColor: 'var(--brand, #6366f1)' }}
+          style={{ backgroundColor: 'var(--brand, #6E8B74)' }}
         >
           {t('+ New Template')}
         </Link>

@@ -208,7 +208,7 @@ export function EditMemberButton({ userId, name, email, phone, roleName, isActiv
                 onClick={handleSave}
                 disabled={saving || !form.name.trim() || !form.email.trim()}
                 className="text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50"
-                style={{ backgroundColor: 'var(--brand,#6366f1)' }}
+                style={{ backgroundColor: 'var(--brand,#6E8B74)' }}
               >
                 {saving ? t('Saving…') : t('Save changes')}
               </button>

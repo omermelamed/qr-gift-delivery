@@ -136,7 +136,7 @@ export function TemplateEditor({ mode, templateId, initialName = '', initialBody
             onClick={handleSave}
             disabled={!name.trim() || !body.trim() || saving}
             className="px-6 py-2.5 rounded-lg text-white font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ backgroundColor: 'var(--brand, #6366f1)' }}
+            style={{ backgroundColor: 'var(--brand, #6E8B74)' }}
           >
             {saving ? t('Saving…') : mode === 'edit' ? t('Update Template') : t('Create Template')}
           </button>

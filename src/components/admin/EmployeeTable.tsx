@@ -271,7 +271,7 @@ export function EmployeeTable({
   const [enlarged, setEnlarged] = useState<(TokenRow & { qr_image_url: string }) | null>(null)
   const closeQr = useCallback(() => setEnlarged(null), [])
 
-  const GIFT_COLORS = ['#6366f1', '#8b5cf6', '#f59e0b', '#14b8a6', '#f43f5e', '#f97316']
+  const GIFT_COLORS = ['#6E8B74', '#C76D4A', '#E8B86D', '#5A8FB5', '#9B6B5C', '#8B6BA8']
   const giftMap = new Map(gifts.map((g, i) => [g.id, { name: g.name, color: GIFT_COLORS[i % GIFT_COLORS.length] }]))
 
   async function changeGift(tokenId: string, giftId: string) {

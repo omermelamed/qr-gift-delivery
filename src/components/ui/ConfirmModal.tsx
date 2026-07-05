@@ -30,7 +30,7 @@ export function ConfirmModal({
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
         onClick={onCancel}
       />
-      <div className="relative bg-white rounded-2xl shadow-xl border border-zinc-200 p-6 w-full max-w-sm">
+      <div className="modal-surface relative p-6 w-full max-w-sm">
         <h2 className="text-base font-semibold text-zinc-900 mb-1.5">{title}</h2>
         <p className="text-sm text-zinc-500 mb-6">{message}</p>
         {error && (
@@ -40,14 +40,14 @@ export function ConfirmModal({
           <button
             onClick={onCancel}
             disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-zinc-700 border border-zinc-200 rounded-lg hover-brand transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-zinc-700 border border-zinc-200 rounded-[var(--radius-button)] hover-brand transition-colors disabled:opacity-50"
           >
             {t('Cancel')}
           </button>
           <button
             onClick={onConfirm}
             disabled={loading}
-            className="px-4 py-2 text-sm font-semibold text-white bg-brand rounded-lg hover:brightness-110 transition-all disabled:opacity-50"
+            className="px-4 py-2 text-sm font-semibold text-white bg-brand rounded-[var(--radius-button)] disabled:opacity-50"
           >
             {loading ? `${confirmLabel}…` : confirmLabel}
           </button>

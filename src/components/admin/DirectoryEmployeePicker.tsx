@@ -104,7 +104,7 @@ export function DirectoryEmployeePicker({ campaignId, existingTokens = [], onAdd
       <div className="flex gap-2 mb-3">
         <input type="text" placeholder={t('Search…')} value={search} onChange={(e) => setSearch(e.target.value)}
           className="flex-1 border border-zinc-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-          style={{ '--tw-ring-color': 'var(--brand,#6366f1)' } as React.CSSProperties} />
+          style={{ '--tw-ring-color': 'var(--brand,#6E8B74)' } as React.CSSProperties} />
         {departments.length > 0 && (
           <select value={deptFilter} onChange={(e) => { setDeptFilter(e.target.value); setSelected(new Set()) }}
             className="border border-zinc-200 rounded-lg px-2 py-1.5 text-sm text-zinc-700 focus:outline-none">
@@ -115,7 +115,7 @@ export function DirectoryEmployeePicker({ campaignId, existingTokens = [], onAdd
       </div>
 
       <div className="flex items-center justify-between mb-2">
-        <button onClick={toggleAll} disabled={filtered.length === 0} className="text-xs font-medium disabled:opacity-40" style={{ color: 'var(--brand,#6366f1)' }}>
+        <button onClick={toggleAll} disabled={filtered.length === 0} className="text-xs font-medium disabled:opacity-40" style={{ color: 'var(--brand,#6E8B74)' }}>
           {allFilteredSelected
             ? deptFilter ? `${t('Deselect all')} ${deptFilter}` : t('Deselect all')
             : deptFilter ? `${t('Select all')} ${deptFilter}` : t('Select all')}
@@ -154,7 +154,7 @@ export function DirectoryEmployeePicker({ campaignId, existingTokens = [], onAdd
         onClick={handleAdd}
         disabled={selected.size === 0 || loading}
         className="w-full text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
-        style={{ backgroundColor: 'var(--brand,#6366f1)' }}
+        style={{ backgroundColor: 'var(--brand,#6E8B74)' }}
       >
         {loading ? t('Adding…') : `${t('Add')} ${selected.size > 0 ? selected.size : ''} ${t('employees')}`}
       </button>

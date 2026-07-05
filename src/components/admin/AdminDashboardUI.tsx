@@ -227,7 +227,7 @@ export function AdminDashboardUI({ campaigns }: Props) {
         <Link
           href="/admin/campaigns/new"
           className="text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all"
-          style={{ backgroundColor: 'var(--brand, #6366f1)' }}
+          style={{ backgroundColor: 'var(--brand, #6E8B74)' }}
         >
           {t('+ New Campaign')}
         </Link>
@@ -255,7 +255,7 @@ export function AdminDashboardUI({ campaigns }: Props) {
           <Link
             href="/admin/campaigns/new"
             className="text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all"
-            style={{ backgroundColor: 'var(--brand, #6366f1)' }}
+            style={{ backgroundColor: 'var(--brand, #6E8B74)' }}
           >
             {t('+ New Campaign')}
           </Link>
@@ -312,7 +312,7 @@ export function AdminDashboardUI({ campaigns }: Props) {
                     <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all"
-                        style={{ width: `${pct}%`, backgroundColor: 'var(--brand, #6366f1)' }}
+                        style={{ width: `${pct}%`, backgroundColor: 'var(--brand, #6E8B74)' }}
                       />
                     </div>
                   </div>

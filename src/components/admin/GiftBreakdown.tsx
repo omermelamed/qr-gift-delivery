@@ -4,7 +4,7 @@ import { useT } from '@/lib/i18n/useT'
 import type { GiftOption } from '@/types'
 import { giftDistribution } from '@/lib/gift-distribution'
 
-const GIFT_COLORS = ['#6366f1', '#8b5cf6', '#f59e0b', '#14b8a6', '#f43f5e', '#f97316']
+const GIFT_COLORS = ['#6E8B74', '#C76D4A', '#E8B86D', '#5A8FB5', '#9B6B5C', '#8B6BA8']
 
 type TokenSlice = { redeemed: boolean; gift_id: string | null }
 

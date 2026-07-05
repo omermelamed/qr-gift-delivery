@@ -11,7 +11,7 @@ type ScanState = 'scanning' | 'loading' | 'gift_selection' | 'arrival_count' | '
 
 const TOKEN_PATTERN = /\/verify\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i
 
-const GIFT_COLORS = ['#6366f1', '#8b5cf6', '#f59e0b', '#14b8a6', '#f43f5e', '#f97316']
+const GIFT_COLORS = ['#6E8B74', '#C76D4A', '#E8B86D', '#5A8FB5', '#9B6B5C', '#8B6BA8']
 
 function outcomeFromResult(result: TokenVerifyResult): ScanOutcome {
   if (result.valid) return 'success'
@@ -376,10 +376,10 @@ export default function ScanPage() {
         {isBatchMode && (
           <div className="absolute inset-x-0 bottom-0 top-[45%] flex flex-col bg-zinc-950">
             {/* Status bar */}
-            <div className="flex items-center justify-between px-4 py-2 bg-indigo-900/60 border-b border-brand/40">
+            <div className="flex items-center justify-between px-4 py-2 bg-zinc-900/60 border-b border-brand/40">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
-                <span className="text-indigo-300 text-xs font-semibold uppercase tracking-widest">
+                <span className="w-2 h-2 rounded-full bg-brand animate-pulse" />
+                <span className="text-brand text-xs font-semibold uppercase tracking-widest">
                   {t('Batch Mode')}
                 </span>
               </div>
@@ -421,7 +421,7 @@ export default function ScanPage() {
                   <span className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-brand rounded-tr-lg" />
                   <span className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-brand rounded-bl-lg" />
                   <span className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-brand rounded-br-lg" />
-                  <span className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-indigo-400 to-transparent animate-scan-line" style={{ top: '50%' }} />
+                  <span className="absolute left-2 right-2 h-0.5 bg-gradient-to-r from-transparent via-[var(--brand)] to-transparent animate-scan-line" style={{ top: '50%' }} />
                 </div>
                 <p className="text-white/50 text-sm mt-6">{t('Point camera at QR code')}</p>
               </div>

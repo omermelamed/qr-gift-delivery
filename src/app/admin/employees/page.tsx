@@ -93,7 +93,7 @@ export default function EmployeesPage() {
           <button onClick={() => setShowImport(true)} className="border border-zinc-200 rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover-brand transition-colors">
             {t('Import CSV')}
           </button>
-          <button onClick={() => setShowAdd(true)} className="text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all" style={{ backgroundColor: 'var(--brand,#6366f1)' }}>
+          <button onClick={() => setShowAdd(true)} className="text-white rounded-lg px-4 py-2 text-sm font-semibold hover:brightness-110 transition-all" style={{ backgroundColor: 'var(--brand,#6E8B74)' }}>
             {t('+ Add employee')}
           </button>
         </div>
@@ -146,7 +146,7 @@ export default function EmployeesPage() {
                       </td>
                       <td className="px-5 py-2 text-end">
                         <div className="flex justify-end gap-2">
-                          <button onClick={() => handleSaveEdit(e.id)} className="text-xs font-medium" style={{ color: 'var(--brand,#6366f1)' }}>{t('Save')}</button>
+                          <button onClick={() => handleSaveEdit(e.id)} className="text-xs font-medium" style={{ color: 'var(--brand,#6E8B74)' }}>{t('Save')}</button>
                           <button onClick={() => setEditingId(null)} className="text-xs font-medium text-zinc-400 hover-brand-text">{t('Cancel')}</button>
                         </div>
                       </td>

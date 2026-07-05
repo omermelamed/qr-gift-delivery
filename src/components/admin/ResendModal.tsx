@@ -102,7 +102,7 @@ export function ResendModal({ campaignId, tokens, creditBalance, onClose, onDone
                 key={m}
                 onClick={() => setMode(m)}
                 className={tabClass(m)}
-                style={mode === m ? { backgroundColor: 'var(--brand, #6366f1)' } : undefined}
+                style={mode === m ? { backgroundColor: 'var(--brand, #6E8B74)' } : undefined}
               >
                 {label}
               </button>
@@ -156,7 +156,7 @@ export function ResendModal({ campaignId, tokens, creditBalance, onClose, onDone
                 <>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-zinc-400">{manualSelected.size} selected</span>
-                    <button onClick={toggleAll} className="text-xs font-medium" style={{ color: 'var(--brand, #6366f1)' }}>
+                    <button onClick={toggleAll} className="text-xs font-medium" style={{ color: 'var(--brand, #6E8B74)' }}>
                       {manualSelected.size === unredeemed.length ? t('Deselect all') : t('Select all')}
                     </button>
                   </div>
@@ -202,7 +202,7 @@ export function ResendModal({ campaignId, tokens, creditBalance, onClose, onDone
               onClick={handleSend}
               disabled={loading || selectedIds.length === 0 || selectedIds.length > creditBalance}
               className="flex-1 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
-              style={{ backgroundColor: 'var(--brand, #6366f1)' }}
+              style={{ backgroundColor: 'var(--brand, #6E8B74)' }}
             >
               {loading ? t('Sending…') : `${t('Send to')} ${selectedIds.length}`}
             </button>

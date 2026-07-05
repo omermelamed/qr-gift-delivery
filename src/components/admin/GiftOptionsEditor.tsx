@@ -91,7 +91,7 @@ export function GiftOptionsEditor({ campaignId, disabled = false }: Props) {
                     }}
                     className="flex-1 border border-zinc-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 ring-brand"
                   />
-                  <button onClick={() => handleSaveEdit(g.id)} className="text-xs font-medium" style={{ color: 'var(--brand,#6366f1)' }}>{t('Save')}</button>
+                  <button onClick={() => handleSaveEdit(g.id)} className="text-xs font-medium" style={{ color: 'var(--brand,#6E8B74)' }}>{t('Save')}</button>
                   <button onClick={() => setEditingId(null)} className="text-xs text-zinc-400">{t('Cancel')}</button>
                 </>
               ) : (
@@ -138,7 +138,7 @@ export function GiftOptionsEditor({ campaignId, disabled = false }: Props) {
             type="submit"
             disabled={loading || !newName.trim()}
             className="text-white rounded-lg px-3 py-1.5 text-sm font-medium disabled:opacity-50 hover:brightness-110 transition-all"
-            style={{ backgroundColor: 'var(--brand,#6366f1)' }}
+            style={{ backgroundColor: 'var(--brand,#6E8B74)' }}
           >
             {t('Add')}
           </button>
@@ -148,4 +148,4 @@ export function GiftOptionsEditor({ campaignId, disabled = false }: Props) {
   )
 }
 
-export const GIFT_COLORS = ['#6366f1', '#8b5cf6', '#f59e0b', '#14b8a6', '#f43f5e', '#f97316']
+export const GIFT_COLORS = ['#6E8B74', '#C76D4A', '#E8B86D', '#5A8FB5', '#9B6B5C', '#8B6BA8']

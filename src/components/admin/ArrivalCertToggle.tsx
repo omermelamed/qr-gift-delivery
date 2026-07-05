@@ -71,7 +71,7 @@ export function ArrivalCertToggle({
           checked={enabled}
           disabled={busy}
           onChange={toggle}
-          className="mt-0.5 w-4 h-4 accent-indigo-500"
+          className="mt-0.5 w-4 h-4 accent-[var(--brand)]"
         />
         <span>
           <span className="block text-sm font-medium text-zinc-900">{t('Supports Arrival Certificates')}</span>

@@ -21,7 +21,7 @@ export default function UnauthorizedPage() {
         <Link
           href="/admin"
           className="inline-block text-white text-sm font-semibold rounded-lg px-5 py-2.5 hover:brightness-110 transition-all"
-          style={{ backgroundColor: 'var(--brand, #6366f1)' }}
+          style={{ backgroundColor: 'var(--brand, #6E8B74)' }}
         >
           {t('Go to dashboard')}
         </Link>

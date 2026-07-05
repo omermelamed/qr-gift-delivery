@@ -59,13 +59,13 @@ export function RedemptionProgress({
         <div className="w-full bg-zinc-100 rounded-full h-2.5">
           <div
             className="h-2.5 rounded-full transition-all duration-500"
-            style={{ width: `${pct}%`, backgroundColor: 'var(--brand,#6366f1)' }}
+            style={{ width: `${pct}%`, backgroundColor: 'var(--brand,#6E8B74)' }}
           />
         </div>
         <p className="text-xs text-zinc-400 mt-1.5">{claimed} {t('of')} {total} {t('employees redeemed')}</p>
       </div>
       <div className="flex-shrink-0 text-end">
-        <p className="text-5xl font-bold tabular-nums" style={{ color: 'var(--brand,#6366f1)' }}>{pct}%</p>
+        <p className="text-5xl font-bold tabular-nums" style={{ color: 'var(--brand,#6E8B74)' }}>{pct}%</p>
         <p className="text-xs text-zinc-400 mt-0.5">{t('redeemed')}</p>
       </div>
     </div>

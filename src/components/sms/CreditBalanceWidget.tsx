@@ -38,7 +38,7 @@ export function CreditBalanceWidget({ balance, totalPurchased, totalUsed }: Prop
               className="h-full rounded-full transition-all"
               style={{
                 width: `${usagePct}%`,
-                backgroundColor: usagePct > 90 ? '#dc2626' : usagePct > 70 ? '#d97706' : 'var(--brand, #6366f1)',
+                backgroundColor: usagePct > 90 ? 'var(--color-error)' : usagePct > 70 ? 'var(--color-warning)' : 'var(--brand, #6E8B74)',
               }}
             />
           </div>

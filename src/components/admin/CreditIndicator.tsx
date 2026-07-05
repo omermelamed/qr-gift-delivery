@@ -48,7 +48,7 @@ export function CreditIndicator({ balance, needed, label }: Props) {
         <Link
           href="/admin/sms/credits"
           className="text-sm font-medium hover:underline"
-          style={{ color: 'var(--brand, #6366f1)' }}
+          style={{ color: 'var(--brand, #6E8B74)' }}
         >
           {t('Manage')}
         </Link>
