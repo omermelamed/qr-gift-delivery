@@ -71,7 +71,10 @@ design direction is decided at implementation time via the frontend-design skill
 
 ## 3. What does not change
 
-No changes to auth, middleware, RLS on existing tables, or any existing route.
+No changes to auth, RLS on existing tables, or any existing route. One necessary
+middleware change: `src/proxy.ts` currently redirects anonymous visitors on `/`
+to `/login`; it gets an exact-match (`pathname === '/'`) pass-through so the
+landing page is reachable. No other route's protection changes.
 Logged-in users hitting `/` see the marketing page and use the nav "Log in"
 button; their session carries them through as today.
 
