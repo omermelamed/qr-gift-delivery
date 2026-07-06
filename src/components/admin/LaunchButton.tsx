@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useT } from '@/lib/i18n/useT'
 
-export function LaunchButton({ campaignId, employeeCount, creditBalance }: { campaignId: string; employeeCount: number; creditBalance: number }) {
+export function LaunchButton({ campaignId, employeeCount }: { campaignId: string; employeeCount: number }) {
   const [showModal, setShowModal] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -32,13 +32,6 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance }: { cam
     }
   }
 
-  const insufficientCredits = creditBalance < employeeCount
-  const disabledTooltip = insufficientCredits
-    ? t('Not enough credits — you need {needed} but have {available}')
-        .replace('{needed}', String(employeeCount))
-        .replace('{available}', String(creditBalance))
-    : undefined
-
   return (
     <>
       {error && (
@@ -46,15 +39,12 @@ export function LaunchButton({ campaignId, employeeCount, creditBalance }: { cam
           {error}
         </p>
       )}
-      <span title={disabledTooltip} className="inline-flex">
-        <button
-          onClick={() => setShowModal(true)}
-          disabled={insufficientCredits}
-          className="bg-brand text-white rounded-lg px-5 h-[34px] inline-flex items-center justify-center text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {t('🚀 Launch Campaign')}
-        </button>
-      </span>
+      <button
+        onClick={() => setShowModal(true)}
+        className="bg-brand text-white rounded-lg px-5 h-[34px] inline-flex items-center justify-center text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {t('🚀 Launch Campaign')}
+      </button>
       {showModal && (
         <ConfirmModal
           title={t('Launch campaign?')}
