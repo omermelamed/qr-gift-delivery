@@ -56,9 +56,6 @@ export async function POST(
     return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
   }
 
-  // Cron path: company is whatever the campaign belongs to.
-  if (isCronCall) companyId = campaign.company_id
-
   if (campaign.sent_at) {
     return NextResponse.json({ error: 'Campaign already dispatched' }, { status: 409 })
   }

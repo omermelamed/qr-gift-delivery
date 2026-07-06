@@ -41,7 +41,7 @@ export function LaunchButton({ campaignId, employeeCount }: { campaignId: string
       )}
       <button
         onClick={() => setShowModal(true)}
-        className="bg-brand text-white rounded-lg px-5 h-[34px] inline-flex items-center justify-center text-sm font-semibold hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="bg-brand text-white rounded-lg px-5 h-[34px] inline-flex items-center justify-center text-sm font-semibold hover:brightness-110 transition-all"
       >
         {t('🚀 Launch Campaign')}
       </button>
