@@ -284,7 +284,6 @@ export const he: Record<string, string> = {
   'Failed to delete campaign': 'שגיאה במחיקת קמפיין',
 
   // LaunchButton
-  'Not enough credits — you need {needed} but have {available}': 'אין מספיק קרדיטים — נדרשים {needed} אך יש {available}',
   '🚀 Launch Campaign': '🚀 הפעל קמפיין',
   'Launch campaign?': 'להפעיל את הקמפיין?',
   'Launch': 'הפעל',
@@ -516,18 +515,9 @@ export const he: Record<string, string> = {
   'delivered': 'נמסרו',
   'recipients': 'נמענים',
 
-  // SMS Credits
-  'SMS Credits': 'קרדיטי SMS',
-  'Transaction History': 'היסטוריית עסקאות',
-  'No transactions yet': 'אין עסקאות עדיין',
+  // kept: 'Date' still string-matches an unrelated (unused) label field in
+  // src/components/sms/TemplateEditor.tsx; left in place per verification policy
   'Date': 'תאריך',
-  'Type': 'סוג',
-  'Description': 'תיאור',
-  'Amount': 'כמות',
-  'Purchase': 'רכישה',
-  'Used': 'שומש',
-  'Refund': 'זיכוי',
-  'Purchase credits to start sending SMS campaigns.': 'רכוש קרדיטים כדי להתחיל לשלוח קמפייני SMS.',
 
   // Credit Purchase Modal
   'Buy SMS Credits': 'קנה קרדיטי SMS',
@@ -575,8 +565,6 @@ export const he: Record<string, string> = {
   '+ Upload CSV': '+ העלה CSV',
   'Sending...': 'שולח...',
   'Credits Reserved': 'קרדיטים שמורים',
-  'Insufficient credits': 'אין מספיק קרדיטים',
-  'SMS credits remaining': 'קרדיטי SMS נותרו',
   'after sending': 'לאחר שליחה',
   'Campaign sent:': 'קמפיין נשלח:',
   'Messages': 'הודעות',
@@ -593,9 +581,6 @@ export const he: Record<string, string> = {
   'Need': 'צריך',
   'have': 'יש',
   'Manage': 'ניהול',
-  'credits will be used': 'קרדיטים ישמשו',
-  'Contact us to purchase more credits': 'צרו קשר לרכישת קרדיטים נוספים',
-  'if resending to all unclaimed': 'אם שולחים מחדש לכל מי שלא דרש',
 
   // SMS Audit actions
   'Purchased credits': 'רכש קרדיטים',
