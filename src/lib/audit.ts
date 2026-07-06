@@ -11,9 +11,6 @@ type AuditAction =
   | 'token.redeemed'
   | 'token.gift_changed'
   | 'token.attendance_changed'
-  | 'credits.purchased'
-  | 'credits.used'
-  | 'credits.refunded'
   | 'template.created'
   | 'template.updated'
   | 'template.deleted'
@@ -27,7 +24,7 @@ type AuditEventInput = {
   companyId: string
   actorId: string | null
   action: AuditAction
-  resourceType: 'campaign' | 'gift_token' | 'credits' | 'template' | 'user' | 'company'
+  resourceType: 'campaign' | 'gift_token' | 'template' | 'user' | 'company'
   resourceId?: string
   metadata?: Record<string, unknown>
 }
