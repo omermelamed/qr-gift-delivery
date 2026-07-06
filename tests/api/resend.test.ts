@@ -62,7 +62,6 @@ describe('POST /api/campaigns/[id]/resend', () => {
       campaigns: { data: { id: 'c-1', name: 'Test', company_id: 'company-1' }, error: null },
       companies: { data: { sms_template: null }, error: null },
       gift_tokens: { data: [], error: null },
-      credits: { data: { id: 'cr-1', balance: 1000, total_used: 0 }, error: null },
     }))
     const { POST } = await import('@/app/api/campaigns/[id]/resend/route')
     const res = await POST(makeRequest('c-1'), { params: Promise.resolve({ id: 'c-1' }) })
@@ -76,8 +75,6 @@ describe('POST /api/campaigns/[id]/resend', () => {
       campaigns: { data: { id: 'c-1', name: 'Passover 2026', company_id: 'company-1' }, error: null },
       companies: { data: { sms_template: null }, error: null },
       gift_tokens: { data: [{ id: 't-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: 'https://example.com/qr.png' }], error: null },
-      credits: { data: { id: 'cr-1', balance: 1000, total_used: 0 }, error: null },
-      credit_transactions: { data: null, error: null },
     }))
 
     const { POST } = await import('@/app/api/campaigns/[id]/resend/route')

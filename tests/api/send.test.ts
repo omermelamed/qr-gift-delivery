@@ -2,7 +2,6 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { NextRequest } from 'next/server'
 import { makeServiceFrom } from '../helpers/supabase-mock'
 
-const CREDITS_OK = { data: { id: 'cr-1', company_id: 'company-1', balance: 1000, total_used: 0 }, error: null }
 const CAMPAIGN_OK = { data: { id: 'campaign-1', name: 'Passover 2026', company_id: 'company-1', sent_at: null }, error: null }
 
 const mockGetUser = vi.fn()
@@ -152,8 +151,6 @@ describe('POST /api/campaigns/[id]/send', () => {
       campaigns: CAMPAIGN_OK,
       companies: { data: { sms_template: null }, error: null },
       gift_tokens: { data: [{ id: 'token-row-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: null }], error: null },
-      credits: CREDITS_OK,
-      credit_transactions: { data: null, error: null },
     }))
 
     const { POST } = await import('@/app/api/campaigns/[id]/send/route')
@@ -172,8 +169,6 @@ describe('POST /api/campaigns/[id]/send', () => {
       campaigns: CAMPAIGN_OK,
       companies: { data: { sms_template: null }, error: null },
       gift_tokens: { data: [{ id: 'token-row-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: 'https://existing-url.com/qr.png' }], error: null },
-      credits: CREDITS_OK,
-      credit_transactions: { data: null, error: null },
     }))
 
     const { generateQrBuffer } = await import('@/lib/qr')
@@ -195,8 +190,6 @@ describe('POST /api/campaigns/[id]/send', () => {
       campaigns: CAMPAIGN_OK,
       companies: { data: { sms_template: null }, error: null },
       gift_tokens: { data: [{ id: 'token-row-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: 'https://existing.com/qr.png' }], error: null },
-      credits: CREDITS_OK,
-      credit_transactions: { data: null, error: null },
     }))
 
     const { POST } = await import('@/app/api/campaigns/[id]/send/route')
