@@ -36,15 +36,9 @@ export default async function PlatformCompaniesPage() {
     }
   }
 
-  const { data: allCredits } = companyIds.length > 0
-    ? await service.from('credits').select('company_id, balance').in('company_id', companyIds)
-    : { data: [] }
-  const creditsByCompany = new Map((allCredits ?? []).map((c) => [c.company_id, c.balance]))
-
   const companiesWithEmail = (companies ?? []).map((c) => ({
     ...c,
     admin_email: adminEmails.get(c.id) ?? null,
-    credit_balance: creditsByCompany.get(c.id) ?? 0,
   }))
 
   return <CompaniesUI initialCompanies={companiesWithEmail} />
