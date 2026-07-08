@@ -17,12 +17,11 @@ type Mode = 'unclaimed' | 'department' | 'manual'
 type Props = {
   campaignId: string
   tokens: TokenSlice[]
-  creditBalance: number
   onClose: () => void
   onDone: (dispatched: number, failed: number) => void
 }
 
-export function ResendModal({ campaignId, tokens, creditBalance, onClose, onDone }: Props) {
+export function ResendModal({ campaignId, tokens, onClose, onDone }: Props) {
   const t = useT()
   const [mode, setMode] = useState<Mode>('unclaimed')
   const [selectedDept, setSelectedDept] = useState('')
@@ -187,20 +186,13 @@ export function ResendModal({ campaignId, tokens, creditBalance, onClose, onDone
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-zinc-100 flex flex-col gap-2 flex-shrink-0">
-          {selectedIds.length > 0 && (
-            <div className={`text-xs text-center ${selectedIds.length > creditBalance ? 'text-red-600' : 'text-zinc-400'}`}>
-              {selectedIds.length > creditBalance
-                ? `${t('Insufficient credits')}: ${t('Need')} ${selectedIds.length}, ${t('have')} ${creditBalance}`
-                : `${selectedIds.length} ${t('credits will be used')} · ${creditBalance - selectedIds.length} ${t('remaining')}`}
-            </div>
-          )}
           <div className="flex gap-3">
             <button onClick={onClose} disabled={loading} className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-700 hover-brand transition-colors disabled:opacity-50">
               {t('Cancel')}
             </button>
             <button
               onClick={handleSend}
-              disabled={loading || selectedIds.length === 0 || selectedIds.length > creditBalance}
+              disabled={loading || selectedIds.length === 0}
               className="flex-1 text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50 hover:brightness-110 transition-all"
               style={{ backgroundColor: 'var(--brand, #6E8B74)' }}
             >

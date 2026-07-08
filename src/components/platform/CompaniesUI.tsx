@@ -10,14 +10,12 @@ type Company = {
   active: boolean
   created_at: string
   admin_email: string | null
-  credit_balance: number
 }
 
 export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] }) {
   const [companies, setCompanies] = useState<Company[]>(initialCompanies)
   const [showCreate, setShowCreate] = useState(false)
   const [loginLoading, setLoginLoading] = useState<string | null>(null)
-  const [creditTarget, setCreditTarget] = useState<Company | null>(null)
   const router = useRouter()
 
   async function handleToggle(company: Company) {
@@ -67,14 +65,13 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
               <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[20%]">Admin Email</th>
               <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[12%]">Created</th>
               <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[10%]">Status</th>
-              <th className="text-start px-5 py-3 font-semibold text-zinc-500 text-xs uppercase tracking-wide w-[14%]">Credits</th>
               <th className="px-5 py-3 w-[26%]" />
             </tr>
           </thead>
           <tbody>
             {companies.length === 0 && (
               <tr>
-                <td colSpan={6} className="text-center py-16 text-zinc-400">No companies yet. Create one to get started.</td>
+                <td colSpan={5} className="text-center py-16 text-zinc-400">No companies yet. Create one to get started.</td>
               </tr>
             )}
             {companies.map(company => (
@@ -91,17 +88,6 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
                     <span className={`w-1.5 h-1.5 rounded-full ${company.active ? 'bg-green-500' : 'bg-zinc-400'}`} />
                     {company.active ? 'Active' : 'Inactive'}
                   </span>
-                </td>
-                <td className="px-5 py-4">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-zinc-900">{company.credit_balance}</span>
-                    <button
-                      onClick={() => setCreditTarget(company)}
-                      className="text-xs font-semibold px-2 py-1 rounded-md border border-emerald-200 text-emerald-700 hover:bg-emerald-50 transition-colors"
-                    >
-                      + Add
-                    </button>
-                  </div>
                 </td>
                 <td className="px-5 py-4 text-end">
                   <div className="flex items-center justify-end gap-2">
@@ -136,17 +122,6 @@ export function CompaniesUI({ initialCompanies }: { initialCompanies: Company[] 
           onCreated={(c) => {
             setCompanies(cs => [c, ...cs])
             setShowCreate(false)
-          }}
-        />
-      )}
-
-      {creditTarget && (
-        <AddCreditsModal
-          company={creditTarget}
-          onClose={() => setCreditTarget(null)}
-          onAdded={(companyId, newBalance) => {
-            setCompanies(cs => cs.map(c => c.id === companyId ? { ...c, credit_balance: newBalance } : c))
-            setCreditTarget(null)
           }}
         />
       )}
@@ -192,7 +167,6 @@ function CreateCompanyModal({
         active: true,
         created_at: new Date().toISOString(),
         admin_email: adminEmail.trim() || null,
-        credit_balance: 0,
       })
     } finally {
       setLoading(false)
@@ -258,102 +232,6 @@ function CreateCompanyModal({
               className="flex-1 bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold transition-colors disabled:opacity-50"
             >
               {loading ? 'Creating…' : 'Create Company'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  )
-}
-
-function AddCreditsModal({
-  company,
-  onClose,
-  onAdded,
-}: {
-  company: Company
-  onClose: () => void
-  onAdded: (companyId: string, newBalance: number) => void
-}) {
-  const [amount, setAmount] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    const num = Number(amount)
-    if (!num || num <= 0 || !Number.isInteger(num)) {
-      setError('Enter a positive whole number')
-      return
-    }
-    setLoading(true)
-    setError(null)
-    const res = await fetch(`/api/platform/companies/${company.id}/credits`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: num }),
-    })
-    const data = await res.json()
-    if (!res.ok) {
-      setError(data.error ?? 'Failed to add credits')
-      setLoading(false)
-      return
-    }
-    onAdded(company.id, data.credits?.balance ?? company.credit_balance + num)
-  }
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6" onClick={e => e.stopPropagation()}>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-zinc-900">Add Credits</h2>
-          <button onClick={onClose} className="text-zinc-400 hover-brand-text transition-colors">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        <p className="text-sm text-zinc-500 mb-4">
-          Adding credits to <strong className="text-zinc-900">{company.name}</strong>
-          <br />
-          Current balance: <strong>{company.credit_balance}</strong>
-        </p>
-
-        {error && (
-          <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 mb-4">{error}</p>
-        )}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-zinc-700">Amount</label>
-            <input
-              type="number"
-              min="1"
-              step="1"
-              value={amount}
-              onChange={e => setAmount(e.target.value)}
-              required
-              placeholder="e.g. 500"
-              autoFocus
-              className="border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent"
-            />
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex-1 border border-zinc-200 rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover-brand transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading || !amount}
-              className="flex-1 bg-emerald-600 text-white rounded-lg px-4 py-2 text-sm font-semibold hover:bg-emerald-700 transition-colors disabled:opacity-50"
-            >
-              {loading ? 'Adding…' : 'Add Credits'}
             </button>
           </div>
         </form>

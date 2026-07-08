@@ -93,27 +93,6 @@ export type ScanHistoryEntry = {
 // SMS Bulk Messaging SaaS types
 // ============================================================
 
-export type Credits = {
-  id: string
-  company_id: string
-  total_purchased: number
-  total_used: number
-  balance: number
-  updated_at: string
-}
-
-export type CreditTransactionType = 'purchase' | 'use' | 'refund' | 'grant'
-
-export type CreditTransaction = {
-  id: string
-  company_id: string
-  amount: number
-  type: CreditTransactionType
-  description: string | null
-  created_at: string
-  created_by: string | null
-}
-
 export type MessageTemplate = {
   id: string
   company_id: string
@@ -123,12 +102,3 @@ export type MessageTemplate = {
   created_at: string
   updated_at: string
 }
-
-export const CREDIT_PACKAGES = [
-  { name: 'Starter', messages: 100, price: 100 },
-  { name: 'Small', messages: 300, price: 280 },
-  { name: 'Medium', messages: 600, price: 540 },
-  { name: 'Large', messages: 1000, price: 850 },
-] as const
-
-export type CreditPackage = (typeof CREDIT_PACKAGES)[number]

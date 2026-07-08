@@ -46,7 +46,6 @@ test.describe('company_admin (HR)', () => {
     '/admin/campaigns/new',
     '/admin/employees',
     '/admin/sms/templates',
-    '/admin/sms/credits',
     '/admin/team',
     '/admin/settings',
     '/admin/audit',

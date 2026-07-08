@@ -56,9 +56,6 @@ export async function POST(
     return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
   }
 
-  // Cron path: company is whatever the campaign belongs to.
-  if (isCronCall) companyId = campaign.company_id
-
   if (campaign.sent_at) {
     return NextResponse.json({ error: 'Campaign already dispatched' }, { status: 409 })
   }
@@ -81,58 +78,20 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to fetch tokens' }, { status: 500 })
   }
 
-  // Plan every recipient's message up front so credits reflect real InforU
-  // billing: Hebrew SMS is charged per 201-char unit, so a long message costs
-  // more than one credit. (See lib/sms/segments.ts.)
-  const { plan, totalCredits, recipientCount } = planTokenMessages(tokens, {
+  // Campaigns are no longer gated by a pre-purchased credit balance — payment
+  // will happen at the end of the create-campaign flow in a future change.
+  // `planTokenMessages` still plans each recipient's SMS body (and segment
+  // count, kept for a future per-segment pricing model) up front.
+  const { plan } = planTokenMessages(tokens, {
     campaignName: campaign.name,
     effectiveTemplate,
     appUrl: process.env.NEXT_PUBLIC_APP_URL ?? '',
   })
 
-  if (totalCredits > 0) {
-    const { data: credits } = await service
-      .from('credits')
-      .select('id, balance, total_used')
-      .eq('company_id', companyId)
-      .single()
-
-    if (!credits || credits.balance < totalCredits) {
-      return NextResponse.json(
-        { error: `Insufficient SMS credits: need ${totalCredits}, have ${credits?.balance ?? 0}` },
-        { status: 402 }
-      )
-    }
-
-    // Atomic reserve — .gte guard prevents race conditions
-    const { error: reserveError } = await service
-      .from('credits')
-      .update({
-        total_used: credits.total_used + totalCredits,
-        balance: credits.balance - totalCredits,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('company_id', companyId)
-      .gte('balance', totalCredits)
-
-    if (reserveError) {
-      return NextResponse.json({ error: 'Failed to reserve credits' }, { status: 402 })
-    }
-
-    await service.from('credit_transactions').insert({
-      company_id: companyId,
-      amount: totalCredits,
-      type: 'use' as const,
-      description: `Campaign "${campaign.name}" — ${totalCredits} SMS to ${recipientCount} recipients`,
-      created_by: actorUserId ?? null,
-    })
-  }
-
   const smsProvider = getSmsProvider()
   const smsSending = smsProvider.isConfigured()
   let dispatched = 0
   let failed = 0
-  let failedCredits = 0
 
   for (let i = 0; i < tokens.length; i += BATCH_SIZE) {
     const batch = tokens.slice(i, i + BATCH_SIZE)
@@ -173,45 +132,16 @@ export async function POST(
       })
     )
 
-    results.forEach((result, j) => {
+    results.forEach((result) => {
       if (result.status === 'fulfilled') dispatched++
       else {
         failed++
-        failedCredits += plan.get(batch[j].id)?.segments ?? 0
         console.error('[send] token failed:', result.reason)
       }
     })
 
     if (i + BATCH_SIZE < tokens.length) {
       await new Promise((r) => setTimeout(r, DELAY_MS))
-    }
-  }
-
-  // Refund credits for failed SMS sends (by segment count, mirroring the charge)
-  if (failedCredits > 0) {
-    const { data: currentCredits } = await service
-      .from('credits')
-      .select('total_used, balance')
-      .eq('company_id', companyId!)
-      .single()
-
-    if (currentCredits) {
-      await service
-        .from('credits')
-        .update({
-          total_used: currentCredits.total_used - failedCredits,
-          balance: currentCredits.balance + failedCredits,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('company_id', companyId!)
-
-      await service.from('credit_transactions').insert({
-        company_id: companyId!,
-        amount: failedCredits,
-        type: 'refund' as const,
-        description: `Campaign "${campaign.name}" — ${failed} failed SMS (${failedCredits} credits) refunded`,
-        created_by: actorUserId ?? null,
-      })
     }
   }
 

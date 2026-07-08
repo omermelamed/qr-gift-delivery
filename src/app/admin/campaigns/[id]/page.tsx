@@ -16,7 +16,6 @@ import { ReminderButton } from '@/components/admin/ReminderButton'
 import { GiftBreakdown } from '@/components/admin/GiftBreakdown'
 import { ArrivalSummary } from '@/components/admin/ArrivalSummary'
 import { CampaignDetailHeader } from '@/components/admin/CampaignDetailHeader'
-import { CreditIndicator } from '@/components/admin/CreditIndicator'
 import { ViewQrLink, ExportCsvLink } from '@/components/admin/CampaignActions'
 import { KebabMenu } from '@/components/admin/KebabMenu'
 import { MENU_ITEM, MENU_ITEM_DANGER } from '@/components/admin/menuItemStyles'
@@ -40,16 +39,11 @@ export default async function CampaignDetailPage({
 
   const service = createServiceClient()
 
-  const [campaignResult, creditsResult, companyResult] = await Promise.all([
+  const [campaignResult, companyResult] = await Promise.all([
     service
       .from('campaigns')
       .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates, max_attendee_count, sms_template, wizard_last_step')
       .eq('id', campaignId)
-      .eq('company_id', companyId)
-      .single(),
-    service
-      .from('credits')
-      .select('balance')
       .eq('company_id', companyId)
       .single(),
     service
@@ -62,7 +56,6 @@ export default async function CampaignDetailPage({
   const campaign = campaignResult.data
   if (!campaign) redirect('/admin')
 
-  const creditBalance = creditsResult.data?.balance ?? 0
   const companyDefaultTemplate = companyResult.data?.sms_template ?? null
 
   const tokensResult = await service
@@ -128,7 +121,7 @@ export default async function CampaignDetailPage({
                 className={MENU_ITEM}
               />
               {campaign.sent_at && !campaign.closed_at && (
-                <ReminderButton campaignId={campaign.id} tokens={allTokens} creditBalance={creditBalance} className={MENU_ITEM} />
+                <ReminderButton campaignId={campaign.id} tokens={allTokens} className={MENU_ITEM} />
               )}
               {campaign.sent_at && <ViewQrLink campaignId={campaign.id} className={MENU_ITEM} />}
               {campaign.sent_at && <ExportCsvLink campaignId={campaign.id} className={MENU_ITEM} />}
@@ -136,16 +129,6 @@ export default async function CampaignDetailPage({
           )}
         </div>
       </div>
-
-      <CreditIndicator
-        balance={creditBalance}
-        needed={
-          isDraft
-            ? allTokens.filter((t) => !!t.phone_number).length
-            : allTokens.filter((t) => !t.redeemed && !!t.phone_number).length
-        }
-        label={isDraft ? undefined : 'if resending to all unclaimed'}
-      />
 
       {/* ── Bento grid ── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
@@ -164,7 +147,6 @@ export default async function CampaignDetailPage({
               }}
               tokens={allTokens}
               gifts={gifts}
-              creditBalance={creditBalance}
               companyDefaultTemplate={companyDefaultTemplate}
               canEditGift={canEditGift}
             />

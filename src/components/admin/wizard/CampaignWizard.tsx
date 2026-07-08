@@ -32,13 +32,12 @@ type CampaignWizardProps = {
   }
   tokens: Tokens
   gifts: { id: string; name: string }[]
-  creditBalance: number
   companyDefaultTemplate: string | null
   canEditGift: boolean
 }
 
 export function CampaignWizard({
-  campaign, tokens, gifts, creditBalance, companyDefaultTemplate, canEditGift,
+  campaign, tokens, gifts, companyDefaultTemplate, canEditGift,
 }: CampaignWizardProps) {
   const t = useT()
   const router = useRouter()
@@ -215,7 +214,7 @@ export function CampaignWizard({
               </p>
             ) : (
               <div className="flex justify-center">
-                <LaunchButton campaignId={campaign.id} employeeCount={employeeCount} creditBalance={creditBalance} />
+                <LaunchButton campaignId={campaign.id} employeeCount={employeeCount} />
               </div>
             )}
           </div>

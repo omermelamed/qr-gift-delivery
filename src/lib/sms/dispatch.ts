@@ -11,7 +11,7 @@ export function buildGiftLink(token: string, appUrl: string): string {
 /**
  * Renders the final SMS body for one recipient: the effective template if set,
  * otherwise the built-in default. Single source of truth shared by send/resend
- * so the credit estimate and the actual sent text can never diverge.
+ * so the segment estimate and the actual sent text can never diverge.
  */
 export function buildSmsBodyForToken(opts: {
   token: string
@@ -31,10 +31,11 @@ type BillableToken = { id: string; token: string; employee_name: string; phone_n
 export type TokenMessagePlan = Map<string, { body: string; segments: number }>
 
 /**
- * Pre-computes the SMS body + billed segment count for every recipient that has
- * a phone number, keyed by token id. Returns the plan and the total credits the
- * send will cost (Σ segments), so the credit reservation reflects real InforU
- * billing instead of one-credit-per-recipient.
+ * Pre-computes the SMS body + segment count for every recipient that has a
+ * phone number, keyed by token id. `totalCredits` (Σ segments) and
+ * `recipientCount` are no longer consumed for balance deduction — campaigns
+ * are not gated by a credit ledger — but are kept for a future per-segment
+ * pricing estimate.
  */
 export function planTokenMessages(
   tokens: BillableToken[],
