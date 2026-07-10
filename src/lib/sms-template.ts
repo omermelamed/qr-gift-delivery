@@ -22,3 +22,18 @@ export function resolveSmsTemplate(
   if (co) return co
   return null
 }
+
+/**
+ * Picks the effective reminder template: reminder override if non-empty, else
+ * whatever resolveSmsTemplate would pick for the primary message. Trims, treats
+ * whitespace-only as absent.
+ */
+export function resolveReminderTemplate(
+  reminderTemplate: string | null,
+  campaignTemplate: string | null,
+  companyTemplate: string | null,
+): string | null {
+  const rem = reminderTemplate?.trim()
+  if (rem) return rem
+  return resolveSmsTemplate(campaignTemplate, companyTemplate)
+}

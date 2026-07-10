@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { renderSmsTemplate, resolveSmsTemplate } from '@/lib/sms-template'
+import { renderSmsTemplate, resolveSmsTemplate, resolveReminderTemplate } from '@/lib/sms-template'
 
 describe('renderSmsTemplate', () => {
   it('substitutes name and link', () => {
@@ -31,5 +31,26 @@ describe('resolveSmsTemplate', () => {
   })
   it('trims the chosen template', () => {
     expect(resolveSmsTemplate('  camp {link}  ', null)).toBe('camp {link}')
+  })
+})
+
+describe('resolveReminderTemplate', () => {
+  it('prefers a non-empty reminder template over everything else', () => {
+    expect(resolveReminderTemplate('rem {link}', 'camp {link}', 'co {link}')).toBe('rem {link}')
+  })
+  it('falls back to resolveSmsTemplate when reminder is null', () => {
+    expect(resolveReminderTemplate(null, 'camp {link}', 'co {link}')).toBe('camp {link}')
+  })
+  it('falls back to the company template when reminder and campaign are both absent', () => {
+    expect(resolveReminderTemplate(null, null, 'co {link}')).toBe('co {link}')
+  })
+  it('treats a whitespace-only reminder as absent', () => {
+    expect(resolveReminderTemplate('   ', 'camp {link}', 'co {link}')).toBe('camp {link}')
+  })
+  it('returns null when nothing is set anywhere', () => {
+    expect(resolveReminderTemplate(null, null, null)).toBeNull()
+  })
+  it('trims the chosen reminder template', () => {
+    expect(resolveReminderTemplate('  rem {link}  ', null, null)).toBe('rem {link}')
   })
 })
