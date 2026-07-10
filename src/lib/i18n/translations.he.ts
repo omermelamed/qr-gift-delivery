@@ -650,6 +650,7 @@ export const he: Record<string, string> = {
   'Review': 'סיכום',
   'Review & Launch': 'סיכום והפעלה',
   'Advanced settings': 'הגדרות מתקדמות',
+  'Reminder SMS': 'תזכורת SMS',
   'Gift options': 'אפשרויות מתנה',
   'On': 'פעיל',
   'Off': 'כבוי',

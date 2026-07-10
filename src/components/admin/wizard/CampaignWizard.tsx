@@ -9,7 +9,9 @@ import { EmployeeTable } from '@/components/admin/EmployeeTable'
 import { DistributorAssignment } from '@/components/admin/DistributorAssignment'
 import { GiftOptionsEditor } from '@/components/admin/GiftOptionsEditor'
 import { CampaignSmsTemplate } from '@/components/admin/CampaignSmsTemplate'
+import { ReminderSmsTemplate } from '@/components/admin/ReminderSmsTemplate'
 import { ArrivalCertToggle } from '@/components/admin/ArrivalCertToggle'
+import { resolveSmsTemplate } from '@/lib/sms-template'
 import { LaunchButton } from '@/components/admin/LaunchButton'
 import { WizardStepper } from '@/components/admin/wizard/WizardStepper'
 import { ConfirmModal } from '@/components/ui/ConfirmModal'
@@ -28,6 +30,7 @@ type CampaignWizardProps = {
     supports_arrival_certificates: boolean
     max_attendee_count: number | null
     sms_template: string | null
+    reminder_sms_template: string | null
     wizard_last_step: number
   }
   tokens: Tokens
@@ -60,6 +63,8 @@ export function CampaignWizard({
     resolveInitialStep(searchParams.get('step'), campaign.wizard_last_step, ctx),
   )
   const [advancedOpen, setAdvancedOpen] = useState(campaign.supports_arrival_certificates)
+  const [reminderOpen, setReminderOpen] = useState(!!campaign.reminder_sms_template)
+  const effectivePrimaryTemplate = resolveSmsTemplate(campaign.sms_template, companyDefaultTemplate)
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [cancelLoading, setCancelLoading] = useState(false)
   const [cancelError, setCancelError] = useState<string | null>(null)
@@ -190,6 +195,26 @@ export function CampaignWizard({
                     campaignId={campaign.id}
                     initial={campaign.supports_arrival_certificates}
                     initialMax={campaign.max_attendee_count}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="rounded-xl border border-zinc-200">
+              <button
+                type="button"
+                onClick={() => setReminderOpen((o) => !o)}
+                className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-zinc-700"
+                aria-expanded={reminderOpen}
+              >
+                <span>{t('Reminder SMS')}</span>
+                <span className={`transition-transform ${reminderOpen ? 'rotate-180' : ''}`}>⌄</span>
+              </button>
+              {reminderOpen && (
+                <div className="px-4 pb-4">
+                  <ReminderSmsTemplate
+                    campaignId={campaign.id}
+                    initial={campaign.reminder_sms_template}
+                    effectivePrimaryTemplate={effectivePrimaryTemplate}
                   />
                 </div>
               )}
