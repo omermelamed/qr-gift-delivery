@@ -600,6 +600,7 @@ export const he: Record<string, string> = {
   'Deleted campaign': 'מחק קמפיין',
   'Duplicated campaign': 'שכפל קמפיין',
   'Sent reminder': 'שלח תזכורת',
+  'Updated reminder message': 'עדכן הודעת תזכורת',
   'Redeemed gift': 'מימש מתנה',
 
   // Previously-missed strings
