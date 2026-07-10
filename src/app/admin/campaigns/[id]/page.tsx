@@ -123,9 +123,6 @@ export default async function CampaignDetailPage({
                 sourceDate={campaign.campaign_date}
                 className={MENU_ITEM}
               />
-              {campaign.sent_at && !campaign.closed_at && (
-                <ReminderButton campaignId={campaign.id} tokens={allTokens} className={MENU_ITEM} />
-              )}
               {campaign.sent_at && <ViewQrLink campaignId={campaign.id} className={MENU_ITEM} />}
               {campaign.sent_at && <ExportCsvLink campaignId={campaign.id} className={MENU_ITEM} />}
             </KebabMenu>
@@ -191,7 +188,11 @@ export default async function CampaignDetailPage({
                 campaignId={campaign.id}
                 initial={campaign.reminder_sms_template}
                 effectivePrimaryTemplate={effectivePrimaryTemplate}
-              />
+              >
+                {!campaign.closed_at && (
+                  <ReminderButton campaignId={campaign.id} tokens={allTokens} />
+                )}
+              </ReminderSmsTemplate>
               <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
               <DistributorStats campaignId={campaign.id} total={allTokens.length} />
             </div>

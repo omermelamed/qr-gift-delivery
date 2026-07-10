@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { useT } from '@/lib/i18n/useT'
 import { SmsLengthHint } from '@/components/admin/SmsLengthHint'
@@ -9,9 +9,10 @@ type Props = {
   campaignId: string
   initial: string | null
   effectivePrimaryTemplate: string | null
+  children?: ReactNode
 }
 
-export function ReminderSmsTemplate({ campaignId, initial, effectivePrimaryTemplate }: Props) {
+export function ReminderSmsTemplate({ campaignId, initial, effectivePrimaryTemplate, children }: Props) {
   const t = useT()
   const router = useRouter()
   const [value, setValue] = useState(initial ?? '')
@@ -68,14 +69,17 @@ export function ReminderSmsTemplate({ campaignId, initial, effectivePrimaryTempl
       </span>
       <SmsLengthHint template={value} />
       {error && <span className="text-xs text-red-500">{error}</span>}
-      <button
-        type="button"
-        onClick={save}
-        disabled={busy}
-        className="self-start bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50"
-      >
-        {busy ? t('Saving…') : t('Save')}
-      </button>
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={save}
+          disabled={busy}
+          className="self-start bg-brand text-white rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50"
+        >
+          {busy ? t('Saving…') : t('Save')}
+        </button>
+        {children}
+      </div>
     </div>
   )
 }
