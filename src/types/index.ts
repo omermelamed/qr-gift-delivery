@@ -38,6 +38,7 @@ export type Campaign = {
   supports_arrival_certificates: boolean
   max_attendee_count: number | null
   sms_template: string | null
+  reminder_sms_template: string | null
 }
 
 export type GiftToken = {
