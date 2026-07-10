@@ -6,6 +6,7 @@ import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignBut
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { StatusBadge } from '@/components/admin/StatusBadge'
 import { KebabMenu } from '@/components/admin/KebabMenu'
+import { DatePicker } from '@/components/admin/DatePicker'
 import { MENU_ITEM, MENU_ITEM_DANGER } from '@/components/admin/menuItemStyles'
 import { useT } from '@/lib/i18n/useT'
 import { useLocale } from '@/lib/i18n/LanguageContext'
@@ -159,27 +160,15 @@ function DateRangeDropdown({ from, to, onFromChange, onToChange }: {
       </button>
 
       {open && (
-        <div className="absolute top-full mt-1.5 start-0 z-20 bg-white border border-zinc-200 rounded-xl shadow-lg p-3 w-64">
+        <div className="absolute top-full mt-1.5 start-0 z-20 bg-white border border-zinc-200 rounded-xl shadow-lg p-3 w-80">
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-zinc-500">{t('From date')}</label>
-              <input
-                type="date"
-                value={from}
-                max={to || undefined}
-                onChange={(e) => onFromChange(e.target.value)}
-                className="input-field h-9 w-full px-3 text-sm"
-              />
+              <DatePicker value={from} max={to || undefined} onChange={onFromChange} />
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-zinc-500">{t('To date')}</label>
-              <input
-                type="date"
-                value={to}
-                min={from || undefined}
-                onChange={(e) => onToChange(e.target.value)}
-                className="input-field h-9 w-full px-3 text-sm"
-              />
+              <DatePicker value={to} min={from || undefined} onChange={onToChange} />
             </div>
             {hasFilter && (
               <button

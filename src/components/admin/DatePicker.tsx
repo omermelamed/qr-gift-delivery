@@ -10,12 +10,15 @@ type Props = {
   onChange: (value: string) => void
   id?: string
   placeholder?: string
+  /** ISO date strings; days outside this range render disabled. */
+  min?: string
+  max?: string
 }
 
 const inputClass =
   'w-full text-start border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 ring-brand focus:border-transparent'
 
-export function DatePicker({ value, onChange, id, placeholder }: Props) {
+export function DatePicker({ value, onChange, id, placeholder, min, max }: Props) {
   const { locale } = useLocale()
   const t = useT()
   const intlLocale = locale === 'he' ? 'he-IL' : 'en-GB'
@@ -140,17 +143,21 @@ export function DatePicker({ value, onChange, id, placeholder }: Props) {
                 view.year === today.getFullYear() &&
                 view.month === today.getMonth() + 1 &&
                 day === today.getDate()
+              const isDisabled = (min !== undefined && iso < min) || (max !== undefined && iso > max)
               return (
                 <button
                   key={i}
                   type="button"
+                  disabled={isDisabled}
                   onClick={() => pick(day)}
                   className={`h-9 rounded-lg text-sm transition-colors ${
-                    isSelected
-                      ? 'bg-brand text-white font-semibold'
-                      : isToday
-                        ? 'text-brand font-semibold hover-brand'
-                        : 'text-zinc-700 hover-brand'
+                    isDisabled
+                      ? 'text-zinc-300 cursor-not-allowed'
+                      : isSelected
+                        ? 'bg-brand text-white font-semibold'
+                        : isToday
+                          ? 'text-brand font-semibold hover-brand'
+                          : 'text-zinc-700 hover-brand'
                   }`}
                 >
                   {day}
