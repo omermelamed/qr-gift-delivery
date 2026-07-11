@@ -166,4 +166,46 @@ describe('PATCH /api/campaigns/[id]', () => {
     expect(await res.json()).toEqual({ ok: true })
     expect(update).toHaveBeenCalledWith({ supports_arrival_certificates: true })
   })
+
+  it('returns 400 when allowGiftIfNotAttending is present but not a boolean', async () => {
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    const res = await PATCH(makeRequest({ allowGiftIfNotAttending: 'yes' }), params)
+    expect(res.status).toBe(400)
+    expect((await res.json()).error).toBe('allowGiftIfNotAttending must be a boolean')
+  })
+
+  it('updates allowGiftIfNotAttending on a draft campaign', async () => {
+    const update = vi.fn(() => ({ eq: () => ({ eq: () => Promise.resolve({ error: null }) }) }))
+    mockFromService.mockReturnValue({
+      select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null } }) }) }) }),
+      update,
+    })
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    const res = await PATCH(makeRequest({ allowGiftIfNotAttending: true }), params)
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ ok: true })
+    expect(update).toHaveBeenCalledWith({ allow_gift_if_not_attending: true })
+  })
+
+  it('updates both arrival flags together in one PATCH', async () => {
+    const update = vi.fn(() => ({ eq: () => ({ eq: () => Promise.resolve({ error: null }) }) }))
+    mockFromService.mockReturnValue({
+      select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: null } }) }) }) }),
+      update,
+    })
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    const res = await PATCH(makeRequest({ supportsArrivalCertificates: true, allowGiftIfNotAttending: true }), params)
+    expect(res.status).toBe(200)
+    expect(update).toHaveBeenCalledWith({ supports_arrival_certificates: true, allow_gift_if_not_attending: true })
+  })
+
+  it('returns 409 for allowGiftIfNotAttending when the campaign was already sent', async () => {
+    mockFromService.mockReturnValue({
+      select: () => ({ eq: () => ({ eq: () => ({ single: () => Promise.resolve({ data: { id: 'c-1', sent_at: '2026-06-01T00:00:00Z' } }) }) }) }),
+      update: () => ({ eq: () => ({ eq: () => Promise.resolve({ error: null }) }) }),
+    })
+    const { PATCH } = await import('@/app/api/campaigns/[id]/route')
+    const res = await PATCH(makeRequest({ allowGiftIfNotAttending: true }), params)
+    expect(res.status).toBe(409)
+  })
 })

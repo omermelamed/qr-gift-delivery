@@ -1,0 +1,2 @@
+ALTER TABLE campaigns
+  ADD COLUMN IF NOT EXISTS allow_gift_if_not_attending BOOLEAN NOT NULL DEFAULT FALSE;

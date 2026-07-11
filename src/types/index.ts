@@ -37,6 +37,7 @@ export type Campaign = {
   scheduled_confirmed_at: string | null
   supports_arrival_certificates: boolean
   max_attendee_count: number | null
+  allow_gift_if_not_attending: boolean
   sms_template: string | null
   reminder_sms_template: string | null
 }

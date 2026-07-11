@@ -20,6 +20,7 @@ type Props = {
   attending: boolean | null
   attendeeCount: number | null
   maxCount: number | null
+  allowGiftIfNotAttending: boolean
 }
 
 export function GiftRedemptionView({
@@ -35,6 +36,7 @@ export function GiftRedemptionView({
   attending,
   attendeeCount,
   maxCount,
+  allowGiftIfNotAttending,
 }: Props) {
   const t = useT()
   const [editing, setEditing] = useState(false)
@@ -53,9 +55,10 @@ export function GiftRedemptionView({
     )
   }
 
-  // For arrival-certificate campaigns, the RSVP gates the gift QR.
+  // For arrival-certificate campaigns, the RSVP gates the gift QR — unless the
+  // campaign explicitly allows non-attendees to still receive a gift.
   const showRsvpForm = supportsArrival && (attending === null || editing)
-  const showNotComing = supportsArrival && attending === false && !editing
+  const showNotComing = supportsArrival && attending === false && !allowGiftIfNotAttending && !editing
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-zinc-50 to-[var(--color-success-bg)] px-6">
