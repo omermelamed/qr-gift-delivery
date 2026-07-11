@@ -11,8 +11,11 @@ ALTER TABLE gift_tokens
   ADD COLUMN IF NOT EXISTS attendee_count INT,
   ADD COLUMN IF NOT EXISTS responded_at   TIMESTAMPTZ;
 
-ALTER TABLE gift_tokens
-  ADD CONSTRAINT attendee_count_consistency CHECK (
-    (attending = TRUE AND attendee_count IS NOT NULL AND attendee_count >= 1) OR
-    (attending IS DISTINCT FROM TRUE AND attendee_count IS NULL)
-  );
+DO $$ BEGIN
+  ALTER TABLE gift_tokens
+    ADD CONSTRAINT attendee_count_consistency CHECK (
+      (attending = TRUE AND attendee_count IS NOT NULL AND attendee_count >= 1) OR
+      (attending IS DISTINCT FROM TRUE AND attendee_count IS NULL)
+    );
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
