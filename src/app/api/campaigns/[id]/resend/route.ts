@@ -6,7 +6,7 @@ import { planTokenMessages } from '@/lib/sms/dispatch'
 import { logAuditEvent } from '@/lib/audit'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
-import { resolveSmsTemplate } from '@/lib/sms-template'
+import { resolveReminderTemplate } from '@/lib/sms-template'
 
 const BATCH_SIZE = 50
 const DELAY_MS = 1000
@@ -33,7 +33,7 @@ export async function POST(
 
   const { data: campaign } = await service
     .from('campaigns')
-    .select('id, name, sms_template')
+    .select('id, name, sms_template, reminder_sms_template')
     .eq('id', campaignId)
     .eq('company_id', companyId)
     .single()
@@ -46,7 +46,11 @@ export async function POST(
     .eq('id', companyId)
     .single()
 
-  const effectiveTemplate = resolveSmsTemplate(campaign.sms_template, company?.sms_template ?? null)
+  const effectiveTemplate = resolveReminderTemplate(
+    campaign.reminder_sms_template,
+    campaign.sms_template,
+    company?.sms_template ?? null,
+  )
 
   const body = await _request.json().catch(() => ({}))
   const tokenIds: string[] | undefined = Array.isArray(body.tokenIds) ? body.tokenIds : undefined

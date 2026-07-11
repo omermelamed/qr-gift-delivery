@@ -9,6 +9,7 @@ const ACTION_KEY: Record<string, string> = {
   'campaign.deleted': 'Deleted campaign',
   'campaign.duplicated': 'Duplicated campaign',
   'campaign.reminder_sent': 'Sent reminder',
+  'campaign.reminder_template_updated': 'Updated reminder message',
   'token.redeemed': 'Redeemed gift',
 }
 
