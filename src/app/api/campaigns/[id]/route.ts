@@ -81,6 +81,7 @@ export async function PATCH(
     campaign_date?: string
     supports_arrival_certificates?: boolean
     max_attendee_count?: number | null
+    allow_gift_if_not_attending?: boolean
     sms_template?: string | null
     wizard_last_step?: number
   } = {}
@@ -120,6 +121,13 @@ export async function PATCH(
       return NextResponse.json({ error: 'invalid_max' }, { status: 400 })
     }
     update.max_attendee_count = raw
+  }
+
+  if ('allowGiftIfNotAttending' in body) {
+    if (typeof body.allowGiftIfNotAttending !== 'boolean') {
+      return NextResponse.json({ error: 'allowGiftIfNotAttending must be a boolean' }, { status: 400 })
+    }
+    update.allow_gift_if_not_attending = body.allowGiftIfNotAttending
   }
 
   if ('smsTemplate' in body) {
