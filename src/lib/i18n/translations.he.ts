@@ -673,8 +673,6 @@ export const he: Record<string, string> = {
   'Gift day without the spreadsheet chaos': 'יום חלוקת מתנות בלי כאוס של אקסלים',
   'GiftFlow sends every employee a personal QR code by SMS. Your team scans at the event, and you watch redemptions live — no double handouts, no guesswork.':
     'GiftFlow שולחת לכל עובד קוד QR אישי ב-SMS. הצוות שלכם סורק באירוע, ואתם רואים את המימושים בזמן אמת — בלי חלוקות כפולות, בלי ניחושים.',
-  'Book a demo': 'קבעו הדגמה',
-  'See how it works': 'איך זה עובד',
   'How it works': 'איך זה עובד',
   'Why GiftFlow': 'למה GiftFlow',
   'Log in': 'התחברות',
@@ -705,8 +703,10 @@ export const he: Record<string, string> = {
   'Full right-to-left support across the product, for employees and admins alike.': 'תמיכה מלאה בכיווניות ימין-לשמאל בכל המוצר, לעובדים ולמנהלים כאחד.',
   'Per-campaign reports': 'דוחות לכל קמפיין',
   'Export exactly who picked up what, when, and who handed it out.': 'ייצוא מדויק של מי קיבל מה, מתי, ומי מסר.',
-  'See your next gift day in GiftFlow': 'ככה ייראה יום חלוקת המתנות הבא שלכם',
-  "Tell us about your next gift day and we'll show you GiftFlow in action.": 'ספרו לנו על יום חלוקת המתנות הבא שלכם ונראה לכם את GiftFlow בפעולה.',
+  'Get in touch': 'בואו נדבר',
+  'Bring GiftFlow to your next gift day': 'תביאו את GiftFlow ליום החלוקה הבא שלכם',
+  "Tell us about your team and your next event — we'll set your first campaign up with you.":
+    'ספרו לנו על הצוות שלכם והאירוע הבא — ונקים יחד את הקמפיין הראשון שלכם.',
   'Company': 'חברה',
   'Work email': 'אימייל עבודה',
   'Phone (optional)': 'טלפון (לא חובה)',
@@ -715,4 +715,16 @@ export const he: Record<string, string> = {
   "Thanks! We'll be in touch within one business day.": 'תודה! נחזור אליכם תוך יום עסקים.',
   "Something went wrong. Your message wasn't sent — please try again.": 'משהו השתבש. ההודעה לא נשלחה — נסו שוב.',
   'Back to top': 'חזרה למעלה',
+
+  // How-it-works video modal (animated placeholder — see HowItWorksModal.tsx)
+  'Watch how it works': 'צפו איך זה עובד',
+  'Talk to our team': 'דברו עם הצוות שלנו',
+  'Tap to simulate a scan': 'הקישו כדי לדמות סריקה',
+  'All gifts redeemed': 'כל המתנות נמסרו',
+  'Replay': 'הפעילו שוב',
+  "That's the whole flow.": 'זה כל התהליך.',
+  'Upload a list, we handle the SMS and the scanning — you just watch the gifts go out.':
+    'מעלים רשימה, אנחנו דואגים ל-SMS ולסריקה — ואתם רק צופים במתנות יוצאות.',
+  'Close video': 'סגירת הווידאו',
+  'How GiftFlow works': 'איך GiftFlow עובד',
 }

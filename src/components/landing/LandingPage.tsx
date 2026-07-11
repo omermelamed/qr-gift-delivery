@@ -1,31 +1,21 @@
 'use client'
 
 import Link from 'next/link'
+import { useState } from 'react'
 import { useT } from '@/lib/i18n/useT'
 import { HeroMockup } from './HeroMockup'
+import { HeroAmbient } from './HeroAmbient'
 import { ContactForm } from './ContactForm'
 import { Reveal } from './Reveal'
-import { QrMark, Eyebrow } from './Marks'
+import { QrMark, Eyebrow, PlayIcon } from './Marks'
 import { LandingNav } from './LandingNav'
 import { FeatureIcon, type FeatureIconName } from './FeatureIcon'
 import { BackToTop } from './BackToTop'
+import { StepRail } from './StepRail'
+import { TiltCard } from './TiltCard'
+import { HowItWorksModal } from './HowItWorksModal'
 
 export { QrMark, Eyebrow } from './Marks'
-
-const STEPS = [
-  {
-    title: 'Upload your employee list',
-    body: 'A CSV file is all it takes — your campaign is ready in minutes.',
-  },
-  {
-    title: 'Everyone gets a personal QR',
-    body: 'Sent by SMS. Nothing to install, nothing to print.',
-  },
-  {
-    title: 'Scan and watch it live',
-    body: 'Each code redeems exactly once, and the dashboard updates as gifts are handed out.',
-  },
-]
 
 const FEATURES: Array<{ title: string; body: string; icon: FeatureIconName }> = [
   {
@@ -62,15 +52,18 @@ const FEATURES: Array<{ title: string; body: string; icon: FeatureIconName }> = 
 
 export function LandingPage() {
   const t = useT()
+  const [videoOpen, setVideoOpen] = useState(false)
+
   return (
     <div className="min-h-screen bg-white text-zinc-900">
       <noscript>
         <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
       </noscript>
-      <LandingNav />
+      <LandingNav onOpenVideo={() => setVideoOpen(true)} />
+      <HowItWorksModal open={videoOpen} onClose={() => setVideoOpen(false)} />
 
       <main id="top">
-        <section className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
+        <HeroAmbient className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(55%_45%_at_72%_18%,rgba(99,102,241,0.09),transparent)]" />
           <div>
             <Eyebrow className="rise text-brand">{t('Employee gifting, scanned')}</Eyebrow>
@@ -83,19 +76,21 @@ export function LandingPage() {
               )}
             </p>
             <div className="rise rise-d3 mt-8 flex flex-wrap items-center gap-5">
-              <a
-                href="#contact"
-                className="rounded-full bg-brand px-6 py-3 text-base font-semibold text-white shadow-md transition hover:opacity-90 motion-safe:hover:-translate-y-px"
+              <button
+                type="button"
+                onClick={() => setVideoOpen(true)}
+                className="flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-base font-semibold text-white shadow-md transition hover:opacity-90 motion-safe:hover:-translate-y-px"
               >
-                {t('Book a demo')}
-              </a>
-              <a href="#how-it-works" className="text-base font-semibold text-zinc-700 hover:text-zinc-900">
-                {t('See how it works')} <span className="inline-block rtl:rotate-180">→</span>
+                <PlayIcon className="h-3.5 w-3.5" />
+                {t('Watch how it works')}
+              </button>
+              <a href="#contact" className="text-base font-semibold text-zinc-700 hover:text-zinc-900">
+                {t('Talk to our team')} <span className="inline-block rtl:rotate-180">→</span>
               </a>
             </div>
           </div>
           <HeroMockup />
-        </section>
+        </HeroAmbient>
 
         <section id="how-it-works" className="scroll-mt-16 border-y border-zinc-100 bg-zinc-50">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-24">
@@ -105,35 +100,7 @@ export function LandingPage() {
                 {t('From employee list to gift day in three steps')}
               </h2>
             </Reveal>
-            <Reveal className="mt-8 hidden lg:block">
-              {/* viewBox ≈ rendered size so stroke width stays uniform without
-                  non-scaling-stroke (which breaks pathLength dash normalization) */}
-              <svg viewBox="0 0 1100 32" preserveAspectRatio="none" aria-hidden="true" className="h-8 w-full overflow-visible rtl:-scale-x-100">
-                <path
-                  d="M0 16 C 220 -8, 350 40, 550 16 S 900 -8, 1100 16"
-                  fill="none"
-                  strokeOpacity="0.4"
-                  strokeWidth="1.5"
-                  className="connector-path"
-                />
-              </svg>
-            </Reveal>
-            <ol className="mt-6 grid gap-6 lg:grid-cols-3">
-              {STEPS.map((step, i) => (
-                <li key={step.title}>
-                  <Reveal
-                    delay={i * 100}
-                    className="h-full rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm hover:shadow-md motion-safe:hover:-translate-y-0.5"
-                  >
-                    <span className="step-chip font-display flex h-8 w-8 items-center justify-center rounded-lg bg-brand text-sm font-bold text-white">
-                      {i + 1}
-                    </span>
-                    <h3 className="mt-2 text-lg font-semibold">{t(step.title)}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t(step.body)}</p>
-                  </Reveal>
-                </li>
-              ))}
-            </ol>
+            <StepRail />
           </div>
         </section>
 
@@ -147,13 +114,15 @@ export function LandingPage() {
           <div className="mt-10 grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((f, i) => (
               <Reveal key={f.title} delay={i * 50} className="group">
-                <h3 className="flex items-center gap-3 text-base font-semibold">
-                  <span className="feature-tile flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors duration-200">
-                    <FeatureIcon name={f.icon} />
-                  </span>
-                  {t(f.title)}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t(f.body)}</p>
+                <TiltCard>
+                  <h3 className="flex items-center gap-3 text-base font-semibold">
+                    <span className="feature-tile flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition-colors duration-200">
+                      <FeatureIcon name={f.icon} />
+                    </span>
+                    {t(f.title)}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-600">{t(f.body)}</p>
+                </TiltCard>
               </Reveal>
             ))}
           </div>
@@ -162,12 +131,12 @@ export function LandingPage() {
         <section id="contact" className="scroll-mt-16 bg-indigo-950 text-white">
           <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
             <Reveal>
-              <Eyebrow className="text-indigo-300">{t('Book a demo')}</Eyebrow>
+              <Eyebrow className="text-indigo-300">{t('Get in touch')}</Eyebrow>
               <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
-                {t('See your next gift day in GiftFlow')}
+                {t('Bring GiftFlow to your next gift day')}
               </h2>
               <p className="mt-4 max-w-md leading-relaxed text-indigo-200/90">
-                {t("Tell us about your next gift day and we'll show you GiftFlow in action.")}
+                {t("Tell us about your team and your next event — we'll set your first campaign up with you.")}
               </p>
             </Reveal>
             <Reveal delay={100}>

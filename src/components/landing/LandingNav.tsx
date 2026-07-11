@@ -3,11 +3,11 @@
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { useT } from '@/lib/i18n/useT'
-import { QrMark } from './Marks'
+import { QrMark, PlayIcon } from './Marks'
 
 const SECTION_IDS = ['how-it-works', 'why', 'contact'] as const
 
-export function LandingNav() {
+export function LandingNav({ onOpenVideo }: { onOpenVideo: () => void }) {
   const t = useT()
   const [active, setActive] = useState<string>('')
   const [scrolled, setScrolled] = useState(false)
@@ -73,12 +73,14 @@ export function LandingNav() {
           <Link href="/login" className="text-sm font-medium text-zinc-600 hover:text-zinc-900">
             {t('Log in')}
           </Link>
-          <a
-            href="#contact"
-            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 motion-safe:hover:-translate-y-px"
+          <button
+            type="button"
+            onClick={onOpenVideo}
+            className="flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 motion-safe:hover:-translate-y-px"
           >
-            {t('Book a demo')}
-          </a>
+            <PlayIcon />
+            {t('Watch how it works')}
+          </button>
         </div>
       </nav>
       {/* Reading progress along the header's bottom edge */}

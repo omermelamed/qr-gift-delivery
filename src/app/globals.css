@@ -494,13 +494,6 @@ input:-webkit-autofill:focus {
   font-family: var(--font-heebo), sans-serif;
 }
 
-/* Journey-line color: var() is invalid inside SVG presentation attributes,
-   so the stroke lives here. Outside the motion gate — reduced motion shows
-   the line fully drawn. */
-.connector-path {
-  stroke: var(--brand, #6366f1);
-}
-
 /* Feature icon tile: light brand fill inverting to solid on feature hover.
    (.bg-brand and friends are plain classes — Tailwind opacity modifiers and
    group-hover variants don't exist for them, hence this custom pair.) */
@@ -599,16 +592,47 @@ input:user-valid + .valid-check {
     animation: bar-fill 1s cubic-bezier(0.16, 1, 0.3, 1) 2.4s both;
   }
   [dir='rtl'] .bar-grow { transform-origin: 100% 50%; }
+  /* Live-updating variant of .bar-grow: once the one-shot entrance animation
+     above has settled, JS changes to `width` (redeemed progress, video
+     scrubber) transition smoothly instead of jumping. */
+  .bar-live { transition: width 0.4s ease; }
   .toast-in { animation: pop-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) 3.4s both; }
 
-  /* How-it-works journey line: draws when its Reveal flips to shown.
-     Dash values are explicit path lengths — CSS px dash values don't reliably
-     honor SVG pathLength normalization, so pathLength is not used. */
-  .connector-path { stroke-dasharray: 1200; stroke-dashoffset: 1200; }
-  [data-reveal='shown'] .connector-path {
-    animation: draw-stroke 1.4s ease-in-out 0.3s both;
+  /* Tap-to-scan replay sweep (HeroMockup): a faster one-shot pass reused each
+     time the QR is tapped, distinct from the slower entrance `.scan-once`
+     sweep above which stays untouched. Remounted via key per tap. */
+  @keyframes tap-scan-sweep {
+    0% { transform: translateY(-48px); opacity: 0 }
+    15% { opacity: 0.9 }
+    50% { transform: translateY(48px); opacity: 1 }
+    85% { opacity: 0.9 }
+    100% { transform: translateY(48px); opacity: 0 }
   }
-  @keyframes draw-stroke { to { stroke-dashoffset: 0 } }
+  .tap-scan-sweep {
+    background-color: color-mix(in srgb, var(--brand, #6366f1) 70%, transparent);
+    animation: tap-scan-sweep 0.7s ease-in-out both;
+  }
+
+  /* Hero ambient motion: cursor-tracked glow (position set via --glow-x/-y in
+     HeroAmbient.tsx) and a handful of slow drifting particles behind the
+     phone mockup. Understated on purpose — texture, not a focal point. */
+  .hero-glow {
+    background: radial-gradient(
+      320px 320px at var(--glow-x, 50%) var(--glow-y, 20%),
+      color-mix(in srgb, var(--brand, #6366f1) 14%, transparent),
+      transparent 70%
+    );
+  }
+  @keyframes particle-drift {
+    0%, 100% { transform: translate(0, 0); opacity: 0.4; }
+    50% { transform: translate(8px, -14px); opacity: 0.9; }
+  }
+  .hero-particle {
+    animation-name: particle-drift;
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+  }
+
   /* Step chips fill shortly after their card reveals. Base markup is the
      final filled state; these rules stage the tinted pre-reveal state only
      when motion is allowed. */
@@ -629,6 +653,15 @@ input:user-valid + .valid-check {
     stroke-dashoffset: 40;
     animation: draw-stroke 0.5s ease-out 0.35s both;
   }
+}
+
+/* Step rail chip: inactive fill is muted, driven by click state (StepRail.tsx)
+   rather than scroll reveal. State indication, not decoration — lives outside
+   the motion gate, and outside/after it in source order so this wins the
+   specificity tie against `[data-reveal='shown'] .step-chip` above. */
+.step-chip[data-active='false'] {
+  background: color-mix(in srgb, var(--brand, #6366f1) 10%, transparent);
+  color: var(--brand, #6366f1);
 }
 
 /* Pointer affordance for clickable elements. Modern browsers default
