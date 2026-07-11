@@ -43,7 +43,7 @@ export default async function CampaignDetailPage({
   const [campaignResult, companyResult] = await Promise.all([
     service
       .from('campaigns')
-      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates, max_attendee_count, sms_template, reminder_sms_template, wizard_last_step')
+      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates, max_attendee_count, allow_gift_if_not_attending, sms_template, reminder_sms_template, wizard_last_step')
       .eq('id', campaignId)
       .eq('company_id', companyId)
       .single(),
@@ -141,6 +141,7 @@ export default async function CampaignDetailPage({
                 campaign_date: campaign.campaign_date,
                 supports_arrival_certificates: campaign.supports_arrival_certificates,
                 max_attendee_count: campaign.max_attendee_count,
+                allow_gift_if_not_attending: campaign.allow_gift_if_not_attending,
                 sms_template: campaign.sms_template,
                 reminder_sms_template: campaign.reminder_sms_template,
                 wizard_last_step: campaign.wizard_last_step,

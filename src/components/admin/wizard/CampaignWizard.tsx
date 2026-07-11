@@ -29,6 +29,7 @@ type CampaignWizardProps = {
     campaign_date: string | null
     supports_arrival_certificates: boolean
     max_attendee_count: number | null
+    allow_gift_if_not_attending: boolean
     sms_template: string | null
     reminder_sms_template: string | null
     wizard_last_step: number
@@ -216,6 +217,7 @@ export function CampaignWizard({
                     campaignId={campaign.id}
                     initial={campaign.supports_arrival_certificates}
                     initialMax={campaign.max_attendee_count}
+                    initialAllowGiftIfNotAttending={campaign.allow_gift_if_not_attending}
                   />
                 </div>
               )}
@@ -233,6 +235,12 @@ export function CampaignWizard({
               <dt className="text-zinc-500">{t('Gift options')}</dt><dd className="text-zinc-900">{gifts.length}</dd>
               <dt className="text-zinc-500">{t('Arrival Certificates')}</dt>
               <dd className="text-zinc-900">{campaign.supports_arrival_certificates ? t('On') : t('Off')}</dd>
+              {campaign.supports_arrival_certificates && (
+                <>
+                  <dt className="text-zinc-500">{t('Gift if not attending')}</dt>
+                  <dd className="text-zinc-900">{campaign.allow_gift_if_not_attending ? t('Allowed') : t('Skipped')}</dd>
+                </>
+              )}
             </dl>
             {missing.length > 0 ? (
               <p className="text-sm text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
