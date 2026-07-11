@@ -1,7 +1,17 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useT } from '@/lib/i18n/useT'
 import { CountUp } from './CountUp'
+import { usePrefersReducedMotion } from './usePrefersReducedMotion'
+
+const TOTAL = 500
+const SETTLED_COUNT = 312
+// Matches CountUp's startDelay + duration for the initial 0→312 run, so the
+// tap interaction only takes over once that animation has actually settled.
+const SETTLE_DELAY_MS = 2400 + 1200
+const TAP_SWEEP_MS = 700
+const TOAST_MS = 1400
 
 // Deterministic decorative "QR" — three finder patterns plus scattered modules.
 const MODULES: Array<[number, number]> = [
@@ -35,8 +45,46 @@ function FakeQr() {
 
 export function HeroMockup() {
   const t = useT()
+  const reducedMotion = usePrefersReducedMotion()
+  const [count, setCount] = useState(SETTLED_COUNT)
+  const [settled, setSettled] = useState(false)
+  const [scanning, setScanning] = useState(false)
+  // True by default: irrelevant until `settled`, and the moment settle
+  // happens we want the badge already showing (matching the entrance state)
+  // with no extra render round-trip that could flicker it invisible first.
+  const [showToast, setShowToast] = useState(true)
+  const [tapSweepKey, setTapSweepKey] = useState(0)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSettled(true), reducedMotion ? 0 : SETTLE_DELAY_MS)
+    return () => clearTimeout(timer)
+  }, [reducedMotion])
+
+  const exhausted = count >= TOTAL
+
+  function handleTap() {
+    if (!settled || scanning || exhausted) return
+    setScanning(true)
+    setTapSweepKey((k) => k + 1)
+
+    const applyRedeem = () => {
+      setCount((c) => Math.min(c + 1, TOTAL))
+      setShowToast(true)
+      setScanning(false)
+      window.setTimeout(() => setShowToast(false), TOAST_MS)
+    }
+
+    if (reducedMotion) {
+      applyRedeem()
+    } else {
+      window.setTimeout(applyRedeem, TAP_SWEEP_MS)
+    }
+  }
+
+  const percent = Math.round((count / TOTAL) * 100)
+
   return (
-    <div className="relative mx-auto w-full max-w-sm" aria-hidden="true">
+    <div className="relative mx-auto w-full max-w-sm">
       {/* Phone showing the SMS every employee receives */}
       <div className="rise rise-d2 rounded-[2rem] border border-zinc-200 bg-white p-4 shadow-xl">
         <div className="rounded-2xl bg-zinc-50 p-4">
@@ -52,9 +100,25 @@ export function HeroMockup() {
               <p className="text-sm text-zinc-800">{t('Hi Dana! Your holiday gift is waiting 🎁')}</p>
               <p className="mt-1 text-sm text-zinc-500">{t('Show this code at the event:')}</p>
               <div className="relative mt-3 flex justify-center overflow-hidden py-2 text-zinc-900">
-                <FakeQr />
+                <button
+                  type="button"
+                  onClick={handleTap}
+                  disabled={exhausted}
+                  aria-label={t('Tap to simulate a scan')}
+                  className="rounded-lg transition motion-safe:hover:scale-[1.03] motion-safe:active:scale-[0.97] disabled:cursor-not-allowed"
+                >
+                  <FakeQr />
+                </button>
+                {/* One-shot entrance sweep — untouched. */}
                 <div className="scan-once absolute inset-x-6 top-1/2 h-0.5 rounded opacity-0 motion-reduce:hidden" />
+                {/* Tap-triggered sweep — remounted via key on every tap so the animation replays. */}
+                {tapSweepKey > 0 && !reducedMotion && (
+                  <div key={tapSweepKey} className="tap-scan-sweep absolute inset-x-6 top-1/2 h-0.5 rounded" aria-hidden="true" />
+                )}
               </div>
+              <p className="mt-1 text-center text-xs text-zinc-400">
+                {exhausted ? t('All gifts redeemed') : t('Tap to simulate a scan')}
+              </p>
             </div>
           </div>
         </div>
@@ -62,8 +126,22 @@ export function HeroMockup() {
       {/* Floating live-dashboard card — the HR side of the same moment.
           On mobile there's no room beside the phone, so it stacks below. */}
       <div className="pop d-hero-card mt-4 w-full rounded-2xl border border-zinc-100 bg-white p-4 shadow-2xl sm:absolute sm:-bottom-6 sm:-end-8 sm:mt-0 sm:w-56">
-        {/* Redeemed toast — lands after the counter settles */}
-        <div className="toast-in absolute -top-3 end-3 flex items-center gap-1 rounded-full bg-emerald-500 px-2.5 py-1 text-xs font-semibold text-white opacity-0 shadow-md motion-reduce:hidden">
+        {/* Redeemed toast — lands after the counter settles (original one-shot
+            CSS animation, untouched), then re-flashes on each tap. Once settled,
+            the `toast-in` class is dropped so JS-driven opacity can take over —
+            CSS animation effects always outrank inline styles while active, so
+            controlling visibility after the animation completes needs the class
+            gone, not just an inline override layered on top of it. */}
+        <div
+          className={`absolute -top-3 end-3 flex items-center gap-1 rounded-full bg-emerald-500 px-2.5 py-1 text-xs font-semibold text-white shadow-md ${
+            settled ? '' : 'toast-in'
+          }`}
+          style={
+            settled
+              ? { opacity: showToast ? 1 : 0, transition: reducedMotion ? 'none' : 'opacity 0.25s ease' }
+              : undefined
+          }
+        >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3" aria-hidden="true">
             <path d="M20 6 9 17l-5-5" />
           </svg>
@@ -80,12 +158,15 @@ export function HeroMockup() {
           </span>
         </div>
         <p className="font-display mt-2 text-2xl font-bold">
-          <CountUp to={312} startDelay={2400} />
-          <span className="text-base font-medium text-zinc-400"> / 500</span>
+          {settled ? count : <CountUp to={SETTLED_COUNT} startDelay={2400} />}
+          <span className="text-base font-medium text-zinc-400"> / {TOTAL}</span>
         </p>
         <p className="text-xs text-zinc-500">{t('gifts redeemed')}</p>
         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-100">
-          <div className="bar-grow h-full w-[62%] rounded-full bg-brand" />
+          <div
+            className="bar-grow bar-live h-full rounded-full bg-brand"
+            style={settled ? { width: `${percent}%` } : { width: '62%' }}
+          />
         </div>
       </div>
     </div>
