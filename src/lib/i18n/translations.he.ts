@@ -50,11 +50,13 @@ export const he: Record<string, string> = {
   'Next month': 'חודש הבא',
   'SMS message': 'הודעת SMS',
   'Reminder message': 'הודעת תזכורת',
-  'Leave empty to use the primary message.': 'השאירו ריק כדי להשתמש בהודעה הראשית.',
-  'Leave empty to use the default reminder text.': 'השאירו ריק כדי להשתמש בטקסט התזכורת המובנה.',
+  'Save & Resend': 'שמור ושלח שוב',
+  'Leave empty to use the original message.': 'השאירו ריק כדי להשתמש בהודעה המקורית.',
   'Leave empty to use the default from Settings.': 'השאירו ריק כדי להשתמש בברירת המחדל מההגדרות.',
   'Use {name} for the recipient and {link} for the gift link.': 'השתמשו ב-{name} עבור שם הנמען וב-{link} עבור קישור המתנה.',
+  'Use {name} for the recipient (required) and {link} for the gift link (optional).': 'השתמשו ב-{name} עבור שם הנמען (חובה) וב-{link} עבור קישור המתנה (אופציונלי).',
   'The message must contain {link}.': 'ההודעה חייבת לכלול {link}.',
+  'The message must contain {name}.': 'ההודעה חייבת לכלול {name}.',
   'Could not save. Please try again.': 'לא ניתן לשמור. נסו שוב.',
   'Up to {n} people': 'עד {n} אנשים',
   'You can bring up to {n} people.': 'ניתן להגיע עד {n} אנשים.',
@@ -378,7 +380,7 @@ export const he: Record<string, string> = {
   'options': 'אפשרויות',
   'defined': 'מוגדרות',
 
-  // ReminderButton
+  // ReminderSmsTemplate
   'Resend SMS ({count})': 'שלח שוב SMS ({count})',
   'failed': 'נכשלו',
 
@@ -650,7 +652,6 @@ export const he: Record<string, string> = {
   'Review': 'סיכום',
   'Review & Launch': 'סיכום והפעלה',
   'Advanced settings': 'הגדרות מתקדמות',
-  'Reminder SMS': 'תזכורת SMS',
   'Gift options': 'אפשרויות מתנה',
   'On': 'פעיל',
   'Off': 'כבוי',

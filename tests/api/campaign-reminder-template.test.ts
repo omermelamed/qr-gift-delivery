@@ -59,17 +59,17 @@ describe('PATCH /api/campaigns/[id]/reminder-template', () => {
     expect((await res.json()).error).toBe('reminderSmsTemplate is required')
   })
 
-  it('returns 400 invalid_template when {link} is missing', async () => {
+  it('returns 400 invalid_template when {name} is missing', async () => {
     mockFromService.mockImplementation(makeServiceFrom({
       campaigns: { data: { id: 'c-1' }, error: null },
     }))
     const { PATCH } = await import('@/app/api/campaigns/[id]/reminder-template/route')
-    const res = await PATCH(makeRequest({ reminderSmsTemplate: 'no link here' }), params)
+    const res = await PATCH(makeRequest({ reminderSmsTemplate: 'Reminder text with {link} but no name placeholder' }), params)
     expect(res.status).toBe(400)
     expect((await res.json()).error).toBe('invalid_template')
   })
 
-  it('persists a valid reminder template containing {link}', async () => {
+  it('persists a valid reminder template containing both {name} and {link}', async () => {
     const from = makeServiceFrom({ campaigns: { data: { id: 'c-1' }, error: null } })
     mockFromService.mockImplementation(from)
     const { PATCH } = await import('@/app/api/campaigns/[id]/reminder-template/route')
@@ -77,6 +77,16 @@ describe('PATCH /api/campaigns/[id]/reminder-template', () => {
     expect(res.status).toBe(200)
     expect(await res.json()).toEqual({ ok: true })
     expect(from.builders.campaigns.update).toHaveBeenCalledWith({ reminder_sms_template: 'Reminder for {name}: {link}' })
+  })
+
+  it('persists a valid reminder template containing {name} without {link}', async () => {
+    const from = makeServiceFrom({ campaigns: { data: { id: 'c-1' }, error: null } })
+    mockFromService.mockImplementation(from)
+    const { PATCH } = await import('@/app/api/campaigns/[id]/reminder-template/route')
+    const res = await PATCH(makeRequest({ reminderSmsTemplate: 'Hi {name}, this is your reminder!' }), params)
+    expect(res.status).toBe(200)
+    expect(await res.json()).toEqual({ ok: true })
+    expect(from.builders.campaigns.update).toHaveBeenCalledWith({ reminder_sms_template: 'Hi {name}, this is your reminder!' })
   })
 
   it('clears the reminder template when given null', async () => {
@@ -93,7 +103,7 @@ describe('PATCH /api/campaigns/[id]/reminder-template', () => {
       campaigns: { data: null, error: null },
     }))
     const { PATCH } = await import('@/app/api/campaigns/[id]/reminder-template/route')
-    const res = await PATCH(makeRequest({ reminderSmsTemplate: 'Hi {link}' }), params)
+    const res = await PATCH(makeRequest({ reminderSmsTemplate: 'Hi {name}' }), params)
     expect(res.status).toBe(404)
   })
 
@@ -101,7 +111,7 @@ describe('PATCH /api/campaigns/[id]/reminder-template', () => {
     const from = makeServiceFrom({ campaigns: { data: { id: 'c-1' }, error: null } })
     mockFromService.mockImplementation(from)
     const { PATCH } = await import('@/app/api/campaigns/[id]/reminder-template/route')
-    const res = await PATCH(makeRequest({ reminderSmsTemplate: 'Hi {link}' }), params)
+    const res = await PATCH(makeRequest({ reminderSmsTemplate: 'Hi {name}' }), params)
     expect(res.status).toBe(200)
   })
 })

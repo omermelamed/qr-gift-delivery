@@ -181,6 +181,27 @@ export function CampaignWizard({
             <div className="rounded-xl border border-zinc-200">
               <button
                 type="button"
+                onClick={() => setReminderOpen((o) => !o)}
+                className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-zinc-700"
+                aria-expanded={reminderOpen}
+              >
+                <span>{t('Reminder message')}</span>
+                <span className={`transition-transform ${reminderOpen ? 'rotate-180' : ''}`}>⌄</span>
+              </button>
+              {reminderOpen && (
+                <div className="px-4 pb-4">
+                  <ReminderSmsTemplate
+                    campaignId={campaign.id}
+                    initial={campaign.reminder_sms_template}
+                    effectivePrimaryTemplate={effectivePrimaryTemplate}
+                    showTitle={false}
+                  />
+                </div>
+              )}
+            </div>
+            <div className="rounded-xl border border-zinc-200">
+              <button
+                type="button"
                 onClick={() => setAdvancedOpen((o) => !o)}
                 className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-zinc-700"
                 aria-expanded={advancedOpen}
@@ -195,26 +216,6 @@ export function CampaignWizard({
                     campaignId={campaign.id}
                     initial={campaign.supports_arrival_certificates}
                     initialMax={campaign.max_attendee_count}
-                  />
-                </div>
-              )}
-            </div>
-            <div className="rounded-xl border border-zinc-200">
-              <button
-                type="button"
-                onClick={() => setReminderOpen((o) => !o)}
-                className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium text-zinc-700"
-                aria-expanded={reminderOpen}
-              >
-                <span>{t('Reminder SMS')}</span>
-                <span className={`transition-transform ${reminderOpen ? 'rotate-180' : ''}`}>⌄</span>
-              </button>
-              {reminderOpen && (
-                <div className="px-4 pb-4">
-                  <ReminderSmsTemplate
-                    campaignId={campaign.id}
-                    initial={campaign.reminder_sms_template}
-                    effectivePrimaryTemplate={effectivePrimaryTemplate}
                   />
                 </div>
               )}

@@ -33,7 +33,7 @@ export async function PATCH(
   if (raw === null || (typeof raw === 'string' && raw.trim() === '')) {
     reminderSmsTemplate = null
   } else if (typeof raw === 'string') {
-    if (!raw.includes('{link}')) {
+    if (!raw.includes('{name}')) {
       return NextResponse.json({ error: 'invalid_template' }, { status: 400 })
     }
     reminderSmsTemplate = raw.trim()

@@ -14,7 +14,6 @@ import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { CampaignNotes } from '@/components/admin/CampaignNotes'
 import { DistributorStats } from '@/components/admin/DistributorStats'
 import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignButton'
-import { ReminderButton } from '@/components/admin/ReminderButton'
 import { GiftBreakdown } from '@/components/admin/GiftBreakdown'
 import { ArrivalSummary } from '@/components/admin/ArrivalSummary'
 import { CampaignDetailHeader } from '@/components/admin/CampaignDetailHeader'
@@ -188,11 +187,8 @@ export default async function CampaignDetailPage({
                 campaignId={campaign.id}
                 initial={campaign.reminder_sms_template}
                 effectivePrimaryTemplate={effectivePrimaryTemplate}
-              >
-                {!campaign.closed_at && (
-                  <ReminderButton campaignId={campaign.id} tokens={allTokens} />
-                )}
-              </ReminderSmsTemplate>
+                tokens={campaign.closed_at ? undefined : allTokens}
+              />
               <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
               <DistributorStats campaignId={campaign.id} total={allTokens.length} />
             </div>
