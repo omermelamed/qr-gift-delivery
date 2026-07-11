@@ -63,33 +63,34 @@ export function LandingPage() {
       <HowItWorksModal open={videoOpen} onClose={() => setVideoOpen(false)} />
 
       <main id="top">
-        <HeroAmbient className="relative mx-auto grid max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(55%_45%_at_72%_18%,rgba(99,102,241,0.09),transparent)]" />
-          <div>
-            <Eyebrow className="rise text-brand">{t('Employee gifting, scanned')}</Eyebrow>
-            <h1 className="font-display rise rise-d1 mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-              {t('Gift day without the spreadsheet chaos')}
-            </h1>
-            <p className="rise rise-d2 mt-5 max-w-xl text-lg leading-relaxed text-zinc-600">
-              {t(
-                'GiftFlow sends every employee a personal QR code by SMS. Your team scans at the event, and you watch redemptions live — no double handouts, no guesswork.'
-              )}
-            </p>
-            <div className="rise rise-d3 mt-8 flex flex-wrap items-center gap-5">
-              <button
-                type="button"
-                onClick={() => setVideoOpen(true)}
-                className="flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-base font-semibold text-white shadow-md transition hover:opacity-90 motion-safe:hover:-translate-y-px"
-              >
-                <PlayIcon className="h-3.5 w-3.5" />
-                {t('Watch how it works')}
-              </button>
-              <a href="#contact" className="text-base font-semibold text-zinc-700 hover:text-zinc-900">
-                {t('Talk to our team')} <span className="inline-block rtl:rotate-180">→</span>
-              </a>
+        <HeroAmbient className="relative z-0 bg-zinc-50">
+          <div className="mx-auto grid max-w-6xl items-center gap-14 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
+            <div>
+              <Eyebrow className="rise text-brand">{t('Employee gifting, scanned')}</Eyebrow>
+              <h1 className="font-display rise rise-d1 mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
+                {t('Gift day without the spreadsheet chaos')}
+              </h1>
+              <p className="rise rise-d2 mt-5 max-w-xl text-lg leading-relaxed text-zinc-600">
+                {t(
+                  'GiftFlow sends every employee a personal QR code by SMS. Your team scans at the event, and you watch redemptions live — no double handouts, no guesswork.'
+                )}
+              </p>
+              <div className="rise rise-d3 mt-8 flex flex-wrap items-center gap-5">
+                <button
+                  type="button"
+                  onClick={() => setVideoOpen(true)}
+                  className="hover-glow-brand flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-base font-semibold text-white shadow-md transition hover:opacity-90 motion-safe:hover:-translate-y-px"
+                >
+                  <PlayIcon className="h-3.5 w-3.5" />
+                  {t('Watch how it works')}
+                </button>
+                <a href="#contact" className="text-base font-semibold text-zinc-700 hover:text-zinc-900">
+                  {t('Talk to our team')} <span className="inline-block rtl:rotate-180">→</span>
+                </a>
+              </div>
             </div>
+            <HeroMockup />
           </div>
-          <HeroMockup />
         </HeroAmbient>
 
         <section id="how-it-works" className="scroll-mt-16 border-y border-zinc-100 bg-zinc-50">
@@ -128,14 +129,14 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="contact" className="scroll-mt-16 bg-indigo-950 text-white">
+        <section id="contact" className="bg-brand-panel scroll-mt-16 text-white">
           <div className="mx-auto grid max-w-6xl gap-12 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-24">
             <Reveal>
-              <Eyebrow className="text-indigo-300">{t('Get in touch')}</Eyebrow>
+              <Eyebrow className="text-brand-panel-tint">{t('Get in touch')}</Eyebrow>
               <h2 className="font-display mt-3 text-3xl font-bold tracking-tight">
                 {t('Bring GiftFlow to your next gift day')}
               </h2>
-              <p className="mt-4 max-w-md leading-relaxed text-indigo-200/90">
+              <p className="text-on-brand-panel-muted mt-4 max-w-md leading-relaxed">
                 {t("Tell us about your team and your next event — we'll set your first campaign up with you.")}
               </p>
             </Reveal>

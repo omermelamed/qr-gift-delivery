@@ -506,6 +506,93 @@ input:-webkit-autofill:focus {
   color: #fff;
 }
 
+/* Feature icon micro-animations: each of the six "Why GiftFlow" icons gets a
+   small hint of its own meaning on hover (scan brackets widen, the activity
+   line draws itself, a dot pulses, the globe's meridian turns, chart bars
+   grow). `.group` is the Reveal wrapper around each feature. transform-box:
+   fill-box is needed for scale/rotate to originate from the shape's own
+   center rather than the SVG viewport's corner. */
+.scan-l,
+.scan-r {
+  transition: transform 0.3s ease;
+}
+.group:hover .scan-l {
+  transform: translateX(-1.5px);
+}
+.group:hover .scan-r {
+  transform: translateX(1.5px);
+}
+.pulse-line {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  transition: stroke-dashoffset 0.5s ease;
+}
+.group:hover .pulse-line {
+  stroke-dashoffset: 0;
+}
+.ring-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.4s ease;
+}
+.group:hover .ring-dot {
+  transform: scale(1.4);
+}
+.globe-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.5s ease;
+}
+.group:hover .globe-ring {
+  transform: rotate(90deg);
+}
+.bar {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  transition: transform 0.3s ease;
+}
+.group:hover .bar1 {
+  transform: scaleY(1.3);
+}
+.group:hover .bar2 {
+  transform: scaleY(1.5);
+}
+.group:hover .bar3 {
+  transform: scaleY(1.15);
+}
+
+/* Landing page dark contact panel — restyled for the Sage/Terracotta/Gold
+   rebrand. Previously hardcoded Tailwind `indigo-*` classes (a leftover from
+   the old brand); this file's header note deliberately left `indigo`
+   unthemed and flagged this section for individual restyling. Uses the
+   darkest step of the sage/success ramp so the panel still reads as
+   "brand, but dark" — the same relationship indigo-950 had to the old
+   brand color — rather than an arbitrary unrelated dark color. */
+.bg-brand-panel {
+  background-color: var(--color-green-950, #1d2820);
+}
+.bg-brand-panel-field {
+  background-color: color-mix(in srgb, var(--color-green-700, #4e6554) 40%, transparent);
+}
+.border-brand-panel {
+  border-color: var(--color-green-600, #5e7863);
+}
+.border-brand-panel:focus {
+  border-color: var(--brand, #6e8b74);
+}
+.ring-brand-panel:focus {
+  --tw-ring-color: color-mix(in srgb, var(--brand, #6e8b74) 40%, transparent);
+}
+.text-on-brand-panel-muted {
+  color: var(--color-nav-text-default, rgba(255, 255, 255, 0.72));
+}
+.placeholder-brand-panel::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+.text-brand-panel-tint {
+  color: color-mix(in srgb, var(--brand, #6e8b74) 55%, white);
+}
+
 /* Contact form: positive validity indicator (required fields only).
    State indication, not decoration — lives outside the motion gate. */
 .valid-check {
@@ -618,14 +705,14 @@ input:user-valid + .valid-check {
      phone mockup. Understated on purpose — texture, not a focal point. */
   .hero-glow {
     background: radial-gradient(
-      320px 320px at var(--glow-x, 50%) var(--glow-y, 20%),
-      color-mix(in srgb, var(--brand, #6366f1) 14%, transparent),
+      480px 480px at var(--glow-x, 50%) var(--glow-y, 20%),
+      color-mix(in srgb, var(--brand, #6366f1) 45%, transparent),
       transparent 70%
     );
   }
   @keyframes particle-drift {
-    0%, 100% { transform: translate(0, 0); opacity: 0.4; }
-    50% { transform: translate(8px, -14px); opacity: 0.9; }
+    0%, 100% { transform: translate(0, 0); opacity: 0.6; }
+    50% { transform: translate(14px, -24px); opacity: 1; }
   }
   .hero-particle {
     animation-name: particle-drift;
@@ -733,6 +820,16 @@ button[disabled],
 .bg-brand[aria-disabled="true"] {
   background-color: var(--color-primary-disabled);
 }
+/* Landing page CTA glow — opt-in, not part of the app-wide .bg-brand hover
+   (which already darkens on hover at ~60 call sites). Adds a soft brand-tinted
+   shadow lift on hover for the two "Watch how it works" buttons specifically. */
+.hover-glow-brand {
+  transition: box-shadow 0.2s ease;
+}
+.hover-glow-brand:hover {
+  box-shadow: 0 8px 18px -8px color-mix(in srgb, var(--brand, #6e8b74) 60%, transparent);
+}
+
 /* Light brand fill (selected pills, dropzone backgrounds, active nav rows). */
 .bg-brand-soft {
   background-color: color-mix(in srgb, var(--brand, #6E8B74) 10%, transparent);

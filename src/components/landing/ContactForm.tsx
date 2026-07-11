@@ -7,7 +7,7 @@ import { useLocale } from '@/lib/i18n/LanguageContext'
 type Status = 'idle' | 'sending' | 'success' | 'error'
 
 const inputClass =
-  'w-full rounded-xl border border-indigo-800 bg-indigo-900/50 px-4 py-2.5 text-white placeholder:text-indigo-300/50 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-400/40'
+  'bg-brand-panel-field border-brand-panel ring-brand-panel placeholder-brand-panel w-full rounded-xl border px-4 py-2.5 text-white focus:outline-none focus:ring-2'
 
 // Emerald check that fades in via CSS :user-valid (see globals.css).
 function ValidCheck() {
@@ -60,7 +60,7 @@ export function ContactForm() {
 
   if (status === 'success') {
     return (
-      <div className="rounded-2xl border border-indigo-800 bg-indigo-900/50 p-10 text-center">
+      <div className="bg-brand-panel-field border-brand-panel rounded-2xl border p-10 text-center">
         <svg viewBox="0 0 52 52" className="mx-auto mb-4 h-12 w-12 text-emerald-400" aria-hidden="true">
           <circle cx="26" cy="26" r="24" fill="none" stroke="currentColor" strokeWidth="2" className="draw-stroke-1" />
           <path d="M15 27l8 8 15-15" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="draw-stroke-2" />
@@ -82,14 +82,14 @@ export function ContactForm() {
         className="absolute h-0 w-0 overflow-hidden opacity-0"
       />
       <div className="grid gap-4 sm:grid-cols-2">
-        <label className="grid gap-1.5 text-sm font-medium text-indigo-100">
+        <label className="grid gap-1.5 text-sm font-medium text-on-brand-panel-muted">
           {t('Full name')}
           <span className="relative block">
             <input name="name" required maxLength={120} className={inputClass} />
             <ValidCheck />
           </span>
         </label>
-        <label className="grid gap-1.5 text-sm font-medium text-indigo-100">
+        <label className="grid gap-1.5 text-sm font-medium text-on-brand-panel-muted">
           {t('Company')}
           <span className="relative block">
             <input name="company" required maxLength={120} className={inputClass} />
@@ -97,18 +97,18 @@ export function ContactForm() {
           </span>
         </label>
       </div>
-      <label className="grid gap-1.5 text-sm font-medium text-indigo-100">
+      <label className="grid gap-1.5 text-sm font-medium text-on-brand-panel-muted">
         {t('Work email')}
         <span className="relative block">
           <input type="email" name="email" required maxLength={254} className={inputClass} />
           <ValidCheck />
         </span>
       </label>
-      <label className="grid gap-1.5 text-sm font-medium text-indigo-100">
+      <label className="grid gap-1.5 text-sm font-medium text-on-brand-panel-muted">
         {t('Phone (optional)')}
         <input type="tel" name="phone" maxLength={32} className={inputClass} />
       </label>
-      <label className="grid gap-1.5 text-sm font-medium text-indigo-100">
+      <label className="grid gap-1.5 text-sm font-medium text-on-brand-panel-muted">
         {t('Message (optional)')}
         <textarea name="message" rows={4} maxLength={2000} className={inputClass} />
       </label>
@@ -120,7 +120,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={status === 'sending'}
-        className="rounded-full bg-white px-6 py-3 text-base font-semibold text-indigo-950 transition hover:bg-indigo-100 disabled:opacity-60 motion-safe:hover:-translate-y-px"
+        className="text-brand hover:bg-[color-mix(in_srgb,var(--brand)_12%,white)] rounded-full bg-white px-6 py-3 text-base font-semibold transition disabled:opacity-60 motion-safe:hover:-translate-y-px"
       >
         {status === 'sending' ? (
           <span className="inline-flex items-center justify-center gap-2">

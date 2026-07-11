@@ -12,7 +12,7 @@ const PARTICLES = Array.from({ length: PARTICLE_COUNT }, (_, i) => {
   return {
     left: seed % 100,
     top: (seed * 1.7) % 100,
-    size: 3 + (i % 4),
+    size: 7 + (i % 5),
     delay: (i % 6) * 0.8,
     duration: 10 + (i % 5) * 2,
   }
@@ -42,13 +42,13 @@ export function HeroAmbient({ children, className = '' }: { children: ReactNode;
           {PARTICLES.map((p, i) => (
             <span
               key={i}
-              className="hero-particle absolute rounded-full"
+              className="hero-particle absolute rounded-[1px]"
               style={{
                 left: `${p.left}%`,
                 top: `${p.top}%`,
                 width: p.size,
                 height: p.size,
-                backgroundColor: 'color-mix(in srgb, var(--brand, #6366f1) 30%, transparent)',
+                backgroundColor: 'color-mix(in srgb, var(--brand, #6366f1) 90%, transparent)',
                 animationDelay: `${p.delay}s`,
                 animationDuration: `${p.duration}s`,
               }}

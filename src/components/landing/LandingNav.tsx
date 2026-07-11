@@ -76,7 +76,7 @@ export function LandingNav({ onOpenVideo }: { onOpenVideo: () => void }) {
           <button
             type="button"
             onClick={onOpenVideo}
-            className="flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 motion-safe:hover:-translate-y-px"
+            className="hover-glow-brand flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:opacity-90 motion-safe:hover:-translate-y-px"
           >
             <PlayIcon />
             {t('Watch how it works')}

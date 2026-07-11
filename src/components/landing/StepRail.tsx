@@ -27,8 +27,16 @@ export function StepRail() {
       <Reveal className="mt-8">
         <div className="h-1 w-full overflow-hidden rounded-full bg-zinc-200" aria-hidden="true">
           <div
-            className="h-full origin-left rounded-full bg-brand transition-transform duration-500 ease-out rtl:origin-right"
-            style={{ transform: `scaleX(${(active + 1) / STEPS.length})` }}
+            className="h-full origin-left rounded-full bg-brand rtl:origin-right"
+            style={{
+              transform: `scaleX(${(active + 1) / STEPS.length})`,
+              // `.bg-brand`'s own `transition: background-color …` is plain
+              // (unlayered) CSS, so it always wins the cascade over Tailwind's
+              // layered `transition-transform` utility on this same element —
+              // that utility was silently doing nothing, so the fill jumped
+              // instantly instead of animating. Set inline to guarantee it wins.
+              transition: 'transform 500ms ease-out',
+            }}
           />
         </div>
       </Reveal>
