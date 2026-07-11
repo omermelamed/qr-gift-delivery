@@ -5,6 +5,8 @@ import { resolveCompanyId } from '@/lib/platform-auth'
 import { fetchPermissions, hasPermission } from '@/lib/permissions'
 import { CloseCampaignButton } from '@/components/admin/CloseCampaignButton'
 import { CampaignWizard } from '@/components/admin/wizard/CampaignWizard'
+import { ReminderSmsTemplate } from '@/components/admin/ReminderSmsTemplate'
+import { resolveSmsTemplate } from '@/lib/sms-template'
 import { RedemptionProgress } from '@/components/admin/RedemptionProgress'
 import { DistributorAssignment } from '@/components/admin/DistributorAssignment'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
@@ -12,7 +14,6 @@ import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { CampaignNotes } from '@/components/admin/CampaignNotes'
 import { DistributorStats } from '@/components/admin/DistributorStats'
 import { DuplicateCampaignButton } from '@/components/admin/DuplicateCampaignButton'
-import { ReminderButton } from '@/components/admin/ReminderButton'
 import { GiftBreakdown } from '@/components/admin/GiftBreakdown'
 import { ArrivalSummary } from '@/components/admin/ArrivalSummary'
 import { CampaignDetailHeader } from '@/components/admin/CampaignDetailHeader'
@@ -42,7 +43,7 @@ export default async function CampaignDetailPage({
   const [campaignResult, companyResult] = await Promise.all([
     service
       .from('campaigns')
-      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates, max_attendee_count, sms_template, wizard_last_step')
+      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates, max_attendee_count, sms_template, reminder_sms_template, wizard_last_step')
       .eq('id', campaignId)
       .eq('company_id', companyId)
       .single(),
@@ -57,6 +58,7 @@ export default async function CampaignDetailPage({
   if (!campaign) redirect('/admin')
 
   const companyDefaultTemplate = companyResult.data?.sms_template ?? null
+  const effectivePrimaryTemplate = resolveSmsTemplate(campaign.sms_template, companyDefaultTemplate)
 
   const tokensResult = await service
     .from('gift_tokens')
@@ -120,9 +122,6 @@ export default async function CampaignDetailPage({
                 sourceDate={campaign.campaign_date}
                 className={MENU_ITEM}
               />
-              {campaign.sent_at && !campaign.closed_at && (
-                <ReminderButton campaignId={campaign.id} tokens={allTokens} className={MENU_ITEM} />
-              )}
               {campaign.sent_at && <ViewQrLink campaignId={campaign.id} className={MENU_ITEM} />}
               {campaign.sent_at && <ExportCsvLink campaignId={campaign.id} className={MENU_ITEM} />}
             </KebabMenu>
@@ -143,6 +142,7 @@ export default async function CampaignDetailPage({
                 supports_arrival_certificates: campaign.supports_arrival_certificates,
                 max_attendee_count: campaign.max_attendee_count,
                 sms_template: campaign.sms_template,
+                reminder_sms_template: campaign.reminder_sms_template,
                 wizard_last_step: campaign.wizard_last_step,
               }}
               tokens={allTokens}
@@ -183,6 +183,12 @@ export default async function CampaignDetailPage({
             {/* Sidebar (1 col): config + notes + stats, stacked independently. */}
             <div className="flex flex-col gap-4">
               <DistributorAssignment campaignId={campaign.id} />
+              <ReminderSmsTemplate
+                campaignId={campaign.id}
+                initial={campaign.reminder_sms_template}
+                effectivePrimaryTemplate={effectivePrimaryTemplate}
+                tokens={campaign.closed_at ? undefined : allTokens}
+              />
               <CampaignNotes campaignId={campaign.id} currentUserId={user.id} />
               <DistributorStats campaignId={campaign.id} total={allTokens.length} />
             </div>

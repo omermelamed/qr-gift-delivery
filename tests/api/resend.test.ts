@@ -5,6 +5,7 @@ import { makeServiceFrom } from '../helpers/supabase-mock'
 const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
 const mockSend = vi.fn().mockResolvedValue({ sid: 'mock' })
+const mockProviderSend = vi.fn().mockResolvedValue({ providerId: 'mock', status: 'sent' })
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => ({ auth: { getUser: mockGetUser } }),
@@ -17,6 +18,7 @@ vi.mock('@/lib/permissions', () => ({
 }))
 
 vi.mock('@/lib/twilio', () => ({ sendGiftMMS: mockSend }))
+vi.mock('@/lib/sms', () => ({ getSmsProvider: () => ({ send: mockProviderSend }) }))
 
 function makeRequest(id: string) {
   return new NextRequest(`http://localhost/api/campaigns/${id}/resend`, { method: 'POST' })
@@ -29,6 +31,7 @@ describe('POST /api/campaigns/[id]/resend', () => {
     const { hasPermission } = await import('@/lib/permissions')
     vi.mocked(hasPermission).mockReturnValue(true)
     mockSend.mockResolvedValue({ sid: 'mock' })
+    mockProviderSend.mockResolvedValue({ providerId: 'mock', status: 'sent' })
     mockGetUser.mockResolvedValue({
       data: {
         user: {
@@ -84,5 +87,33 @@ describe('POST /api/campaigns/[id]/resend', () => {
     expect(body.dispatched).toBe(1)
     expect(body.failed).toBe(0)
     expect(mockSend).not.toHaveBeenCalled()
+  })
+
+  it('uses the reminder template override instead of the primary template', async () => {
+    mockFromService.mockImplementation(makeServiceFrom({
+      campaigns: { data: { id: 'c-1', name: 'Test', company_id: 'company-1', sms_template: 'Primary msg {link}', reminder_sms_template: 'Reminder msg {link}' }, error: null },
+      companies: { data: { sms_template: null }, error: null },
+      gift_tokens: { data: [{ id: 't-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: 'https://example.com/qr.png' }], error: null },
+    }))
+    const { POST } = await import('@/app/api/campaigns/[id]/resend/route')
+    const res = await POST(makeRequest('c-1'), { params: Promise.resolve({ id: 'c-1' }) })
+    expect(res.status).toBe(200)
+    expect(mockProviderSend).toHaveBeenCalledTimes(1)
+    const sentBody = mockProviderSend.mock.calls[0][0].body
+    expect(sentBody).toContain('Reminder msg')
+    expect(sentBody).not.toContain('Primary msg')
+  })
+
+  it('falls back to the primary template when no reminder override is set', async () => {
+    mockFromService.mockImplementation(makeServiceFrom({
+      campaigns: { data: { id: 'c-1', name: 'Test', company_id: 'company-1', sms_template: 'Primary msg {link}', reminder_sms_template: null }, error: null },
+      companies: { data: { sms_template: null }, error: null },
+      gift_tokens: { data: [{ id: 't-1', token: 'uuid-1', employee_name: 'Omer', phone_number: '+972501234567', qr_image_url: 'https://example.com/qr.png' }], error: null },
+    }))
+    const { POST } = await import('@/app/api/campaigns/[id]/resend/route')
+    const res = await POST(makeRequest('c-1'), { params: Promise.resolve({ id: 'c-1' }) })
+    expect(res.status).toBe(200)
+    const sentBody = mockProviderSend.mock.calls[0][0].body
+    expect(sentBody).toContain('Primary msg')
   })
 })
