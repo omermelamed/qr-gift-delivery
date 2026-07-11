@@ -91,6 +91,10 @@ rationale as `max_attendee_count` (campaign stays editable pre-send).
   to `<ArrivalCertToggle>` at `CampaignWizard.tsx:215-219`. Extend the wizard's campaign
   fetch (wherever `CampaignWizard` is rendered, e.g.
   `src/app/admin/campaigns/[id]/page.tsx` / `.../new/page.tsx`) to select the new column.
+- Review & Launch step (`CampaignWizard.tsx`, step 5 summary `dl`, around line 234-235):
+  add a row matching the existing "Arrival Certificates: On/Off" row, shown only when
+  `campaign.supports_arrival_certificates` is true:
+  `<dt>{t('Gift if not attending')}</dt><dd>{campaign.allow_gift_if_not_attending ? t('Allowed') : t('Skipped')}</dd>`.
 
 ## UI — employee gift page
 
@@ -125,6 +129,8 @@ Add to `src/lib/i18n/translations.he.ts`:
 - "Let people who aren't coming still choose a gift" (checkbox label)
 - "Off: they'll see a message instead of the gift picker. On: they can still pick a gift
   and get their QR code even if they're not attending." (helper text)
+- "Gift if not attending" (review-step summary row label)
+- "Allowed" / "Skipped" (review-step summary row values)
 
 ## Testing
 
