@@ -13,6 +13,16 @@ export function QrMark({ className = '' }: { className?: string }) {
   )
 }
 
+// Small inline "play" triangle — used on both the nav and hero CTAs that
+// open the how-it-works video modal, so the two buttons read as one action.
+export function PlayIcon({ className = '' }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={`h-3 w-3 shrink-0 ${className}`}>
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  )
+}
+
 export function Eyebrow({
   children,
   className = 'text-brand',
