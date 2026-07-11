@@ -4,6 +4,9 @@
 ALTER TABLE campaigns
   ADD COLUMN IF NOT EXISTS max_attendee_count INT;
 
-ALTER TABLE campaigns
-  ADD CONSTRAINT max_attendee_count_positive
-  CHECK (max_attendee_count IS NULL OR max_attendee_count >= 1);
+DO $$ BEGIN
+  ALTER TABLE campaigns
+    ADD CONSTRAINT max_attendee_count_positive
+    CHECK (max_attendee_count IS NULL OR max_attendee_count >= 1);
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
