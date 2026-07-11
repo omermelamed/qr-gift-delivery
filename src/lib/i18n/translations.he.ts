@@ -35,6 +35,9 @@ export const he: Record<string, string> = {
   // Arrival certificates (אישור הגעה)
   'Supports Arrival Certificates': 'תומך באישורי הגעה',
   'Let people confirm attendance and how many are coming.': 'אפשר למוזמנים לאשר הגעה ולציין כמה אנשים מגיעים.',
+  "Let people who aren't coming still choose a gift": 'אפשר למי שלא מגיע לבחור מתנה בכל זאת',
+  "Off: they'll see a message instead of the gift picker. On: they can still pick a gift and get their QR code even if they're not attending.":
+    'כבוי: הם יראו הודעה במקום בורר המתנות. פעיל: הם עדיין יוכלו לבחור מתנה ולקבל את קוד ה-QR שלהם גם אם הם לא מגיעים.',
   'Are you coming?': 'האם אתם מגיעים?',
   "I'm coming": 'אני מגיע/ה',
   "I'm not coming": 'אני לא מגיע/ה',
