@@ -9,6 +9,12 @@ const PUBLIC_PREFIXES = ['/login', '/reset-password', '/verify', '/gift', '/auth
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // The marketing landing page is public. Exact match — a '/' prefix would
+  // open every route.
+  if (pathname === '/') {
+    return NextResponse.next()
+  }
+
   // Pass through public routes
   if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
     return NextResponse.next()

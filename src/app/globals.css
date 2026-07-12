@@ -484,6 +484,264 @@ input:-webkit-autofill:focus {
   font-family: var(--font-heebo), sans-serif;
 }
 
+/* Landing display face: Space Grotesk for English headlines; Hebrew headlines
+   fall back to Heebo so RTL pages keep one coherent voice. */
+.font-display {
+  font-family: var(--font-display, var(--font-inter)), sans-serif;
+  letter-spacing: -0.01em;
+}
+:lang(he) .font-display {
+  font-family: var(--font-heebo), sans-serif;
+}
+
+/* Feature icon tile: light brand fill inverting to solid on feature hover.
+   (.bg-brand and friends are plain classes — Tailwind opacity modifiers and
+   group-hover variants don't exist for them, hence this custom pair.) */
+.feature-tile {
+  background-color: color-mix(in srgb, var(--brand, #6366f1) 10%, transparent);
+  color: var(--brand, #6366f1);
+}
+.group:hover .feature-tile {
+  background-color: var(--brand, #6366f1);
+  color: #fff;
+}
+
+/* Feature icon micro-animations: each of the six "Why GiftFlow" icons gets a
+   small hint of its own meaning on hover (scan brackets widen, the activity
+   line draws itself, a dot pulses, the globe's meridian turns, chart bars
+   grow). `.group` is the Reveal wrapper around each feature. transform-box:
+   fill-box is needed for scale/rotate to originate from the shape's own
+   center rather than the SVG viewport's corner. */
+.scan-l,
+.scan-r {
+  transition: transform 0.3s ease;
+}
+.group:hover .scan-l {
+  transform: translateX(-1.5px);
+}
+.group:hover .scan-r {
+  transform: translateX(1.5px);
+}
+.pulse-line {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  transition: stroke-dashoffset 0.5s ease;
+}
+.group:hover .pulse-line {
+  stroke-dashoffset: 0;
+}
+.ring-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.4s ease;
+}
+.group:hover .ring-dot {
+  transform: scale(1.4);
+}
+.globe-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 0.5s ease;
+}
+.group:hover .globe-ring {
+  transform: rotate(90deg);
+}
+.bar {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  transition: transform 0.3s ease;
+}
+.group:hover .bar1 {
+  transform: scaleY(1.3);
+}
+.group:hover .bar2 {
+  transform: scaleY(1.5);
+}
+.group:hover .bar3 {
+  transform: scaleY(1.15);
+}
+
+/* Landing page dark contact panel — restyled for the Sage/Terracotta/Gold
+   rebrand. Previously hardcoded Tailwind `indigo-*` classes (a leftover from
+   the old brand); this file's header note deliberately left `indigo`
+   unthemed and flagged this section for individual restyling. Uses the
+   darkest step of the sage/success ramp so the panel still reads as
+   "brand, but dark" — the same relationship indigo-950 had to the old
+   brand color — rather than an arbitrary unrelated dark color. */
+.bg-brand-panel {
+  background-color: var(--color-green-950, #1d2820);
+}
+.bg-brand-panel-field {
+  background-color: color-mix(in srgb, var(--color-green-700, #4e6554) 40%, transparent);
+}
+.border-brand-panel {
+  border-color: var(--color-green-600, #5e7863);
+}
+.border-brand-panel:focus {
+  border-color: var(--brand, #6e8b74);
+}
+.ring-brand-panel:focus {
+  --tw-ring-color: color-mix(in srgb, var(--brand, #6e8b74) 40%, transparent);
+}
+.text-on-brand-panel-muted {
+  color: var(--color-nav-text-default, rgba(255, 255, 255, 0.72));
+}
+.placeholder-brand-panel::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+.text-brand-panel-tint {
+  color: color-mix(in srgb, var(--brand, #6e8b74) 55%, white);
+}
+
+/* Contact form: positive validity indicator (required fields only).
+   State indication, not decoration — lives outside the motion gate. */
+.valid-check {
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+input:user-valid + .valid-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* --- Landing motion (spec: docs/superpowers/specs/2026-07-05-landing-animations-design.md).
+   Everything here is gated on no-preference: reduced-motion users get the
+   static page, and base styles never hide content. --- */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+
+  @keyframes rise-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: translateY(14px) scale(0.92); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .rise { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .pop { animation: pop-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .rise-d1 { animation-delay: 80ms; }
+  .rise-d2 { animation-delay: 160ms; }
+  .rise-d3 { animation-delay: 240ms; }
+  .rise-d4 { animation-delay: 450ms; }
+
+  /* Scroll reveal: JS flips data-reveal to "shown" (see Reveal.tsx). translate
+     and box-shadow are listed so hover lifts still animate on revealed cards
+     (this unlayered rule beats Tailwind's layered transition utilities). */
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      translate 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  [data-reveal='shown'] {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Hero choreography: typing dots → message+QR → scan sweep → card pop →
+     counter/bar → redeemed toast. All one-shot. */
+  @keyframes sms-typing-window {
+    0% { opacity: 0 }
+    12% { opacity: 1 }
+    85% { opacity: 1 }
+    100% { opacity: 0 }
+  }
+  .sms-typing { animation: sms-typing-window 1.1s linear 0.5s both; }
+  @keyframes dot-pulse {
+    50% { transform: translateY(-3px); opacity: 0.5 }
+  }
+  .sms-typing span {
+    animation: dot-pulse 0.55s ease-in-out 0.5s 2;
+  }
+  .sms-typing span:nth-child(2) { animation-delay: 0.65s }
+  .sms-typing span:nth-child(3) { animation-delay: 0.8s }
+  .sms-msg { animation: rise-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) 1.6s both; }
+  @keyframes scan-sweep {
+    0% { transform: translateY(-48px); opacity: 0 }
+    8% { opacity: 0.9 }
+    50% { transform: translateY(48px); opacity: 1 }
+    92% { opacity: 0.9 }
+    100% { transform: translateY(-48px); opacity: 0 }
+  }
+  .scan-once {
+    background-color: color-mix(in srgb, var(--brand, #6366f1) 70%, transparent);
+    animation: scan-sweep 2.4s ease-in-out 2s 2 both;
+  }
+  .d-hero-card { animation-delay: 2.1s; }
+  @keyframes bar-fill { from { transform: scaleX(0) } to { transform: scaleX(1) } }
+  .bar-grow {
+    transform-origin: 0% 50%;
+    animation: bar-fill 1s cubic-bezier(0.16, 1, 0.3, 1) 2.4s both;
+  }
+  [dir='rtl'] .bar-grow { transform-origin: 100% 50%; }
+  /* Live-updating variant of .bar-grow: once the one-shot entrance animation
+     above has settled, JS changes to `width` (redeemed progress, video
+     scrubber) transition smoothly instead of jumping. */
+  .bar-live { transition: width 0.4s ease; }
+  .toast-in { animation: pop-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) 3.4s both; }
+
+  /* Tap-to-scan replay sweep (HeroMockup): a faster one-shot pass reused each
+     time the QR is tapped, distinct from the slower entrance `.scan-once`
+     sweep above which stays untouched. Remounted via key per tap. */
+  @keyframes tap-scan-sweep {
+    0% { transform: translateY(-48px); opacity: 0 }
+    15% { opacity: 0.9 }
+    50% { transform: translateY(48px); opacity: 1 }
+    85% { opacity: 0.9 }
+    100% { transform: translateY(48px); opacity: 0 }
+  }
+  .tap-scan-sweep {
+    background-color: color-mix(in srgb, var(--brand, #6366f1) 70%, transparent);
+    animation: tap-scan-sweep 0.7s ease-in-out both;
+  }
+
+  /* Hero ambient motion: cursor-tracked glow (position set via --glow-x/-y in
+     HeroAmbient.tsx) behind the phone mockup. Understated on purpose —
+     texture, not a focal point. */
+  .hero-glow {
+    background: radial-gradient(
+      300px 300px at var(--glow-x, 50%) var(--glow-y, 20%),
+      color-mix(in srgb, var(--brand, #6366f1) 45%, transparent),
+      transparent 70%
+    );
+  }
+
+  /* Step chips fill shortly after their card reveals. Base markup is the
+     final filled state; these rules stage the tinted pre-reveal state only
+     when motion is allowed. */
+  .step-chip { transition: background-color 0.4s ease 0.4s, color 0.4s ease 0.4s; }
+  [data-reveal] .step-chip { background: color-mix(in oklab, var(--brand) 10%, white); color: var(--brand); }
+  [data-reveal='shown'] .step-chip { background: var(--brand); color: white; }
+
+  /* Contact success mark: strokes draw in sequence (explicit path lengths:
+     circle 2πr ≈ 151, check ≈ 33). Without motion these rules don't apply
+     and the mark renders fully drawn. */
+  .draw-stroke-1 {
+    stroke-dasharray: 160;
+    stroke-dashoffset: 160;
+    animation: draw-stroke 0.5s ease-out both;
+  }
+  .draw-stroke-2 {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    animation: draw-stroke 0.5s ease-out 0.35s both;
+  }
+}
+
+/* Step rail chip: inactive fill is muted, driven by click state (StepRail.tsx)
+   rather than scroll reveal. State indication, not decoration — lives outside
+   the motion gate, and outside/after it in source order so this wins the
+   specificity tie against `[data-reveal='shown'] .step-chip` above. */
+.step-chip[data-active='false'] {
+  background: color-mix(in srgb, var(--brand, #6366f1) 10%, transparent);
+  color: var(--brand, #6366f1);
+}
+
 /* Pointer affordance for clickable elements. Modern browsers default
    <button> to `cursor: default`, so set it explicitly everywhere. */
 button,
@@ -553,6 +811,16 @@ button[disabled],
 .bg-brand[aria-disabled="true"] {
   background-color: var(--color-primary-disabled);
 }
+/* Landing page CTA glow — opt-in, not part of the app-wide .bg-brand hover
+   (which already darkens on hover at ~60 call sites). Adds a soft brand-tinted
+   shadow lift on hover for the two "Watch how it works" buttons specifically. */
+.hover-glow-brand {
+  transition: box-shadow 0.2s ease;
+}
+.hover-glow-brand:hover {
+  box-shadow: 0 8px 18px -8px color-mix(in srgb, var(--brand, #6e8b74) 60%, transparent);
+}
+
 /* Light brand fill (selected pills, dropzone backgrounds, active nav rows). */
 .bg-brand-soft {
   background-color: color-mix(in srgb, var(--brand, #6E8B74) 10%, transparent);
