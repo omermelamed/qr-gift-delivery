@@ -701,23 +701,14 @@ input:user-valid + .valid-check {
   }
 
   /* Hero ambient motion: cursor-tracked glow (position set via --glow-x/-y in
-     HeroAmbient.tsx) and a handful of slow drifting particles behind the
-     phone mockup. Understated on purpose — texture, not a focal point. */
+     HeroAmbient.tsx) behind the phone mockup. Understated on purpose —
+     texture, not a focal point. */
   .hero-glow {
     background: radial-gradient(
-      480px 480px at var(--glow-x, 50%) var(--glow-y, 20%),
+      300px 300px at var(--glow-x, 50%) var(--glow-y, 20%),
       color-mix(in srgb, var(--brand, #6366f1) 45%, transparent),
       transparent 70%
     );
-  }
-  @keyframes particle-drift {
-    0%, 100% { transform: translate(0, 0); opacity: 0.6; }
-    50% { transform: translate(14px, -24px); opacity: 1; }
-  }
-  .hero-particle {
-    animation-name: particle-drift;
-    animation-timing-function: ease-in-out;
-    animation-iteration-count: infinite;
   }
 
   /* Step chips fill shortly after their card reveals. Base markup is the

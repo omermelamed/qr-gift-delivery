@@ -721,6 +721,7 @@ export const he: Record<string, string> = {
   'Talk to our team': 'דברו עם הצוות שלנו',
   'Tap to simulate a scan': 'הקישו כדי לדמות סריקה',
   'All gifts redeemed': 'כל המתנות נמסרו',
+  'Reset demo': 'איפוס ההדגמה',
   'Replay': 'הפעילו שוב',
   "That's the whole flow.": 'זה כל התהליך.',
   'Upload a list, we handle the SMS and the scanning — you just watch the gifts go out.':

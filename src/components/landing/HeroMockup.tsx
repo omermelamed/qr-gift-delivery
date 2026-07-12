@@ -81,6 +81,11 @@ export function HeroMockup() {
     }
   }
 
+  function handleReset() {
+    setCount(SETTLED_COUNT)
+    setShowToast(false)
+  }
+
   const percent = Math.round((count / TOTAL) * 100)
 
   return (
@@ -99,7 +104,7 @@ export function HeroMockup() {
             <div className="sms-msg">
               <p className="text-sm text-zinc-800">{t('Hi Dana! Your holiday gift is waiting 🎁')}</p>
               <p className="mt-1 text-sm text-zinc-500">{t('Show this code at the event:')}</p>
-              <div className="relative mt-3 flex justify-center overflow-hidden py-2 text-zinc-900">
+              <div className="relative mt-3 flex overflow-hidden py-2 text-zinc-900">
                 <button
                   type="button"
                   onClick={handleTap}
@@ -109,14 +114,30 @@ export function HeroMockup() {
                 >
                   <FakeQr />
                 </button>
-                {/* One-shot entrance sweep — untouched. */}
-                <div className="scan-once absolute inset-x-6 top-1/2 h-0.5 rounded opacity-0 motion-reduce:hidden" />
+                {/* One-shot entrance sweep — untouched. Width/position matches
+                    the QR (start-0 w-24), which is now start-aligned rather
+                    than centered — see the flex container above. */}
+                <div className="scan-once absolute start-0 top-1/2 h-0.5 w-24 rounded opacity-0 motion-reduce:hidden" />
                 {/* Tap-triggered sweep — remounted via key on every tap so the animation replays. */}
                 {tapSweepKey > 0 && !reducedMotion && (
-                  <div key={tapSweepKey} className="tap-scan-sweep absolute inset-x-6 top-1/2 h-0.5 rounded" aria-hidden="true" />
+                  <div key={tapSweepKey} className="tap-scan-sweep absolute start-0 top-1/2 h-0.5 w-24 rounded" aria-hidden="true" />
                 )}
               </div>
-              <p className="mt-1 text-center text-xs text-zinc-400">
+              <p className="text-brand mt-1 flex items-center gap-1 text-xs font-medium">
+                {!exhausted && (
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-3 w-3 shrink-0"
+                    aria-hidden="true"
+                  >
+                    <path d="M20 6 9 17l-5-5" />
+                  </svg>
+                )}
                 {exhausted ? t('All gifts redeemed') : t('Tap to simulate a scan')}
               </p>
             </div>
@@ -168,6 +189,16 @@ export function HeroMockup() {
             style={settled ? { width: `${percent}%` } : { width: '62%' }}
           />
         </div>
+        {settled && (
+          <button
+            type="button"
+            onClick={handleReset}
+            disabled={count === SETTLED_COUNT}
+            className="bg-brand-soft text-brand mt-3.5 w-full rounded-lg py-2 text-xs font-semibold transition hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {t('Reset demo')}
+          </button>
+        )}
       </div>
     </div>
   )
