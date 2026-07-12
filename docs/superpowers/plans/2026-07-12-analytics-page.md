@@ -32,7 +32,7 @@
 
 - [ ] **Step 1: Install the dependency**
 
-Run: `npm install recharts@^2.15.0`
+Run: `npm install recharts`
 
 - [ ] **Step 2: Verify it installed cleanly**
 
@@ -563,7 +563,7 @@ export function RedemptionRateChart({ data }: { data: RedemptionRatePoint[] }) {
         <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 11, fill: '#888D89' }} />
         <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 12, fill: '#2E312F' }} />
         <Tooltip formatter={(value: number) => [`${value}%`, t('Redeemed')]} />
-        <Bar dataKey="rate" fill="var(--brand)" radius={[0, 4, 4, 0]} />
+        <Bar dataKey="rate" fill="#6E8B74" radius={[0, 4, 4, 0]} />
       </BarChart>
     </ResponsiveContainer>
   )
@@ -591,7 +591,7 @@ export function CampaignVolumeChart({ data }: { data: VolumePoint[] }) {
         <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#888D89' }} />
         <YAxis allowDecimals={false} width={28} tick={{ fontSize: 11, fill: '#888D89' }} />
         <Tooltip formatter={(value: number) => [value, t('Campaigns')]} />
-        <Bar dataKey="count" fill="var(--brand)" radius={[6, 6, 2, 2]} />
+        <Bar dataKey="count" fill="#6E8B74" radius={[6, 6, 2, 2]} />
       </BarChart>
     </ResponsiveContainer>
   )
@@ -619,7 +619,7 @@ export function DepartmentEngagementChart({ data }: { data: DepartmentPoint[] })
         <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => `${v}%`} tick={{ fontSize: 11, fill: '#888D89' }} />
         <YAxis type="category" dataKey="department" width={120} tick={{ fontSize: 12, fill: '#2E312F' }} />
         <Tooltip formatter={(value: number) => [`${value}%`, t('Redeemed')]} />
-        <Bar dataKey="rate" fill="var(--color-accent)" radius={[0, 4, 4, 0]} />
+        <Bar dataKey="rate" fill="#E8B86D" radius={[0, 4, 4, 0]} />
       </BarChart>
     </ResponsiveContainer>
   )
@@ -648,8 +648,8 @@ export function RsvpVsRedemptionChart({ data }: { data: RsvpPoint[] }) {
         <YAxis type="category" dataKey="name" width={140} tick={{ fontSize: 12, fill: '#2E312F' }} />
         <Tooltip />
         <Legend wrapperStyle={{ fontSize: 12 }} />
-        <Bar dataKey="attending" name={t('Confirmed attending')} fill="var(--color-secondary)" radius={[0, 4, 4, 0]} />
-        <Bar dataKey="redeemed" name={t('Actually redeemed')} fill="var(--brand)" radius={[0, 4, 4, 0]} />
+        <Bar dataKey="attending" name={t('Confirmed attending')} fill="#C76D4A" radius={[0, 4, 4, 0]} />
+        <Bar dataKey="redeemed" name={t('Actually redeemed')} fill="#6E8B74" radius={[0, 4, 4, 0]} />
       </BarChart>
     </ResponsiveContainer>
   )
