@@ -31,6 +31,7 @@ export function FilterChips({ filter, onFilterChange }: { filter: AnalyticsFilte
         className={CHIP_SELECT_CLASS}
         value={filter.dateRange}
         onChange={(e) => onFilterChange({ ...filter, dateRange: e.target.value as DateRangePreset })}
+        aria-label={t('Date range')}
       >
         {DATE_RANGE_OPTIONS.map((opt) => (
           <option key={opt} value={opt}>{t(DATE_LABEL[opt])}</option>
@@ -38,15 +39,17 @@ export function FilterChips({ filter, onFilterChange }: { filter: AnalyticsFilte
       </select>
       <input
         type="text"
-        placeholder={t('Search campaign…')}
+        placeholder={t('Search campaigns…')}
         className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs text-zinc-700 focus:outline-none focus:border-brand"
         value={filter.campaignName}
         onChange={(e) => onFilterChange({ ...filter, campaignName: e.target.value })}
+        aria-label={t('Campaign name')}
       />
       <select
         className={CHIP_SELECT_CLASS}
         value={filter.status}
         onChange={(e) => onFilterChange({ ...filter, status: e.target.value as StatusFilter })}
+        aria-label={t('Status')}
       >
         {STATUS_OPTIONS.map((opt) => (
           <option key={opt} value={opt}>{t(STATUS_LABEL[opt])}</option>
