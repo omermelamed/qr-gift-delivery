@@ -42,10 +42,11 @@ export function AnalyticsUI({ campaigns, tokens }: Props) {
   function toggleSynced() {
     setSynced((prev) => {
       const next = !prev
-      if (next) {
-        // Snap every chart back to the global values, discarding divergence.
-        setPerChartFilter({ rate: globalFilter, volume: globalFilter, dept: globalFilter, rsvp: globalFilter })
-      }
+      // Snap every chart to the current global value on every toggle, in both
+      // directions: turning sync back on re-syncs everyone to globalFilter,
+      // and turning sync off seeds each chart's independent filter with what
+      // synced mode was just showing, instead of leaving stale values behind.
+      setPerChartFilter({ rate: globalFilter, volume: globalFilter, dept: globalFilter, rsvp: globalFilter })
       return next
     })
   }
