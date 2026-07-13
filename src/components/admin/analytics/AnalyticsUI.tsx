@@ -58,6 +58,11 @@ export function AnalyticsUI({ campaigns, tokens }: Props) {
 
   return (
     <div>
+      <div className="mb-5">
+        <h1 className="text-xl font-bold text-zinc-900">{t('Analytics')}</h1>
+        <p className="mt-1 text-sm text-zinc-500">{t('Across all campaigns for your company')}</p>
+      </div>
+
       <div className="mb-5 flex items-center gap-2.5 rounded-xl border border-zinc-200 bg-white px-3.5 py-2.5">
         <button
           type="button"

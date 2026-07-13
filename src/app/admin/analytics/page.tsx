@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import type { JwtAppMetadata } from '@/types'
 import { resolveCompanyId } from '@/lib/platform-auth'
 import { AnalyticsUI } from '@/components/admin/analytics/AnalyticsUI'
+import { AnalyticsStatusMessage } from '@/components/admin/analytics/AnalyticsStatusMessage'
 
 export default async function AnalyticsPage() {
   const supabase = await createClient()
@@ -23,11 +24,7 @@ export default async function AnalyticsPage() {
     .order('created_at', { ascending: false })
 
   if (campaignsError) {
-    return (
-      <div className="p-6">
-        <p className="text-sm font-medium text-red-600">Couldn&apos;t load analytics data. Please refresh the page.</p>
-      </div>
-    )
+    return <AnalyticsStatusMessage variant="error" />
   }
 
   const list = campaigns ?? []
@@ -40,28 +37,15 @@ export default async function AnalyticsPage() {
     : { data: [], error: null }
 
   if (tokensError) {
-    return (
-      <div className="p-6">
-        <p className="text-sm font-medium text-red-600">Couldn&apos;t load analytics data. Please refresh the page.</p>
-      </div>
-    )
+    return <AnalyticsStatusMessage variant="error" />
   }
 
   if (list.length === 0) {
-    return (
-      <div className="p-6">
-        <h1 className="text-xl font-bold text-zinc-900">Analytics</h1>
-        <p className="mt-2 text-sm text-zinc-500">Run your first campaign to start seeing analytics here.</p>
-      </div>
-    )
+    return <AnalyticsStatusMessage variant="empty" />
   }
 
   return (
     <div className="p-6">
-      <div className="mb-5">
-        <h1 className="text-xl font-bold text-zinc-900">Analytics</h1>
-        <p className="mt-1 text-sm text-zinc-500">Across all campaigns for your company</p>
-      </div>
       <AnalyticsUI campaigns={list} tokens={tokens ?? []} />
     </div>
   )
