@@ -751,6 +751,14 @@ input:user-valid + .valid-check {
   font-family: inherit;
 }
 
+/* Recharts' tooltip has no default font-size, so it inherits the page's
+   16px body text — much bigger than the chart's own 11-12px axis/legend
+   text next to it. font-size is inherited, so this alone covers the
+   label/item children too. */
+.recharts-default-tooltip {
+  font-size: 12px;
+}
+
 /* Pointer affordance for clickable elements. Modern browsers default
    <button> to `cursor: default`, so set it explicitly everywhere. */
 button,
