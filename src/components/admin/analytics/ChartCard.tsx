@@ -2,59 +2,32 @@
 
 import type { ReactNode } from 'react'
 import { useT } from '@/lib/i18n/useT'
-import type { AnalyticsFilter, DateRangePreset, StatusFilter } from '@/lib/analytics/filterCampaigns'
-
-const DATE_RANGE_OPTIONS: DateRangePreset[] = ['all', 'month', 'quarter', 'year']
-const STATUS_OPTIONS: StatusFilter[] = ['all', 'draft', 'active', 'closed']
-
-const DATE_LABEL: Record<DateRangePreset, string> = {
-  all: 'All time',
-  month: 'Last month',
-  quarter: 'Last 3 months',
-  year: 'This year',
-}
-const STATUS_LABEL: Record<StatusFilter, string> = {
-  all: 'All statuses',
-  draft: 'Draft',
-  active: 'Active',
-  closed: 'Closed',
-}
-
-const CHIP_SELECT_CLASS =
-  'rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-semibold text-zinc-600 focus:outline-none focus:border-brand'
+import { StatusDropdown } from '@/components/admin/StatusDropdown'
+import { DateRangeDropdown } from '@/components/admin/DateRangeDropdown'
+import type { AnalyticsFilter } from '@/lib/analytics/filterCampaigns'
 
 export function FilterChips({ filter, onFilterChange }: { filter: AnalyticsFilter; onFilterChange: (next: AnalyticsFilter) => void }) {
   const t = useT()
   return (
     <>
-      <select
-        className={CHIP_SELECT_CLASS}
-        value={filter.dateRange}
-        onChange={(e) => onFilterChange({ ...filter, dateRange: e.target.value as DateRangePreset })}
-        aria-label={t('Date range')}
-      >
-        {DATE_RANGE_OPTIONS.map((opt) => (
-          <option key={opt} value={opt}>{t(DATE_LABEL[opt])}</option>
-        ))}
-      </select>
+      <DateRangeDropdown
+        from={filter.dateFrom}
+        to={filter.dateTo}
+        onFromChange={(v) => onFilterChange({ ...filter, dateFrom: v })}
+        onToChange={(v) => onFilterChange({ ...filter, dateTo: v })}
+      />
+      <StatusDropdown
+        value={filter.status}
+        onChange={(v) => onFilterChange({ ...filter, status: v })}
+      />
       <input
         type="text"
         placeholder={t('Search campaigns…')}
-        className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs text-zinc-700 focus:outline-none focus:border-brand"
+        className="input-field h-9 px-3 text-sm"
         value={filter.campaignName}
         onChange={(e) => onFilterChange({ ...filter, campaignName: e.target.value })}
         aria-label={t('Campaign name')}
       />
-      <select
-        className={CHIP_SELECT_CLASS}
-        value={filter.status}
-        onChange={(e) => onFilterChange({ ...filter, status: e.target.value as StatusFilter })}
-        aria-label={t('Status')}
-      >
-        {STATUS_OPTIONS.map((opt) => (
-          <option key={opt} value={opt}>{t(STATUS_LABEL[opt])}</option>
-        ))}
-      </select>
     </>
   )
 }

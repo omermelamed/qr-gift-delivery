@@ -10,7 +10,7 @@ import { CampaignVolumeChart } from './CampaignVolumeChart'
 import { DepartmentEngagementChart } from './DepartmentEngagementChart'
 import { RsvpVsRedemptionChart } from './RsvpVsRedemptionChart'
 
-const DEFAULT_FILTER: AnalyticsFilter = { dateRange: 'all', campaignName: '', status: 'all' }
+const DEFAULT_FILTER: AnalyticsFilter = { dateFrom: '', dateTo: '', campaignName: '', status: 'all' }
 const CHART_IDS = ['rate', 'volume', 'dept', 'rsvp'] as const
 type ChartId = (typeof CHART_IDS)[number]
 
@@ -72,8 +72,8 @@ export function AnalyticsUI({ campaigns, tokens }: Props) {
           className={`relative h-[22px] w-[38px] flex-shrink-0 rounded-full transition-colors ${synced ? 'bg-brand' : 'bg-zinc-300'}`}
         >
           <span
-            className={`absolute top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform rtl:end-0.5 ${
-              synced ? 'translate-x-4 rtl:-translate-x-4' : 'translate-x-0.5 rtl:translate-x-0'
+            className={`absolute top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-[inset-inline-start] duration-150 ${
+              synced ? 'start-[18px]' : 'start-0.5'
             }`}
           />
         </button>

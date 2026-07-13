@@ -6,6 +6,10 @@ const mockGetUser = vi.fn()
 const mockFromService = vi.fn()
 const mockListUsers = vi.fn()
 
+vi.mock('next/headers', () => ({
+  cookies: () => Promise.resolve({ get: () => undefined }),
+}))
+
 vi.mock('@/lib/supabase/server', () => ({
   createClient: () => ({ auth: { getUser: mockGetUser } }),
   createServiceClient: () => ({ from: mockFromService, auth: { admin: { listUsers: mockListUsers } } }),
@@ -69,7 +73,7 @@ describe('GET /api/campaigns/[id]/export', () => {
     expect(res.headers.get('Content-Type')).toContain('text/csv')
     expect(res.headers.get('Content-Disposition')).toContain('attachment')
     const text = await res.text()
-    expect(text).toContain('name,phone_number,department')
+    expect(text).toContain('"Name","Phone","Department"')
     expect(text).toContain('Omer')
     expect(text).toContain('+972501234567')
   })

@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { filterCampaigns, campaignStatus, type CampaignRow } from '@/lib/analytics/filterCampaigns'
 
-const NOW = new Date('2026-07-12T00:00:00Z')
-
 const campaigns: CampaignRow[] = [
   { id: '1', name: 'Holiday 2026', campaign_date: '2026-07-01', sent_at: '2026-07-01T09:00:00Z', closed_at: '2026-07-05T00:00:00Z', created_at: '2026-06-20T00:00:00Z' },
   { id: '2', name: 'Onboarding Q3', campaign_date: null, sent_at: '2026-06-01T09:00:00Z', closed_at: null, created_at: '2026-05-20T00:00:00Z' },
@@ -23,35 +21,35 @@ describe('campaignStatus', () => {
 })
 
 describe('filterCampaigns', () => {
-  it('returns everything when the filter is all/empty/all', () => {
-    const result = filterCampaigns(campaigns, { dateRange: 'all', campaignName: '', status: 'all' }, NOW)
+  it('returns everything when the filter is empty', () => {
+    const result = filterCampaigns(campaigns, { dateFrom: '', dateTo: '', campaignName: '', status: 'all' })
     expect(result.map((c) => c.id)).toEqual(['1', '2', '3', '4'])
   })
 
   it('filters by status', () => {
-    const result = filterCampaigns(campaigns, { dateRange: 'all', campaignName: '', status: 'draft' }, NOW)
+    const result = filterCampaigns(campaigns, { dateFrom: '', dateTo: '', campaignName: '', status: 'draft' })
     expect(result.map((c) => c.id)).toEqual(['3'])
   })
 
   it('filters by campaign name, case-insensitive substring', () => {
-    const result = filterCampaigns(campaigns, { dateRange: 'all', campaignName: 'welcome', status: 'all' }, NOW)
+    const result = filterCampaigns(campaigns, { dateFrom: '', dateTo: '', campaignName: 'welcome', status: 'all' })
     expect(result.map((c) => c.id)).toEqual(['4'])
   })
 
   it('filters by date range using campaign_date, falling back to sent_at then created_at', () => {
-    // "month" = last 30 days from NOW (2026-07-12). Only campaign 1 (2026-07-01) and
-    // campaign 3 (created 2026-07-10, no campaign_date/sent_at) fall inside that window.
-    const result = filterCampaigns(campaigns, { dateRange: 'month', campaignName: '', status: 'all' }, NOW)
+    // 2026-06-12 through 2026-07-12. Only campaign 1 (2026-07-01) and campaign 3
+    // (created 2026-07-10, no campaign_date/sent_at) fall inside that window.
+    const result = filterCampaigns(campaigns, { dateFrom: '2026-06-12', dateTo: '2026-07-12', campaignName: '', status: 'all' })
     expect(result.map((c) => c.id).sort()).toEqual(['1', '3'])
   })
 
   it('excludes campaigns older than a year', () => {
-    const result = filterCampaigns(campaigns, { dateRange: 'year', campaignName: '', status: 'all' }, NOW)
+    const result = filterCampaigns(campaigns, { dateFrom: '2025-07-12', dateTo: '', campaignName: '', status: 'all' })
     expect(result.map((c) => c.id)).not.toContain('4')
   })
 
   it('combines multiple filters (AND, not OR)', () => {
-    const result = filterCampaigns(campaigns, { dateRange: 'all', campaignName: 'onboarding', status: 'active' }, NOW)
+    const result = filterCampaigns(campaigns, { dateFrom: '', dateTo: '', campaignName: 'onboarding', status: 'active' })
     expect(result.map((c) => c.id)).toEqual(['2'])
   })
 })

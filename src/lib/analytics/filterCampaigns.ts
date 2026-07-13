@@ -7,19 +7,13 @@ export type CampaignRow = {
   created_at: string
 }
 
-export type DateRangePreset = 'all' | 'month' | 'quarter' | 'year'
 export type StatusFilter = 'all' | 'draft' | 'active' | 'closed'
 
 export type AnalyticsFilter = {
-  dateRange: DateRangePreset
+  dateFrom: string
+  dateTo: string
   campaignName: string
   status: StatusFilter
-}
-
-const DATE_RANGE_DAYS: Record<Exclude<DateRangePreset, 'all'>, number> = {
-  month: 30,
-  quarter: 90,
-  year: 365,
 }
 
 /** Mirrors the derivation already used in AdminDashboardUI.tsx's campaigns list. */
@@ -36,18 +30,15 @@ export function effectiveDate(c: CampaignRow): string {
   return c.campaign_date ?? c.sent_at ?? c.created_at
 }
 
-export function filterCampaigns(campaigns: CampaignRow[], filter: AnalyticsFilter, now: Date = new Date()): CampaignRow[] {
+export function filterCampaigns(campaigns: CampaignRow[], filter: AnalyticsFilter): CampaignRow[] {
   const name = filter.campaignName.trim().toLowerCase()
-  let cutoff: Date | null = null
-  if (filter.dateRange !== 'all') {
-    cutoff = new Date(now)
-    cutoff.setDate(cutoff.getDate() - DATE_RANGE_DAYS[filter.dateRange])
-  }
 
   return campaigns.filter((c) => {
     if (filter.status !== 'all' && campaignStatus(c) !== filter.status) return false
     if (name && !c.name.toLowerCase().includes(name)) return false
-    if (cutoff && new Date(effectiveDate(c)) < cutoff) return false
+    const date = effectiveDate(c).slice(0, 10)
+    if (filter.dateFrom && date < filter.dateFrom) return false
+    if (filter.dateTo && date > filter.dateTo) return false
     return true
   })
 }

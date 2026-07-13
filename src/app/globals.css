@@ -742,6 +742,15 @@ input:user-valid + .valid-check {
   color: var(--brand, #6366f1);
 }
 
+/* Recharts renders axis ticks and the tooltip as SVG <text>/a plain div —
+   neither inherits the app font by default, so charts fell back to the
+   browser's default sans-serif instead of Inter/Heebo. (Legends are now our
+   own ToggleLegend component, not recharts', so no override needed there.) */
+.recharts-text,
+.recharts-default-tooltip {
+  font-family: inherit;
+}
+
 /* Pointer affordance for clickable elements. Modern browsers default
    <button> to `cursor: default`, so set it explicitly everywhere. */
 button,
