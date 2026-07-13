@@ -2,6 +2,7 @@
 
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
 import { useT } from '@/lib/i18n/useT'
+import { CategoryTick } from './CategoryTick'
 import type { RsvpPoint } from '@/lib/analytics/aggregate'
 
 export function RsvpVsRedemptionChart({ data }: { data: RsvpPoint[] }) {
@@ -14,7 +15,7 @@ export function RsvpVsRedemptionChart({ data }: { data: RsvpPoint[] }) {
       <BarChart data={data} layout="vertical" margin={{ left: 8, right: 20, top: 4, bottom: 4 }}>
         <CartesianGrid horizontal={false} stroke="#EDE9E2" />
         <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: '#888D89' }} />
-        <YAxis type="category" dataKey="name" width={140} tick={{ fontSize: 12, fill: '#2E312F' }} />
+        <YAxis type="category" dataKey="name" width={160} interval={0} tick={<CategoryTick maxChars={20} />} />
         <Tooltip />
         <Legend wrapperStyle={{ fontSize: 12 }} />
         <Bar dataKey="attending" name={t('Confirmed attending')} fill="#C76D4A" radius={[0, 4, 4, 0]} />
