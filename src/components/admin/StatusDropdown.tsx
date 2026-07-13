@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useT } from '@/lib/i18n/useT'
+import { useLocale } from '@/lib/i18n/LanguageContext'
 import type { StatusFilter } from '@/lib/analytics/filterCampaigns'
 
 const STATUS_DOT: Record<StatusFilter, string> = {
@@ -13,17 +15,43 @@ const STATUS_DOT: Record<StatusFilter, string> = {
 
 export function StatusDropdown({ value, onChange }: { value: StatusFilter; onChange: (v: StatusFilter) => void }) {
   const t = useT()
+  const { locale } = useLocale()
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const [coords, setCoords] = useState<{ top: number; left?: number; right?: number } | null>(null)
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
+  // Rendered in a portal (fixed-positioned), like KebabMenu, so the panel is
+  // never clipped or painted behind a sibling card in the analytics grid.
   useEffect(() => {
     if (!open) return
-    function handle(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    function onDocClick(e: MouseEvent) {
+      const target = e.target as Node
+      if (btnRef.current?.contains(target) || menuRef.current?.contains(target)) return
+      setOpen(false)
     }
-    document.addEventListener('mousedown', handle)
-    return () => document.removeEventListener('mousedown', handle)
+    function onMove() { setOpen(false) }
+    document.addEventListener('mousedown', onDocClick)
+    window.addEventListener('scroll', onMove, true)
+    window.addEventListener('resize', onMove)
+    return () => {
+      document.removeEventListener('mousedown', onDocClick)
+      window.removeEventListener('scroll', onMove, true)
+      window.removeEventListener('resize', onMove)
+    }
   }, [open])
+
+  function toggle() {
+    if (!open && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect()
+      setCoords(
+        locale === 'he'
+          ? { top: r.bottom + 6, right: window.innerWidth - r.right }
+          : { top: r.bottom + 6, left: r.left },
+      )
+    }
+    setOpen((v) => !v)
+  }
 
   const options: { value: StatusFilter; label: string }[] = [
     { value: 'all', label: t('All statuses') },
@@ -35,10 +63,11 @@ export function StatusDropdown({ value, onChange }: { value: StatusFilter; onCha
   const selected = options.find((o) => o.value === value)!
 
   return (
-    <div ref={ref} className="relative">
+    <>
       <button
+        ref={btnRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggle}
         className="input-field h-9 flex items-center gap-2 px-3 text-sm hover:border-[var(--color-border-strong)] transition-colors whitespace-nowrap"
       >
         <span className={`w-2 h-2 rounded-full flex-shrink-0 ${STATUS_DOT[value]}`} />
@@ -48,8 +77,12 @@ export function StatusDropdown({ value, onChange }: { value: StatusFilter; onCha
         </svg>
       </button>
 
-      {open && (
-        <div className="absolute top-full mt-1.5 start-0 z-20 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 min-w-[160px]">
+      {open && coords && createPortal(
+        <div
+          ref={menuRef}
+          style={{ position: 'fixed', top: coords.top, left: coords.left, right: coords.right }}
+          className="z-50 bg-white border border-zinc-200 rounded-xl shadow-lg py-1 min-w-[160px]"
+        >
           {options.map((opt) => (
             <button
               key={opt.value}
@@ -66,8 +99,9 @@ export function StatusDropdown({ value, onChange }: { value: StatusFilter; onCha
               )}
             </button>
           ))}
-        </div>
+        </div>,
+        document.body,
       )}
-    </div>
+    </>
   )
 }

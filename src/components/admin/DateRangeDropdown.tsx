@@ -1,24 +1,52 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useT } from '@/lib/i18n/useT'
+import { useLocale } from '@/lib/i18n/LanguageContext'
 import { DatePicker } from '@/components/admin/DatePicker'
 
 export function DateRangeDropdown({ from, to, onFromChange, onToChange }: {
   from: string; to: string; onFromChange: (v: string) => void; onToChange: (v: string) => void
 }) {
   const t = useT()
+  const { locale } = useLocale()
   const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const [coords, setCoords] = useState<{ top: number; left?: number; right?: number } | null>(null)
+  const btnRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
 
+  // Rendered in a portal (fixed-positioned), like KebabMenu, so the panel is
+  // never clipped or painted behind a sibling card in the analytics grid.
   useEffect(() => {
     if (!open) return
-    function handle(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    function onDocClick(e: MouseEvent) {
+      const target = e.target as Node
+      if (btnRef.current?.contains(target) || panelRef.current?.contains(target)) return
+      setOpen(false)
     }
-    document.addEventListener('mousedown', handle)
-    return () => document.removeEventListener('mousedown', handle)
+    function onMove() { setOpen(false) }
+    document.addEventListener('mousedown', onDocClick)
+    window.addEventListener('scroll', onMove, true)
+    window.addEventListener('resize', onMove)
+    return () => {
+      document.removeEventListener('mousedown', onDocClick)
+      window.removeEventListener('scroll', onMove, true)
+      window.removeEventListener('resize', onMove)
+    }
   }, [open])
+
+  function toggle() {
+    if (!open && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect()
+      setCoords(
+        locale === 'he'
+          ? { top: r.bottom + 6, right: window.innerWidth - r.right }
+          : { top: r.bottom + 6, left: r.left },
+      )
+    }
+    setOpen((v) => !v)
+  }
 
   const hasFilter = from || to
   const label = hasFilter
@@ -26,10 +54,11 @@ export function DateRangeDropdown({ from, to, onFromChange, onToChange }: {
     : t('All dates')
 
   return (
-    <div ref={ref} className="relative">
+    <>
       <button
+        ref={btnRef}
         type="button"
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggle}
         className={`input-field h-9 flex items-center gap-2 px-3 text-sm hover:border-[var(--color-border-strong)] transition-colors whitespace-nowrap ${hasFilter ? 'border-brand text-brand' : 'text-zinc-700'}`}
       >
         <svg className="w-3.5 h-3.5 flex-shrink-0 opacity-60" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -53,8 +82,12 @@ export function DateRangeDropdown({ from, to, onFromChange, onToChange }: {
         </svg>
       </button>
 
-      {open && (
-        <div className="absolute top-full mt-1.5 start-0 z-20 bg-white border border-zinc-200 rounded-xl shadow-lg p-3 w-80">
+      {open && coords && createPortal(
+        <div
+          ref={panelRef}
+          style={{ position: 'fixed', top: coords.top, left: coords.left, right: coords.right }}
+          className="z-50 bg-white border border-zinc-200 rounded-xl shadow-lg p-3 w-80"
+        >
           <div className="flex flex-col gap-2">
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-zinc-500">{t('From date')}</label>
@@ -74,8 +107,9 @@ export function DateRangeDropdown({ from, to, onFromChange, onToChange }: {
               </button>
             )}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
-    </div>
+    </>
   )
 }
