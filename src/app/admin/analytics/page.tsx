@@ -32,7 +32,7 @@ export default async function AnalyticsPage() {
   const { data: tokens, error: tokensError } = list.length
     ? await service
         .from('gift_tokens')
-        .select('campaign_id, redeemed, redeemed_at, sms_sent_at, department, attending')
+        .select('campaign_id, redeemed, department, attending')
         .in('campaign_id', list.map((c) => c.id))
     : { data: [], error: null }
 

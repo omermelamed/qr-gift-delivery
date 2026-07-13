@@ -14,12 +14,12 @@ const campaigns: CampaignRow[] = [
 ]
 
 const tokens: TokenRow[] = [
-  { campaign_id: 'c1', redeemed: true, redeemed_at: '2026-07-01T10:00:00Z', sms_sent_at: '2026-07-01T09:00:00Z', department: 'Engineering', attending: true },
-  { campaign_id: 'c1', redeemed: true, redeemed_at: '2026-07-01T11:00:00Z', sms_sent_at: '2026-07-01T09:00:00Z', department: 'Engineering', attending: true },
-  { campaign_id: 'c1', redeemed: false, redeemed_at: null, sms_sent_at: '2026-07-01T09:00:00Z', department: 'Sales', attending: false },
-  { campaign_id: 'c1', redeemed: false, redeemed_at: null, sms_sent_at: '2026-07-01T09:00:00Z', department: 'Sales', attending: null },
-  { campaign_id: 'c2', redeemed: true, redeemed_at: '2026-06-01T10:00:00Z', sms_sent_at: '2026-06-01T09:00:00Z', department: 'Engineering', attending: null },
-  { campaign_id: 'c2', redeemed: false, redeemed_at: null, sms_sent_at: '2026-06-01T09:00:00Z', department: null, attending: null },
+  { campaign_id: 'c1', redeemed: true, department: 'Engineering', attending: true },
+  { campaign_id: 'c1', redeemed: true, department: 'Engineering', attending: true },
+  { campaign_id: 'c1', redeemed: false, department: 'Sales', attending: false },
+  { campaign_id: 'c1', redeemed: false, department: 'Sales', attending: null },
+  { campaign_id: 'c2', redeemed: true, department: 'Engineering', attending: null },
+  { campaign_id: 'c2', redeemed: false, department: null, attending: null },
 ]
 
 describe('redemptionRateByCampaign', () => {

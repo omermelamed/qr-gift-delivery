@@ -3,8 +3,6 @@ import { effectiveDate, type CampaignRow } from './filterCampaigns'
 export type TokenRow = {
   campaign_id: string
   redeemed: boolean
-  redeemed_at: string | null
-  sms_sent_at: string | null
   department: string | null
   attending: boolean | null
 }
