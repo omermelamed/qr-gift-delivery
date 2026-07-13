@@ -8,6 +8,9 @@ export const he: Record<string, string> = {
   'More': 'עוד',
   'Planned to arrive': 'תכננו להגיע',
   'Actually arrived': 'הגיעו בפועל',
+  'Yes': 'כן',
+  'No': 'לא',
+  'Sent at': 'נשלח בשעה',
   'Batch mode paused — headcount required': 'מצב אצווה הושהה — נדרש מספר משתתפים',
   // Pagination
   'Showing': 'מציג',
