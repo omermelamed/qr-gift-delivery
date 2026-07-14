@@ -38,6 +38,7 @@ export type Campaign = {
   supports_arrival_certificates: boolean
   max_attendee_count: number | null
   allow_gift_if_not_attending: boolean
+  rsvp_locked: boolean
   sms_template: string | null
   reminder_sms_template: string | null
 }
