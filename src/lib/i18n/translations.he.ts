@@ -79,6 +79,8 @@ export const he: Record<string, string> = {
   'Total arriving people': 'סך כל המגיעים',
   'Not coming': 'לא מגיעים',
   'No response': 'ללא תשובה',
+  'Stop new RSVPs (event is full)': 'עצירת הרשמות חדשות (האירוע מלא)',
+  "People who already said they're coming keep their spot. Everyone else sees an \"event is full\" message instead of the RSVP form.": 'מי שכבר אישרו הגעה שומרים על מקומם. כל השאר יראו הודעה שהאירוע מלא במקום טופס האישור.',
 
   // Verify result / ResultCard
   'Invalid QR code': 'קוד QR לא תקין',
