@@ -179,4 +179,48 @@ describe('POST /api/gift/[token]/rsvp', () => {
     const res = await POST(makeRequest('t', { attending: false, attendeeCount: 9 }), { params: Promise.resolve({ token: 't' }) })
     expect(await res.json()).toEqual({ ok: true, attending: false, attendeeCount: null })
   })
+
+  it('409 event_full when locked and the token has not answered', async () => {
+    mockTokenSingle.mockResolvedValue({
+      data: { redeemed: false, attending: null, campaigns: { supports_arrival_certificates: true, closed_at: null, max_attendee_count: null, rsvp_locked: true } },
+    })
+    const { POST } = await import('@/app/api/gift/[token]/rsvp/route')
+    const res = await POST(makeRequest('t', { attending: true, attendeeCount: 1 }), { params: Promise.resolve({ token: 't' }) })
+    const body = await res.json()
+    expect(res.status).toBe(409)
+    expect(body.error).toBe('event_full')
+    expect(mockUpdate).not.toHaveBeenCalled()
+  })
+
+  it('409 event_full when locked and the token previously said not coming', async () => {
+    mockTokenSingle.mockResolvedValue({
+      data: { redeemed: false, attending: false, campaigns: { supports_arrival_certificates: true, closed_at: null, max_attendee_count: null, rsvp_locked: true } },
+    })
+    const { POST } = await import('@/app/api/gift/[token]/rsvp/route')
+    const res = await POST(makeRequest('t', { attending: true, attendeeCount: 1 }), { params: Promise.resolve({ token: 't' }) })
+    const body = await res.json()
+    expect(res.status).toBe(409)
+    expect(body.error).toBe('event_full')
+    expect(mockUpdate).not.toHaveBeenCalled()
+  })
+
+  it('allows an already-yes token to update its headcount while locked', async () => {
+    mockTokenSingle.mockResolvedValue({
+      data: { redeemed: false, attending: true, campaigns: { supports_arrival_certificates: true, closed_at: null, max_attendee_count: null, rsvp_locked: true } },
+    })
+    mockUpdateSingle.mockResolvedValue({ data: { attending: true, attendee_count: 3 } })
+    const { POST } = await import('@/app/api/gift/[token]/rsvp/route')
+    const res = await POST(makeRequest('t', { attending: true, attendeeCount: 3 }), { params: Promise.resolve({ token: 't' }) })
+    expect(await res.json()).toEqual({ ok: true, attending: true, attendeeCount: 3 })
+  })
+
+  it('allows opting out even while locked', async () => {
+    mockTokenSingle.mockResolvedValue({
+      data: { redeemed: false, attending: null, campaigns: { supports_arrival_certificates: true, closed_at: null, max_attendee_count: null, rsvp_locked: true } },
+    })
+    mockUpdateSingle.mockResolvedValue({ data: { attending: false, attendee_count: null } })
+    const { POST } = await import('@/app/api/gift/[token]/rsvp/route')
+    const res = await POST(makeRequest('t', { attending: false }), { params: Promise.resolve({ token: 't' }) })
+    expect(await res.json()).toEqual({ ok: true, attending: false, attendeeCount: null })
+  })
 })
