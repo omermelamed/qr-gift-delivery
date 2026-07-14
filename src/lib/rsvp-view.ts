@@ -12,12 +12,6 @@ export type RsvpViewState = {
   showNotComing: boolean
 }
 
-/**
- * Decides which panel GiftRedemptionView shows for arrival-certificate
- * campaigns: the RSVP form, the "not coming" message, an "event full"
- * message when rsvpLocked has frozen new yes-answers, or (implicitly, when
- * all three are false) the gift picker / QR view.
- */
 export function resolveRsvpViewState(params: RsvpViewParams): RsvpViewState {
   const { supportsArrival, attending, editing, allowGiftIfNotAttending, rsvpLocked } = params
 
@@ -28,10 +22,11 @@ export function resolveRsvpViewState(params: RsvpViewParams): RsvpViewState {
   // A token is exempt from the lock only while it currently reads attending = true.
   const lockedOut = rsvpLocked && attending !== true
   const wantsFormOrChange = attending === null || editing
+  const wouldShowNotComing = attending === false && !allowGiftIfNotAttending && !editing
 
   return {
     showRsvpForm: !lockedOut && wantsFormOrChange,
-    showEventFull: lockedOut,
-    showNotComing: attending === false && !allowGiftIfNotAttending && !editing && !lockedOut,
+    showEventFull: lockedOut && (wantsFormOrChange || wouldShowNotComing),
+    showNotComing: wouldShowNotComing && !lockedOut,
   }
 }

@@ -30,6 +30,11 @@ describe('resolveRsvpViewState', () => {
       .toEqual({ showRsvpForm: false, showEventFull: false, showNotComing: false })
   })
 
+  it('falls through to the gift view when locked, declined, but gift-if-not-attending is on', () => {
+    expect(resolveRsvpViewState({ ...base, attending: false, allowGiftIfNotAttending: true, rsvpLocked: true }))
+      .toEqual({ showRsvpForm: false, showEventFull: false, showNotComing: false })
+  })
+
   it('shows event-full for an unanswered token when locked', () => {
     expect(resolveRsvpViewState({ ...base, attending: null, rsvpLocked: true }))
       .toEqual({ showRsvpForm: false, showEventFull: true, showNotComing: false })
