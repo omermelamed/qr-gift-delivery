@@ -71,6 +71,7 @@ export const he: Record<string, string> = {
   'You can bring up to {n} people.': 'ניתן להגיע עד {n} אנשים.',
   'Could not save your response. Please try again.': 'לא ניתן לשמור את התשובה. נסו שוב.',
   "You marked that you're not coming.": 'סימנתם שאינכם מגיעים.',
+  'This event is full. Registration is closed.': 'האירוע מלא. ההרשמה נסגרה.',
   'Change my answer': 'שינוי התשובה',
   'Arriving': 'מגיעים',
   'Arrival Certificates': 'אישורי הגעה',

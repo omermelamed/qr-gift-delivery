@@ -18,7 +18,7 @@ export default async function GiftQrPage({
 
   const { data: tokenRow } = await service
     .from('gift_tokens')
-    .select('employee_name, redeemed, qr_image_url, gift_id, campaign_id, attending, attendee_count, campaigns(name, supports_arrival_certificates, max_attendee_count, allow_gift_if_not_attending)')
+    .select('employee_name, redeemed, qr_image_url, gift_id, campaign_id, attending, attendee_count, campaigns(name, supports_arrival_certificates, max_attendee_count, allow_gift_if_not_attending, rsvp_locked)')
     .eq('token', token)
     .single()
 
@@ -29,10 +29,12 @@ export default async function GiftQrPage({
     supports_arrival_certificates: boolean
     max_attendee_count: number | null
     allow_gift_if_not_attending: boolean
+    rsvp_locked: boolean
   } | null
   const supportsArrival = campaign?.supports_arrival_certificates ?? false
   const maxCount = campaign?.max_attendee_count ?? null
   const allowGiftIfNotAttending = campaign?.allow_gift_if_not_attending ?? false
+  const rsvpLocked = campaign?.rsvp_locked ?? false
 
   if (tokenRow.redeemed) {
     return (
@@ -50,6 +52,7 @@ export default async function GiftQrPage({
         attendeeCount={tokenRow.attendee_count}
         maxCount={maxCount}
         allowGiftIfNotAttending={allowGiftIfNotAttending}
+        rsvpLocked={rsvpLocked}
       />
     )
   }
@@ -80,6 +83,7 @@ export default async function GiftQrPage({
       attendeeCount={tokenRow.attendee_count}
       maxCount={maxCount}
       allowGiftIfNotAttending={allowGiftIfNotAttending}
+      rsvpLocked={rsvpLocked}
     />
   )
 }

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useT } from '@/lib/i18n/useT'
 import { GiftPicker } from '@/components/gift/GiftPicker'
 import { ArrivalRsvp } from '@/components/gift/ArrivalRsvp'
+import { resolveRsvpViewState } from '@/lib/rsvp-view'
 
 type Gift = { id: string; name: string }
 
@@ -21,6 +22,7 @@ type Props = {
   attendeeCount: number | null
   maxCount: number | null
   allowGiftIfNotAttending: boolean
+  rsvpLocked: boolean
 }
 
 export function GiftRedemptionView({
@@ -37,6 +39,7 @@ export function GiftRedemptionView({
   attendeeCount,
   maxCount,
   allowGiftIfNotAttending,
+  rsvpLocked,
 }: Props) {
   const t = useT()
   const [editing, setEditing] = useState(false)
@@ -57,8 +60,13 @@ export function GiftRedemptionView({
 
   // For arrival-certificate campaigns, the RSVP gates the gift QR — unless the
   // campaign explicitly allows non-attendees to still receive a gift.
-  const showRsvpForm = supportsArrival && (attending === null || editing)
-  const showNotComing = supportsArrival && attending === false && !allowGiftIfNotAttending && !editing
+  const { showRsvpForm, showEventFull, showNotComing } = resolveRsvpViewState({
+    supportsArrival,
+    attending,
+    editing,
+    allowGiftIfNotAttending,
+    rsvpLocked,
+  })
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-zinc-50 to-[var(--color-success-bg)] px-6">
@@ -74,6 +82,8 @@ export function GiftRedemptionView({
             maxCount={maxCount}
             onSubmitted={() => setEditing(false)}
           />
+        ) : showEventFull ? (
+          <p className="text-sm font-medium text-zinc-700">{t('This event is full. Registration is closed.')}</p>
         ) : showNotComing ? (
           <>
             <p className="text-sm font-medium text-zinc-700 mb-2">{t("You marked that you're not coming.")}</p>
