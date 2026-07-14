@@ -2,7 +2,7 @@
 -- RLS is enabled with NO policies on purpose: anon and authenticated roles get
 -- zero access. Only the service-role key (server-side /api/leads route) writes,
 -- and the service role bypasses RLS.
-CREATE TABLE leads (
+CREATE TABLE IF NOT EXISTS leads (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   name       TEXT NOT NULL,
@@ -16,4 +16,4 @@ CREATE TABLE leads (
 
 ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
 
-CREATE INDEX leads_created_idx ON leads (created_at DESC);
+CREATE INDEX IF NOT EXISTS leads_created_idx ON leads (created_at DESC);
