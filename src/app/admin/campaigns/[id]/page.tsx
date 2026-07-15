@@ -9,6 +9,7 @@ import { ReminderSmsTemplate } from '@/components/admin/ReminderSmsTemplate'
 import { resolveSmsTemplate } from '@/lib/sms-template'
 import { RedemptionProgress } from '@/components/admin/RedemptionProgress'
 import { DistributorAssignment } from '@/components/admin/DistributorAssignment'
+import { RsvpLockToggle } from '@/components/admin/RsvpLockToggle'
 import { EmployeeTable } from '@/components/admin/EmployeeTable'
 import { DeleteCampaignButton } from '@/components/admin/DeleteCampaignButton'
 import { CampaignNotes } from '@/components/admin/CampaignNotes'
@@ -43,7 +44,7 @@ export default async function CampaignDetailPage({
   const [campaignResult, companyResult] = await Promise.all([
     service
       .from('campaigns')
-      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates, max_attendee_count, allow_gift_if_not_attending, sms_template, reminder_sms_template, wizard_last_step')
+      .select('id, name, campaign_date, sent_at, closed_at, supports_arrival_certificates, max_attendee_count, allow_gift_if_not_attending, sms_template, reminder_sms_template, wizard_last_step, rsvp_locked')
       .eq('id', campaignId)
       .eq('company_id', companyId)
       .single(),
@@ -183,6 +184,9 @@ export default async function CampaignDetailPage({
 
             {/* Sidebar (1 col): config + notes + stats, stacked independently. */}
             <div className="flex flex-col gap-4">
+              {campaign.supports_arrival_certificates && (
+                <RsvpLockToggle campaignId={campaign.id} initial={campaign.rsvp_locked} />
+              )}
               <DistributorAssignment campaignId={campaign.id} />
               <ReminderSmsTemplate
                 campaignId={campaign.id}

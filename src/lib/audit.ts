@@ -5,6 +5,7 @@ type AuditAction =
   | 'campaign.launched'
   | 'campaign.closed'
   | 'campaign.updated'
+  | 'campaign.rsvp_lock_changed'
   | 'campaign.deleted'
   | 'campaign.duplicated'
   | 'campaign.reminder_sent'
