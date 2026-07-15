@@ -36,24 +36,29 @@ export function RsvpLockToggle({
   }
 
   return (
-    <div className="flex flex-col gap-3 bg-white rounded-2xl border border-zinc-200 p-4">
-      <label className="flex items-start gap-3 cursor-pointer">
-        <input
-          type="checkbox"
-          checked={locked}
-          disabled={busy}
-          onChange={toggle}
-          className="mt-0.5 w-4 h-4 accent-[var(--brand)]"
+    <div className="flex items-start gap-3 bg-white rounded-2xl border border-zinc-200 p-4">
+      <button
+        type="button"
+        role="switch"
+        aria-checked={locked}
+        disabled={busy}
+        onClick={toggle}
+        className={`relative mt-0.5 h-[22px] w-[38px] flex-shrink-0 rounded-full transition-colors disabled:opacity-50 ${locked ? 'bg-brand' : 'bg-zinc-300'}`}
+      >
+        <span
+          className={`absolute top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-[inset-inline-start] duration-150 ${
+            locked ? 'start-[18px]' : 'start-0.5'
+          }`}
         />
-        <span>
-          <span className="block text-sm font-medium text-zinc-900">
-            {t('Stop new RSVPs (event is full)')}
-          </span>
-          <span className="block text-xs text-zinc-500">
-            {t("People who already said they're coming keep their spot. Everyone else sees an \"event is full\" message instead of the RSVP form.")}
-          </span>
+      </button>
+      <span>
+        <span className="block text-sm font-medium text-zinc-900">
+          {t('Stop new RSVPs (event is full)')}
         </span>
-      </label>
+        <span className="block text-xs text-zinc-500">
+          {t("People who already said they're coming keep their spot. Everyone else sees an \"event is full\" message instead of the RSVP form.")}
+        </span>
+      </span>
     </div>
   )
 }
